@@ -1,5 +1,5 @@
 {
-  "name": "bento-reservation",
+  "name": "reservation_system",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
