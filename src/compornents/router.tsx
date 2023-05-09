@@ -23,7 +23,7 @@ export default function RouterCompornent(props: setStateProps) {
                                     {/* ログイン用ページ */}
                                     <Route path="/" element={<Login/>} />
                                     {/* サイドメニュー */}
-                                    <Route element={<ResponsiveDrawer/>}>
+                                    <Route path="/reservation"element={<ResponsiveDrawer/>}>
                                         <Route path="/welcome"  element={<Table setStateProp={items} />} />
                                         <Route path="/element" element={<EnhancedTable />} />
                                         <Route path="/email" element={<SortTable/>} />
