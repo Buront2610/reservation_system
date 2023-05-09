@@ -43,13 +43,14 @@ def get_employee(employee_id):
 @bp.route('/employees', methods=['POST'])
 def add_employee():
     data = request.get_json()
+    id  = data.get('id')
     name = data.get('name')
     location = data.get('location')
 
-    if not name or not location:
+    if not name or not location or not id:
         return jsonify({'error': 'すべてのフィールドが必要です'}), 400
 
-    employee = Employee(name=name, location=location)
+    employee = Employee(id = id ,name=name, location=location)
     db.session.add(employee)
     db.session.commit()
     return jsonify(employee.to_dict()), 201
