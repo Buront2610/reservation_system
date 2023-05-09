@@ -131,17 +131,17 @@ import { textAlign } from '@mui/system';
 
       const itemsList =([
         {
-          text: "Home",
+          text: "予約一覧",
           icon: <InboxIcon />,
           path: "/element"
         },
         {
-          text: "About",
+          text: "社員一覧",
           icon: <MenuIcon />,
           path: "/email"
         },
         {
-          text: "太陽光PCS",
+          text: "社員登録・削除",
           icon: <WbSunnyIcon />,
           path: "/welcome"
         },

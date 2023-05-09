@@ -2,6 +2,7 @@ import React, {FC, Dispatch, SetStateAction} from 'react';
 import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-router-dom';
 import { Box } from '@mui/material';
 import ResponsiveDrawer from './ResponsiveDrawer'
+import { Login } from './login'
 
 interface setStateProps{
 
@@ -19,6 +20,9 @@ export default function RouterCompornent(props: setStateProps) {
                         <div>
                             <BrowserRouter>
                                 <Routes>
+                                    {/* ログイン用ページ */}
+                                    <Route path="/" element={<Login/>} />
+                                    {/* サイドメニュー */}
                                     <Route element={<ResponsiveDrawer/>}>
                                         <Route path="/welcome"  element={<Table setStateProp={items} />} />
                                         <Route path="/element" element={<EnhancedTable />} />
