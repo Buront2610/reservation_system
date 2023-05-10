@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, extract
 from datetime import datetime
 from app import create_app, db
-from app.models import Employee, Workplace, Bento, Reservation
+from app.models import Employee, Workplace, Bento, Reservation, User
 
 bp = Blueprint('api', __name__)
 
@@ -22,6 +22,20 @@ def get_bento():
     bento = Bento.query.all()
     return jsonify([b.to_dict() for b in bento])
 
+#ユーザ取得
+@bp.route("/users", methods=["GET"])
+def get_users():
+    users = User.query.all()
+    return jsonify([u.to_dict() for u in users])
+
+
+@bp.route("/User/<int:User_id>", methods=["GET"])
+def get_user(User_id):
+    user = User.query.get(User_id)
+    if user is None:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify(user.to_dict())
 
 # 全ての社員情報を取得
 @bp.route('/employees', methods=['GET'])
@@ -38,6 +52,21 @@ def get_employee(employee_id):
 
     return jsonify(employee.to_dict())
 
+
+@bp.route('/User', methods=['POST'])
+def add_user():
+    data = request.get_json()
+    id  = data.get('id')
+    PassWord = data.get('PassWord')
+    Roll = data.get('Roll')
+
+    if not PassWord or not Roll or not id:
+        return jsonify({'error': 'すべてのフィールドが必要です'}), 400
+
+    user = User(id = id ,PassWord=PassWord, Roll=Roll)
+    db.session.add(user)
+    db.session.commit()
+    return jsonify(user.to_dict()), 201
 
 # 新しい社員を追加
 @bp.route('/employees', methods=['POST'])
@@ -70,6 +99,13 @@ def update_employee(id):
     employee.location = location
     db.session.commit()
     return jsonify(employee.to_dict())
+
+@bp.route('/User/<int:id>', methods=['DELETE'])
+def delete_user(id):
+    user = User.query.get_or_404(id)
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'message': 'ユーザー情報を削除しました'}), 200
 
 # 社員情報を削除
 @bp.route('/employees/<int:id>', methods=['DELETE'])
