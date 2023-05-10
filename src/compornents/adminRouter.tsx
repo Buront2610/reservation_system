@@ -38,5 +38,5 @@ export default function RouterCompornent(props: setStateProps) {
                 </div>
             </div>
         </div>
-        );
+    );
 }

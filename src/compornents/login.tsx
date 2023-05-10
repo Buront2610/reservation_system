@@ -25,18 +25,18 @@ export const Login = memo(() => {
       variant: "outlined",
     };
   
-    // const onClickLogin = async () => {
-    //   const authStatus = await axios
-    //     .post<User>("http://localhost:1323/api/login", {
-    //       user_id: userId,
-    //       password,
-    //     })
-    //     .then(() => navigate("/home"))
-    //     .catch((e) => {
-    //       navigate("/fail_login");
-    //     });
-    //   console.log("authStatus: ", authStatus);
-    // };
+    const onClickLogin = async () => {
+      const authStatus = await axios
+        .post<User>("http://localhost:1323/api/login", {
+          user_id: userId,
+          password,
+        })
+        .then(() => navigate("/home"))
+        .catch((e) => {
+          navigate("/fail_login");
+        });
+      console.log("authStatus: ", authStatus);
+    };
   
     return (
         <Box
