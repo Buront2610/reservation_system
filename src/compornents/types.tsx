@@ -31,3 +31,8 @@ export interface User {
     PassWord: string;
     Roll: string;
 }
+
+export interface Login {
+    id: number;
+    PassWord: string;
+}
