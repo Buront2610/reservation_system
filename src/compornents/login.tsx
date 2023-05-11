@@ -17,7 +17,7 @@ export const Login = memo(() => {
     const [userId, setUserId] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
-            
+
     const cardStyle = {
       display: "block",
       transitionDuration: "0.3s",
@@ -28,7 +28,7 @@ export const Login = memo(() => {
   
     const onClickLogin = async () => {
       const authStatus = await axios
-        .post<User>("http://localhost:1323/api/login", {
+        .post<User>("http://localhost:5000/api/login", {
           user_id: userId,
           password,
         })
