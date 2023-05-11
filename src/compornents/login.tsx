@@ -11,13 +11,13 @@ import axios from "axios";
 import { memo, useState } from "react";
 //   import { User } from "../types/User";
 import { useNavigate } from "react-router-dom";
-import {}
+import { User } from "./types";
 
 export const Login = memo(() => {
     const [userId, setUserId] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
-  
+            
     const cardStyle = {
       display: "block",
       transitionDuration: "0.3s",
