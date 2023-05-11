@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import ReactDOM from 'react-dom';
 import RouterCompornent from './compornents/router';
+import { Login } from './compornents/login';
 
 
 const App: React.FC = () => {
@@ -14,7 +15,7 @@ const App: React.FC = () => {
             <div className="col-md-8">
               <div className="card">
                 <div>
-                        
+                  <Login/>      
                   <RouterCompornent setStateProp={items} />
                   {/* <DrawTable setStateProp ={items2} /> */}
                 </div>

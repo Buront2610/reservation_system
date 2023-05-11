@@ -2,6 +2,9 @@ from app import db
 
 
 class User(db.User):
+    """
+    ユーザ情報テーブル
+    """
     id = db.Column(db.Integer, primary_key=True)
     PassWord = db.Column(db.String(100), nullable=False)
     Roll = db.Column(db.String(100), nullable=False)

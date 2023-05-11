@@ -1,7 +1,7 @@
 import React, {FC, Dispatch, SetStateAction} from 'react';
 import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-router-dom';
 import { Box } from '@mui/material';
-import ResponsiveDrawer from './ResponsiveDrawer'
+import ResponsiveDrawer from './sideMenu'
 import { Login } from './login'
 
 interface setStateProps{

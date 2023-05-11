@@ -4,10 +4,34 @@ from sqlalchemy import func, extract
 from datetime import datetime
 from app import create_app, db
 from app.models import Employee, Workplace, Bento, Reservation, User
+from backend.app.functions import check_password, hash_password,generate_token
 
 bp = Blueprint('api', __name__)
 
 app =create_app()
+
+# 例: ユーザー認証
+@bp.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    id = data.get('id')
+    password = data.get('password')
+
+    if not password or not id:
+        return jsonify({'error': 'IDとパスワードが必要です'}), 400
+
+    user = User.query.filter_by(id=id).first()
+
+    if not user:
+        return jsonify({'error': 'ユーザーが見つかりません'}), 404
+
+    # フロントエンドでハッシュ化されたパスワードとデータベースのハッシュ化されたパスワードを比較
+    if check_password(password, user.password):
+        # 認証に成功した場合、トークンを生成して返す
+        token = generate_token(user)
+        return jsonify({'token': token}), 200
+    else:
+        return jsonify({'error': 'パスワードが間違っています'}), 401
 
 #以下にAPIの実装を行う
 # 勤務場所情報取得
@@ -57,13 +81,16 @@ def get_employee(employee_id):
 def add_user():
     data = request.get_json()
     id  = data.get('id')
-    PassWord = data.get('PassWord')
-    Roll = data.get('Roll')
+    password = data.get('password')
+    role = data.get('role')
 
-    if not PassWord or not Roll or not id:
+    if not password or not role or not id:
         return jsonify({'error': 'すべてのフィールドが必要です'}), 400
 
-    user = User(id = id ,PassWord=PassWord, Roll=Roll)
+    # フロントエンドでハッシュ化されたパスワードをさらにハッシュ化
+    hashed_password = hash_password(password)
+
+    user = User(id=id, password=hashed_password, role=role)
     db.session.add(user)
     db.session.commit()
     return jsonify(user.to_dict()), 201
