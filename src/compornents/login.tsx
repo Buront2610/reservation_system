@@ -1,3 +1,4 @@
+import React, { useState, ReactElement } from "react";
 import {
   Box,
   Button,
@@ -7,17 +8,29 @@ import {
   CardHeader,
   TextField,
 } from "@mui/material";
-import { memo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User } from "./types";
-import { loginUser } from './authContext';
+import { useAuth } from './authContext';
 import CryptoJS from 'crypto-js';
 
-export const Login = memo(() => {
+interface LoginProps {}
+
+const SALT = 'your-unique-salt-here';
+
+const hashPassword = (password: string): string => {
+  const hashedPassword = CryptoJS.PBKDF2(password, SALT, {
+    keySize: 256 / 32,
+    iterations: 1000,
+  }).toString(CryptoJS.enc.Hex);
+
+  return hashedPassword;
+}
+
+const Login: React.FC<LoginProps> = (): ReactElement => {
   const [username, setUsername] = useState<number | null>(null);
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const auth  = useAuth();
 
   const cardStyle = {
     display: "block",
@@ -27,74 +40,64 @@ export const Login = memo(() => {
     variant: "outlined",
   };
 
-  const SALT = 'your-unique-salt-here';
-
-  const hashPassword = (password: string): string => {
-    const hashedPassword = CryptoJS.PBKDF2(password, SALT, {
-      keySize: 256 / 32,
-      iterations: 1000,
-    }).toString(CryptoJS.enc.Hex);
-
-    return hashedPassword;
-  }
-
   const onClickLogin = async () => {
-    if(username !== null) {
+    if(username !== null && auth !== null) {
       const hashedPassword = hashPassword(password);
-      const user = await loginUser(username, hashedPassword);
-      if (user) {
+      try {
+        await auth.loginUser(username, hashedPassword);
         navigate("/home");
-      } else {
-        setError("ユーザ名またはパスワードが違います。");
+      } catch (error: any) {
+        setError(error.message);
       }
     } else {
       setError("ユーザ名を入力してください。");
     }
   };
-
   return (
-      <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          padding={20}
-      >
-          <Card style={cardStyle}>
-              <CardHeader title="ログインページ" />
-              <CardContent>
-                  <div>
-                  <TextField
-                      fullWidth
-                      id="username"
-                      type="number"
-                      label="userName"
-                      placeholder="userName"
-                      margin="normal"
-                      onChange={(e) => setUsername(parseInt(e.target.value))}
-                  />
-                  <TextField
-                      fullWidth
-                      id="password"
-                      type="password"
-                      label="Password"
-                      placeholder="Password"
-                      margin="normal"
-                      onChange={(e) => setPassword(e.target.value)}
-                  />
-                  {error && <div style={{ color: 'red' }}>{error}</div>}
-                  </div>
-              </CardContent>
-              <CardActions>
-                  <Button
-                      variant="contained"
-                      size="large"
-                      color="secondary"
-                      onClick={onClickLogin}
-                  >
-                  Login
-                  </Button>
-              </CardActions>
-          </Card>
-      </Box>
+    <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        padding={20}
+    >
+        <Card style={cardStyle}>
+            <CardHeader title="ログインページ" />
+            <CardContent>
+                <div>
+                <TextField
+                    fullWidth
+                    id="username"
+                    type="number"
+                    label="userName"
+                    placeholder="userName"
+                    margin="normal"
+                    onChange={(e) => setUsername(parseInt(e.target.value))}
+                />
+                <TextField
+                    fullWidth
+                    id="password"
+                    type="password"
+                    label="Password"
+                    placeholder="Password"
+                    margin="normal"
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                {error && <div style={{ color: 'red' }}>{error}</div>}
+                </div>
+            </CardContent>
+            <CardActions>
+                <Button
+                    variant="contained"
+                    size="large"
+                    color="secondary"
+                    onClick={onClickLogin}
+                >
+                Login
+                </Button>
+            </CardActions>
+        </Card>
+    </Box>
   );
-});
+};
+
+export default React.memo(Login);
