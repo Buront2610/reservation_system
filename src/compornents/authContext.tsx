@@ -2,42 +2,40 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { login } from "./API";
 import { Login } from "./types";
 
+
 interface AuthContextProps {
-  user: Login | null;
-  loginUser: (username: number, password: string) => Promise<void>;
+  user: Login | null;  // Change User to Login
+  loginUser: (id: number, password: string) => Promise<void>;
   logout: () => void;
 }
 
+
 export const AuthContext = createContext<AuthContextProps | null>(null);
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}
 
 interface AuthProviderProps {
   children: ReactNode;
 }
-
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<Login | null>(null);
+  const [user, setUser] = useState<Login | null>(null); // Change User to Login
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  const loginUser = async (username: number, password: string): Promise<void> => {
-    const users = await login();
-    const foundUser = users.find((user) => user.id === username && user.passWord === password);
-
+  const loginUser = async (id: number, password: string): Promise<void> => {
+    const foundUser = await login(id, password);
+  
     if (foundUser) {
       setUser(foundUser);
       localStorage.setItem('user', JSON.stringify(foundUser));
     } else {
-      throw new Error('ユーザ名またはパスワードが違います。');
+      throw new Error('IDまたはパスワードが違います。');
     }
   };
-
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');

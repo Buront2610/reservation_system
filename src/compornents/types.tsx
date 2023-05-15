@@ -3,13 +3,13 @@ export interface Workplace {
     id: number;
     name: string;
     location: string;
-    }
+}
 
 export interface Bento {
     id: number;
     name: string;
     price: number;
-    }
+}
 
 export interface Employee {
     id: number;
@@ -28,11 +28,12 @@ export interface Reservation {
 
 export interface User {
     id: number;
-    passWord: string;
-    Roll: string;
+    password: string;
+    role: string;
 }
 
 export interface Login {
     id: number;
-    passWord: string;
+    password: string;
+    role: string;
 }

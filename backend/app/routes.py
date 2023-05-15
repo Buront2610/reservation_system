@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify,Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, extract
-from datetime import datetime
 from app import create_app, db
 from app.models import Employee, Workplace, Bento, Reservation, User
 from backend.app.functions import check_password, hash_password,generate_token
@@ -29,10 +28,10 @@ def login():
     if check_password(password, user.password):
         # 認証に成功した場合、トークンを生成して返す
         token = generate_token(user)
-        return jsonify({'token': token}), 200
+        return jsonify({'token': token, 'role': user.role}), 200
     else:
         return jsonify({'error': 'パスワードが間違っています'}), 401
-
+    
 #以下にAPIの実装を行う
 # 勤務場所情報取得
 @bp.route("/workplaces", methods=["GET"])
@@ -52,7 +51,7 @@ def get_users():
     users = User.query.all()
     return jsonify([u.to_dict() for u in users])
 
-
+#個別ユーザ取得
 @bp.route("/User/<int:User_id>", methods=["GET"])
 def get_user(User_id):
     user = User.query.get(User_id)
