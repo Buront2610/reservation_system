@@ -28,11 +28,11 @@ export interface Reservation {
 
 export interface User {
     id: number;
-    PassWord: string;
+    passWord: string;
     Roll: string;
 }
 
 export interface Login {
     id: number;
-    PassWord: string;
+    passWord: string;
 }
