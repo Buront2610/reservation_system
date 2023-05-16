@@ -32,7 +32,7 @@ function routerCompornent() {
     return (
         <BrowserRouter>
             <Routes>
-            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
             {user && (
                 <>
                 <Route path="/user/*" element={<SideMenu />}>

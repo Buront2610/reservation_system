@@ -41,16 +41,16 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
   };
 
   const onClickLogin = async () => {
-    if(username !== null && auth !== null) {
+    if(username !== null && auth !== null && password !== "") {
       const hashedPassword = hashPassword(password);
       try {
         await auth.loginUser(username, hashedPassword);
         navigate("/home");
       } catch (error: any) {
-        setError(error.message);
+        setError(error);
       }
     } else {
-      setError("ユーザ名を入力してください。");
+      setError("IDとパスワードを入力してください。");
     }
   };
   return (
@@ -61,7 +61,7 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
         padding={20}
     >
         <Card style={cardStyle}>
-            <CardHeader title="ログインページ" />
+            <CardHeader title="お弁当予約システム" />
             <CardContent>
                 <div>
                 <TextField
