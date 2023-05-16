@@ -1,7 +1,6 @@
 import React, {FC, Dispatch, SetStateAction} from 'react';
 import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-router-dom';
 import { Box } from '@mui/material';
-import ResponsiveDrawer from './sideMenu'
 import Login  from './login'
 import { useAuth } from './authContext';
 import  AdminSideMenu from './adminSideMenu';

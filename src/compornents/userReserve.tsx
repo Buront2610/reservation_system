@@ -1,2 +1,7 @@
-export default function ReservationPage() {
+
+function ReservationPage() {
+    return <div>ReservationPage</div>;
 }
+
+
+export default ReservationPage; 
