@@ -26,7 +26,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { Link as RouterLink, useLocation, Outlet  } from 'react-router-dom';
 
 import userReserve from './userReserve';
-import dashBoard from    './dashBoard';
+import dashBoard from    './adminResrveList';
 import {Login} from './login';
 import BasicExampleDataGrid from './testTable';
 import { textAlign } from '@mui/system';

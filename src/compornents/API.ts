@@ -5,9 +5,17 @@ const API_BASE_URL = 'http://localhost:5000/api';
 
 //以下にAPIを実装する
 
-export async function login(): Promise<Login[]> {
-    const response = await axios.get<Login[]>(`${API_BASE_URL}/login`);
-    return response.data;
+export async function login(id: number, password: string): Promise<Login | null> {
+    const users = await getUsers();
+    const foundUser = users.find(user => user.id === id && user.password === password);
+    if (!foundUser) {
+        return null;
+    }
+    return {
+        id: foundUser.id,
+        password: foundUser.password,
+        role: foundUser.role,
+    };
 }
 
 export async function getWorkplaces(): Promise<Workplace[]> {
