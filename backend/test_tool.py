@@ -1,213 +1,179 @@
-import unittest
+# test_api.py
+import pytest
 import json
-from datetime import datetime
-from app import create_app, db
-from app.models import User, Employee, Workplace, Bento, Reservation
+from backend.factories import Userfactory_boy, Employeefactory_boy, Workplacefactory_boy, Bentofactory_boy, Reservationfactory_boy
+from app.functions import hash_password
+# test_api.py
+def test_login(client, session):
+    # Arrange
+    user = Userfactory_boy.create(password=hash_password('test_password'))
+    session.add(user)
+    session.commit()
 
-class APITestCase(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app('testing')
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
+    # Act
+    response = client.post('/login', json={'id': user.id, 'password': 'test_password'})
 
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+    # Assert
+    assert response.status_code == 200
+    assert 'token' in response.get_json()
+    assert 'role' in response.get_json()
 
-    # User API tests
-    def test_get_users(self):
-        user1 = User(id=1, PassWord="password1", Roll="admin")
-        user2 = User(id=2, PassWord="password2", Roll="user")
-        db.session.add_all([user1, user2])
-        db.session.commit()
+def test_get_workplaces(client, session):
+    # Arrange
+    workplaces = Workplacefactory_boy.create_batch(5)
+    session.add_all(workplaces)
+    session.commit()
 
-        response = self.client.get("/users")
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.data)
-        self.assertEqual(len(data), 2)
+    # Act
+    response = client.get('/workplaces')
 
-    def test_get_user_not_found(self):
-        response = self.client.get("/User/1")
-        self.assertEqual(response.status_code, 404)
+    # Assert
+    assert response.status_code == 200
+    assert len(response.get_json()) == 5
 
-    def test_add_user(self):
-        user_data = {"id": 1, "PassWord": "password1", "Roll": "admin"}
-        response = self.client.post("/User", data=json.dumps(user_data), content_type="application/json")
-        self.assertEqual(response.status_code, 201)
+def test_get_bento(client, session):
+    # Arrange
+    bentos = Bentofactory_boy.create_batch(5)
+    session.add_all(bentos)
+    session.commit()
 
-        user = User.query.get(1)
-        self.assertIsNotNone(user)
-        self.assertEqual(user.id, user_data["id"])
-        self.assertEqual(user.PassWord, user_data["PassWord"])
-        self.assertEqual(user.Roll, user_data["Roll"])
+    # Act
+    response = client.get('/bento')
 
-    def test_add_user_missing_fields(self):
-        user_data = {"id": 1, "PassWord": "password1"}
-        response = self.client.post("/User", data=json.dumps(user_data), content_type="application/json")
-        self.assertEqual(response.status_code, 400)
+    # Assert
+    assert response.status_code == 200
+    assert len(response.get_json()) == 5
 
-    def test_delete_user(self):
-        user = User(id=1, PassWord="password1", Roll="admin")
-        db.session.add(user)
-        db.session.commit()
+def test_get_users(client, session):
+    # Arrange
+    users = Userfactory_boy.create_batch(5)
+    session.add_all(users)
+    session.commit()
 
-        response = self.client.delete("/User/1")
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNone(User.query.get(1))
+    # Act
+    response = client.get('/users')
 
-    def test_delete_user_not_found(self):
-        response = self.client.delete("/User/1")
-        self.assertEqual(response.status_code, 404)
+    # Assert
+    assert response.status_code == 200
+    assert len(response.get_json()) == 5
 
-    # Workplace API tests
-    def test_get_workplaces(self):
-        workplace1 = Workplace(id=1, name="Workplace 1")
-        workplace2 = Workplace(id=2, name="Workplace 2")
-        db.session.add_all([workplace1, workplace2])
-        db.session.commit()
+def test_get_user_by_id(client, session):
+    # Arrange
+    user = Userfactory_boy.create(password=hash_password('test_password'))
+    session.add(user)
+    session.commit()
 
-        response = self.client.get("/workplaces")
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.data)
-        self.assertEqual(len(data), 2)
+    # Act
+    response = client.get(f'/User/{user.id}')
 
-    # Bento API tests
-    def test_get_bento(self):
-        bento1 = Bento(id=1, name="Bento 1", price=500)
-        bento2 = Bento(id=2, name="Bento 2", price=600)
-        db.session.add_all([bento1, bento2])
-        db.session.commit()
+    # Assert
+    assert response.status_code == 200
+    assert 'id' in response.get_json()
+    assert 'role' in response.get_json()
 
-        response = self.client.get("/bento")
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.data)
-        self.assertEqual(len(data), 2)
+def test_get_employee_by_id(client, session):
+    # Arrange
+    employee = Employeefactory_boy.create()
+    session.add(employee)
+    session.commit()
 
-    # Employee API tests
-       # Employee API tests
-    def test_get_employees(self):
-        employee1 = Employee(id=1, name="Employee 1", location="Location 1")
-        employee2 = Employee(id=2, name="Employee 2", location="Location 2")
-        db.session.add_all([employee1, employee2])
-        db.session.commit()
+    # Act
+    response = client.get(f'/employees/{employee.id}')
 
-        response = self.client.get("/employees")
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.data)
-        self.assertEqual(len(data), 2)
+    # Assert
+    assert response.status_code == 200
+    assert 'id' in response.get_json()
+    assert 'name' in response.get_json()
 
-    def test_get_employee_not_found(self):
-        response = self.client.get("/employees/1")
-        self.assertEqual(response.status_code, 404)
+def test_get_reservation_by_id(client, session):
+    # Arrange
+    reservation = Reservationfactory_boy.create()
+    session.add(reservation)
+    session.commit()
 
-    def test_add_employee(self):
-        employee_data = {"id": 1, "name": "Employee 1", "location": "Location 1"}
-        response = self.client.post("/employees", data=json.dumps(employee_data), content_type="application/json")
-        self.assertEqual(response.status_code, 201)
+    # Act
+    response = client.get(f'/reservations/{reservation.id}')
 
-        employee = Employee.query.get(1)
-        self.assertIsNotNone(employee)
-        self.assertEqual(employee.id, employee_data["id"])
-        self.assertEqual(employee.name, employee_data["name"])
-        self.assertEqual(employee.location, employee_data["location"])
+    # Assert
+    assert response.status_code == 200
+    assert 'id' in response.get_json()
+    assert 'user_id' in response.get_json()
 
-    def test_add_employee_missing_fields(self):
-        employee_data = {"id": 1, "name": "Employee 1"}
-        response = self.client.post("/employees", data=json.dumps(employee_data), content_type="application/json")
-        self.assertEqual(response.status_code, 400)
+def test_get_statistics(client, session):
+    # Arrange
+    reservations = Reservationfactory_boy.create_batch(5)
+    session.add_all(reservations)
+    session.commit()
 
-    def test_update_employee(self):
-        employee = Employee(id=1, name="Employee 1", location="Location 1")
-        db.session.add(employee)
-        db.session.commit()
+    # Act
+    response = client.get('/statistics')
 
-        employee_data = {"name": "Updated Employee 1", "location": "Updated Location 1"}
-        response = self.client.put("/employees/1", data=json.dumps(employee_data), content_type="application/json")
-        self.assertEqual(response.status_code, 200)
+    # Assert
+    assert response.status_code == 200
+    assert 'total_reservations' in response.get_json()
+    assert 'total_users' in response.get_json()
 
-        updated_employee = Employee.query.get(1)
-        self.assertEqual(updated_employee.name, employee_data["name"])
-        self.assertEqual(updated_employee.location, employee_data["location"])
+# Employees
+def test_create_employee(client):
+    response = client.post('/employees', json={
+        'id': 'new_employee',
+        'name': 'test_name',
+        'location': 'test_location'
+    })
+    assert response.status_code == 201
+    assert 'id' in response.get_json()
+    assert 'name' in response.get_json()
 
-    def test_delete_employee(self):
-        employee = Employee(id=1, name="Employee 1", location="Location 1")
-        db.session.add(employee)
-        db.session.commit()
+def test_update_employee(client, session):
+    employee = Employeefactory_boy.create()
+    session.add(employee)
+    session.commit()
+    response = client.put(f'/employees/{employee.id}', json={
+        'name': 'updated_name',
+        'location': 'updated_location'
+    })
+    assert response.status_code == 200
+    assert 'name' in response.get_json()
+    assert 'location' in response.get_json()
 
-        response = self.client.delete("/employees/1")
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNone(Employee.query.get(1))
+def test_delete_employee(client, session):
+    employee = Employeefactory_boy.create()
+    session.add(employee)
+    session.commit()
+    response = client.delete(f'/employees/{employee.id}')
+    assert response.status_code == 200
+    assert 'message' in response.get_json()
 
-    def test_delete_employee_not_found(self):
-        response = self.client.delete("/employees/1")
-        self.assertEqual(response.status_code, 404)
+# Reservations
+def test_create_reservation(client):
+    response = client.post('/reservations', json={
+        'employee_id': 'test_employee',
+        'date': '2023-05-17',
+        'meal': 'test_meal',
+        'price': 500
+    })
+    assert response.status_code == 201
+    assert 'employee_id' in response.get_json()
+    assert 'date' in response.get_json()
 
-    # Reservation API tests
-    def test_get_reservations(self):
-        reservation1 = Reservation(id=1, employee_id=1, date=datetime.now(), meal="Meal 1", price=500)
-        reservation2 = Reservation(id=2, employee_id=2, date=datetime.now(), meal="Meal 2", price=600)
-        db.session.add_all([reservation1, reservation2])
-        db.session.commit()
+def test_update_reservation(client, session):
+    reservation = Reservationfactory_boy.create()
+    session.add(reservation)
+    session.commit()
+    response = client.put(f'/reservations/{reservation.id}', json={
+        'employee_id': 'updated_employee',
+        'date': '2023-06-17',
+        'meal': 'updated_meal',
+        'price': 600
+    })
+    assert response.status_code == 200
+    assert 'employee_id' in response.get_json()
+    assert 'date' in response.get_json()
 
-        response = self.client.get("/reservations")
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.data)
-        self.assertEqual(len(data), 2)
-
-    def test_get_reservation_not_found(self):
-        response = self.client.get("/reservations/1")
-        self.assertEqual(response.status_code, 404)
-
-    def test_add_reservation(self):
-        reservation_data = {"id": 1, "employee_id": 1, "date": "2023-05-15", "meal": "Meal 1", "price": 500}
-        response = self.client.post("/reservations", data=json.dumps(reservation_data), content_type="application/json")
-        self.assertEqual(response.status_code, 201)
-        reservation = Reservation.query.get(1)
-        self.assertIsNotNone(reservation)
-        self.assertEqual(reservation.id, reservation_data["id"])
-        self.assertEqual(reservation.employee_id, reservation_data["employee_id"])
-        self.assertEqual(reservation.date.strftime('%Y-%m-%d'), reservation_data["date"])
-        self.assertEqual(reservation.meal, reservation_data["meal"])
-        self.assertEqual(reservation.price, reservation_data["price"])
-
-    def test_add_reservation_missing_fields(self):
-        reservation_data = {"id": 1, "employee_id": 1, "date": "2023-05-15", "meal": "Meal 1"}
-        response = self.client.post("/reservations", data=json.dumps(reservation_data), content_type="application/json")
-        self.assertEqual(response.status_code, 400)
-
-    def test_update_reservation(self):
-        reservation = Reservation(id=1, employee_id=1, date=datetime.now(), meal="Meal 1", price=500)
-        db.session.add(reservation)
-        db.session.commit()
-
-        reservation_data = {"employee_id": 1, "date": "2023-05-20", "meal": "Updated Meal 1", "price": 600}
-        response = self.client.put("/reservations/1", data=json.dumps(reservation_data), content_type="application/json")
-        self.assertEqual(response.status_code, 200)
-
-        updated_reservation = Reservation.query.get(1)
-        self.assertEqual(updated_reservation.employee_id, reservation_data["employee_id"])
-        self.assertEqual(updated_reservation.date.strftime('%Y-%m-%d'), reservation_data["date"])
-        self.assertEqual(updated_reservation.meal, reservation_data["meal"])
-        self.assertEqual(updated_reservation.price, reservation_data["price"])
-
-    def test_delete_reservation(self):
-        reservation = Reservation(id=1, employee_id=1, date=datetime.now(), meal="Meal 1", price=500)
-        db.session.add(reservation)
-        db.session.commit()
-
-        response = self.client.delete("/reservations/1")
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNone(Reservation.query.get(1))
-
-    def test_delete_reservation_not_found(self):
-        response = self.client.delete("/reservations/1")
-        self.assertEqual(response.status_code, 404)
-
-
-if __name__ == '__main__':
-    unittest.main()
-
-
+def test_delete_reservation(client, session):
+    reservation =Reservationfactory_boy.create()
+    session.add(reservation)
+    session.commit()
+    response = client.delete(f'/reservations/{reservation.id}')
+    assert response.status_code == 200
+    assert 'message' in response.get_json()
