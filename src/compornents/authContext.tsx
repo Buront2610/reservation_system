@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { login } from "./API";
+import { login } from "./api";
 import { Login } from "./types";
 
 

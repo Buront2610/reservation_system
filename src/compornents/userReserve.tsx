@@ -3,12 +3,18 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import ja from 'date-fns/locale/ja';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Reservation, Bento, Employee } from './types';
-import { getBento, addReservation, deleteReservation, getReservations, getEmployees } from './API';
+import { getBento, addReservation, deleteReservation, getReservations, getEmployees } from './api';
 import { Box, Button, Typography, Tab, Tabs } from '@mui/material';
 
 registerLocale('ja', ja);
 
+// 予約ページ
+//個別の予約とまとめて予約の両方を実装する
+//個別予約とまとめて予約はタブで切り替える
+//個別予約は予約済みの場合はキャンセルボタンを表示する
+//呼び出し時にIDを渡すようにする？
 function ReservationPage() {
+    //各種変数の定義
     const [bentoList, setBentoList] = useState<Bento[]>([]);
     const [employeeList, setEmployeeList] = useState<Employee[]>([]);
     const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -29,7 +35,7 @@ function ReservationPage() {
         );
         setHasReservation(!!employeeReservation);
     };
-
+    //予約情報更新ハンドル
     const handleReservation = () => {
         const newReservation: Partial<Reservation> = {
             employee_id: employeeList[0].id, // This should be obtained from logged in user
@@ -40,7 +46,7 @@ function ReservationPage() {
         };
         addReservation(newReservation).then(() => setHasReservation(true));
     };
-
+    //予約キャンセルハンドル
     const handleCancellation = () => {
         const reservationToCancel = reservations.find(
             reservation => reservation.employee_id === employeeList[0].id && !reservation.is_delivered
@@ -49,9 +55,12 @@ function ReservationPage() {
             deleteReservation(reservationToCancel.id).then(() => setHasReservation(false));
         }
     };
+
+    //タブの定義
     const [activeTab, setActiveTab] = useState(0);
     const [selectedDates, setSelectedDates] = useState<Date[]>([]);
 
+    //日付選択ハンドル
     const handleDateChange = (date: Date) => {
         const index = selectedDates.findIndex(d => d.toISOString().split('T')[0] === date.toISOString().split('T')[0]);
         if (index !== -1) {
@@ -62,6 +71,8 @@ function ReservationPage() {
             setSelectedDates([...selectedDates, date]);
         }
     };
+
+    //予約送信ハンドル※改修予定
     const handleSubmit = async () => {
         const employeeId = 1; // 適切な値に置き換えてください
         const bentoId = 1; // 適切な値に置き換えてください
@@ -116,7 +127,7 @@ function ReservationPage() {
                     startDate={new Date()}
                 />
                 <Button onClick={handleSubmit} variant="contained" color="primary">
-                    まとめて予約する
+                    まとめて予約
                 </Button>
             </div>
 

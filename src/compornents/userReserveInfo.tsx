@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Reservation, Bento, Employee } from './types';
-import { getReservations, getBento, getEmployees } from './API';
+import { getReservations, getBento, getEmployees } from './api';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
+//予約情報の表示
+//場合によっては消すかも
 function ReservationHistoryPage() {
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [employeeList, setEmployeeList] = useState<Employee[]>([]);
