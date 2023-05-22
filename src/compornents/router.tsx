@@ -26,13 +26,14 @@ function routerCompornent() {
   
     let SideMenu = Placeholder;
     if (user) {
-      SideMenu = user.role === 'admin' ? AdminSideMenu : UserSideMenu;
+        SideMenu = user.role === 'admin' ? AdminSideMenu : UserSideMenu;
     }
   
     return (
         <BrowserRouter>
             <Routes>
-            <Route path="/login" element={<Login />} />
+            <Route path="/test" element={<ReservationPage />} />
+            <Route path="/test2" element={<ReservationInfoPage />} />
             {user && (
                 <>
                 <Route path="/user/*" element={<SideMenu />}>
