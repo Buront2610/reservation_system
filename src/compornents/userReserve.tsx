@@ -6,12 +6,20 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { Reservation, Bento, Employee } from './types';
 import { getBento, addReservation, deleteReservation, getReservations, getEmployees } from './API';
 import { Box, Button, Typography, Tab, Tabs } from '@mui/material';
+import { useAuth } from './authContext';
+
+
 
 // 日本語ロケールをDatePickerに登録
 registerLocale('ja', ja);
 
 // 予約ページの関数コンポーネント
 function ReservationPage() {
+    const { user } = useAuth(); // ログインユーザーの情報を取得
+    // ユーザ情報が存在することを確認（ログインしているかどうか）
+    if (!user) {
+        throw new Error('User is not logged in.');
+    }
     // 各種変数の定義
     const [bentoList, setBentoList] = useState<Bento[]>([]);
     const [employeeList, setEmployeeList] = useState<Employee[]>([]);
@@ -31,7 +39,7 @@ function ReservationPage() {
     // 'reservations'が変更されたときに予約を確認
     const checkReservation = (reservations: Reservation[]) => {
         const employeeReservation = reservations.find(
-            reservation => reservation.employee_id === employeeList[0].id && !reservation.is_delivered
+            reservation => reservation.employee_id === user.id && !reservation.is_delivered
         );
         setHasReservation(!!employeeReservation);
     };
@@ -39,7 +47,7 @@ function ReservationPage() {
     // 予約情報更新ハンドル
     const handleReservation = () => {
         const newReservation: Partial<Reservation> = {
-            employee_id: employeeList[0].id, // ログインユーザから取得するべき
+            employee_id: user.id, // ログインユーザから取得
             reservation_date: new Date().toISOString().split('T')[0], // 今日の日付
             bento_id: bentoList[0].id, // デフォルトのベントウ
             quantity: 1, // デフォルトの数量
@@ -51,7 +59,7 @@ function ReservationPage() {
     // 予約キャンセルハンドル
     const handleCancellation = () => {
         const reservationToCancel = reservations.find(
-            reservation => reservation.employee_id === employeeList[0].id && !reservation.is_delivered
+            reservation => reservation.employee_id === user.id && !reservation.is_delivered
         );
         if (reservationToCancel) {
             deleteReservation(reservationToCancel.id).then(() => setHasReservation(false));
@@ -73,11 +81,10 @@ function ReservationPage() {
             setSelectedDates([...selectedDates, date]);
         }
     };
-
     // 予約送信ハンドル
     const handleSubmit = async () => {
-        const employeeId = 1; // 適切な値に置き換えてください
-        const bentoId = 1; // 適切な値に置き換えてください
+        const employeeId = user.id; // ログインユーザのidを使用
+        const bentoId = bentoList[0].id; // デフォルトのベントウidを使用
 
         try {
             await Promise.all(
@@ -99,7 +106,6 @@ function ReservationPage() {
             alert('予約に失敗しました');
         }
     };
-
     // UIのレンダリング
     return (
         <Box>

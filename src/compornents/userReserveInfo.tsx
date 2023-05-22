@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Reservation, Bento, Employee } from './types';
-import { getReservations, getBento, getEmployees } from './api';
+import { getReservations, getBento, getEmployees } from './API';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 //予約情報の表示
