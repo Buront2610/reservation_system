@@ -1,25 +1,24 @@
+// 必要なパッケージと型をインポート
 import React, { useState, useEffect } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import ja from 'date-fns/locale/ja';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Reservation, Bento, Employee } from './types';
-import { getBento, addReservation, deleteReservation, getReservations, getEmployees } from './api';
+import { getBento, addReservation, deleteReservation, getReservations, getEmployees } from './API';
 import { Box, Button, Typography, Tab, Tabs } from '@mui/material';
 
+// 日本語ロケールをDatePickerに登録
 registerLocale('ja', ja);
 
-// 予約ページ
-//個別の予約とまとめて予約の両方を実装する
-//個別予約とまとめて予約はタブで切り替える
-//個別予約は予約済みの場合はキャンセルボタンを表示する
-//呼び出し時にIDを渡すようにする？
+// 予約ページの関数コンポーネント
 function ReservationPage() {
-    //各種変数の定義
+    // 各種変数の定義
     const [bentoList, setBentoList] = useState<Bento[]>([]);
     const [employeeList, setEmployeeList] = useState<Employee[]>([]);
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [hasReservation, setHasReservation] = useState<boolean>(false);
 
+    // 初回レンダリング時にデータをフェッチ
     useEffect(() => {
         getBento().then(bento => setBentoList(bento));
         getEmployees().then(employee => setEmployeeList(employee));
@@ -29,24 +28,27 @@ function ReservationPage() {
         });
     }, []);
 
+    // 'reservations'が変更されたときに予約を確認
     const checkReservation = (reservations: Reservation[]) => {
         const employeeReservation = reservations.find(
             reservation => reservation.employee_id === employeeList[0].id && !reservation.is_delivered
         );
         setHasReservation(!!employeeReservation);
     };
-    //予約情報更新ハンドル
+
+    // 予約情報更新ハンドル
     const handleReservation = () => {
         const newReservation: Partial<Reservation> = {
-            employee_id: employeeList[0].id, // This should be obtained from logged in user
-            reservation_date: new Date().toISOString().split('T')[0], // Today's date
-            bento_id: bentoList[0].id, // Default Bento
-            quantity: 1, // Default quantity
+            employee_id: employeeList[0].id, // ログインユーザから取得するべき
+            reservation_date: new Date().toISOString().split('T')[0], // 今日の日付
+            bento_id: bentoList[0].id, // デフォルトのベントウ
+            quantity: 1, // デフォルトの数量
             is_delivered: false,
         };
         addReservation(newReservation).then(() => setHasReservation(true));
     };
-    //予約キャンセルハンドル
+
+    // 予約キャンセルハンドル
     const handleCancellation = () => {
         const reservationToCancel = reservations.find(
             reservation => reservation.employee_id === employeeList[0].id && !reservation.is_delivered
@@ -56,11 +58,11 @@ function ReservationPage() {
         }
     };
 
-    //タブの定義
+    // タブの定義
     const [activeTab, setActiveTab] = useState(0);
     const [selectedDates, setSelectedDates] = useState<Date[]>([]);
 
-    //日付選択ハンドル
+    // 日付選択ハンドル
     const handleDateChange = (date: Date) => {
         const index = selectedDates.findIndex(d => d.toISOString().split('T')[0] === date.toISOString().split('T')[0]);
         if (index !== -1) {
@@ -72,7 +74,7 @@ function ReservationPage() {
         }
     };
 
-    //予約送信ハンドル※改修予定
+    // 予約送信ハンドル
     const handleSubmit = async () => {
         const employeeId = 1; // 適切な値に置き換えてください
         const bentoId = 1; // 適切な値に置き換えてください
@@ -98,13 +100,13 @@ function ReservationPage() {
         }
     };
 
+    // UIのレンダリング
     return (
         <Box>
             <Tabs>
                 <Tab label="個別予約" />
                 <Tab label="まとめて予約" />
             </Tabs>
-            {/* Wrap each tab content in a div and toggle visibility based on the active tab */}
             <div style={{ display: activeTab === 0 ? 'block' : 'none' }}>
             <Typography variant="h6">予約: {bentoList[0]?.name}</Typography>
               {hasReservation ? (
