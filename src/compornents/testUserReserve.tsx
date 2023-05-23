@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
-import { Box, Button, Typography, Tab, Tabs, Paper, useTheme } from '@mui/material';
+import { Box, Button, Tab, Tabs, Paper, useTheme } from '@mui/material';
 import ja from 'date-fns/locale/ja';
 import 'react-datepicker/dist/react-datepicker.css';
 
-// 日本語ロケールをDatePickerに登録
 registerLocale('ja', ja);
 
 function TestReservationPage() {
@@ -14,6 +13,7 @@ function TestReservationPage() {
     const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
     const [selectedDates, setSelectedDates] = useState<Date[]>([]);
     const [currentTime, setCurrentTime] = useState<Date>(new Date());
+    const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -22,17 +22,21 @@ function TestReservationPage() {
         return () => clearInterval(timer);
     }, []);
 
-    const handleDateChange = (date: Date) => {
-        const index = selectedDates.findIndex(d => d.toISOString().split('T')[0] === date.toISOString().split('T')[0]);
-        if (index !== -1) {
-            const newSelectedDates = [...selectedDates];
-            newSelectedDates.splice(index, 1);
-            setSelectedDates(newSelectedDates);
-        } else {
-            setSelectedDates([...selectedDates, date]);
-        }
+    const handleMonthChange = (date: Date) => {
+        setSelectedMonth(date);
+        setCurrentMonth(new Date(date.getFullYear(), date.getMonth(), 1));
     };
 
+    const handleDateChange = (date: Date | null) => {
+        if(date) {
+            const index = selectedDates.findIndex(d => d.getTime() === date.getTime());
+            if (index === -1) {
+                setSelectedDates(prevDates => [...prevDates, date]);
+            } else {
+                setSelectedDates(prevDates => prevDates.filter((_, i) => i !== index));
+            }
+        }
+    };
     const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setActiveTab(newValue);
     };
@@ -48,7 +52,7 @@ function TestReservationPage() {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
             <Paper sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '500px', width: '70%', padding: '2em', borderColor: '#ccc' }} elevation={3}>
-                <Tabs value={activeTab} onChange={handleTabChange} sx={{ marginBottom: '2em', width: '100%', borderBottom: '1px solid #ccc' }}>
+                <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth" indicatorColor="primary" textColor="primary" sx={{ marginBottom: '2em', width: '100%', borderBottom: '1px solid #ccc' }}>
                     <Tab label="個別予約" sx={{ fontSize: '1.5em', color: activeTab === 0 ? theme.palette.primary.main : theme.palette.text.primary }} />
                     <Tab label="まとめて予約" sx={{ fontSize: '1.5em', color: activeTab === 1 ? theme.palette.primary.main : theme.palette.text.primary }} />
                 </Tabs>
@@ -67,27 +71,30 @@ function TestReservationPage() {
                         </Button>
                     )}
                 </div>
-                <div style={{ visibility: activeTab === 1 ? 'visible' : 'hidden', height: activeTab === 1 ? 'auto' : '0' }}>
-                    <DatePicker
-                        inline
-                        selected={selectedMonth}
-                        onChange={(date: Date) => setSelectedMonth(date)}
-                        dateFormat="MM/yyyy"
-                        showMonthYearPicker
-                        locale="ja"
-                    />
-                    <DatePicker
-                        inline
-                        selected={null}
-                        locale="ja"
-                        onChange={handleDateChange}
-                        highlightDates={selectedDates}
-                        startDate={selectedMonth}
-                        filterDate={(date: Date) => {
-                            return date.getMonth() === selectedMonth.getMonth();
-                        }}
-                    />
-                    <Button variant="contained" color="primary" sx={{ fontSize: '1.5em', marginTop: '2em' }}>
+                <div style={{ display: activeTab === 1 ? 'flex' : 'none', flexDirection: 'column', alignItems: 'center', minHeight: '300px'}}>
+                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginBottom: '2em' }}>
+                        <div style={{marginRight: "2em", width: '45%'}}>
+                            <DatePicker
+                                inline
+                                selected={selectedMonth}
+                                onChange={handleMonthChange}
+                                dateFormat="yyyy-MMdif"
+                                showMonthYearPicker
+                                locale="ja"
+                            />
+                        </div>
+                        <div style={{marginLeft: "2em", width: '45%'}}>
+                            <DatePicker
+                                inline
+                                selected={currentMonth}
+                                onChange={handleDateChange}
+                                locale="ja"
+                                filterDate={(date) => date.getMonth() === selectedMonth.getMonth()}
+                                highlightDates={selectedDates}
+                            />
+                        </div>
+                    </div>
+                    <Button variant="contained" color="primary" sx={{ fontSize: '1.5em', alignSelf: 'center' }}>
                         まとめて予約
                     </Button>
                 </div>
