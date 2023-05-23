@@ -12,6 +12,7 @@ import ReservationStatsPage from './adminReserveStats';
 import EmployeeManagePage from './adminManage';
 import { styled } from '@mui/material/styles';
 import { Button } from '@mui/material';
+import TestReservationPage from './testUserReserve';
 
 interface setStateProps{
     setStateProp: object;
@@ -32,22 +33,24 @@ function routerCompornent() {
     return (
         <BrowserRouter>
             <Routes>
-            <Route path="/test" element={<ReservationPage />} />
-            <Route path="/test2" element={<ReservationInfoPage />} />
-            {user && (
-                <>
-                <Route path="/user/*" element={<SideMenu />}>
-                    <Route path="/reservation" element={<ReservationPage />} />
-                    <Route path="/info" element={<ReservationInfoPage />} />
-                </Route>
-                {user.role === 'admin' && (
-                    <Route path="/admin/*" element={<SideMenu />}>
-                        <Route path="/list" element={<EmployeeReservationListPage />} />
-                        <Route path="/stats" element={<ReservationStatsPage />} />
-                        <Route path="/manage" element={<EmployeeManagePage />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/test" element={<ReservationPage />} />
+                <Route path="/test2" element={<ReservationInfoPage />} />
+                <Route path="/test3" element={<TestReservationPage />} />
+                {user && (
+                    <>
+                    <Route path="/user/*" element={<SideMenu />}>
+                        <Route path="/reservation" element={<ReservationPage />} />
+                        <Route path="/info" element={<ReservationInfoPage />} />
                     </Route>
-                )}
-                </>
+                    {user.role === 'admin' && (
+                        <Route path="/admin/*" element={<SideMenu />}>
+                            <Route path="/list" element={<EmployeeReservationListPage />} />
+                            <Route path="/stats" element={<ReservationStatsPage />} />
+                            <Route path="/manage" element={<EmployeeManagePage />} />
+                        </Route>
+                    )}
+                    </>
             )}
             </Routes>
         </BrowserRouter>
