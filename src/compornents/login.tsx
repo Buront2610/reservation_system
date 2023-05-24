@@ -9,7 +9,7 @@ import {
   TextField,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from './authContext';
+import { UseAuth } from './authContext';
 import CryptoJS from 'crypto-js';
 
 interface LoginProps {}
@@ -30,7 +30,7 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const auth  = useAuth();
+  const auth  = UseAuth();
 
   const cardStyle = {
     display: "block",

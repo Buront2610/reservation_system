@@ -113,7 +113,7 @@ import { textAlign } from '@mui/system';
     );
 
 
-    export default function userSideMenu() {
+    export default function UserSideMenu() {
 
       const location = useLocation();
       const Path = location.pathname;

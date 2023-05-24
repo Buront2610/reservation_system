@@ -2,7 +2,7 @@ import React, {FC, Dispatch, SetStateAction} from 'react';
 import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-router-dom';
 import { Box } from '@mui/material';
 import Login  from './login'
-import { useAuth } from './authContext';
+import { UseAuth } from './authContext';
 import  AdminSideMenu from './adminSideMenu';
 import  UserSideMenu from './userSideMenu';
 import ReservationPage from './userReserve';
@@ -13,6 +13,7 @@ import EmployeeManagePage from './adminManage';
 import { styled } from '@mui/material/styles';
 import { Button } from '@mui/material';
 import TestReservationPage from './testUserReserve';
+import TestReservationHistoryPage from './testUserReserveInfo';
 
 interface setStateProps{
     setStateProp: object;
@@ -23,7 +24,7 @@ function Placeholder() {
 }
 
 function routerCompornent() {
-    const { user } = useAuth();
+    const { user } = UseAuth();
   
     let SideMenu = Placeholder;
     if (user) {
@@ -37,6 +38,7 @@ function routerCompornent() {
                 <Route path="/test" element={<ReservationPage />} />
                 <Route path="/test2" element={<ReservationInfoPage />} />
                 <Route path="/test3" element={<TestReservationPage />} />
+                <Route path="/test4" element={<TestReservationHistoryPage />} />
                 {user && (
                     <>
                     <Route path="/user/*" element={<SideMenu />}>

@@ -6,7 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { Reservation, Bento, Employee } from './types';
 import { getBento, addReservation, deleteReservation, getReservations, getEmployees } from './API';
 import { Box, Button, Typography, Tab, Tabs } from '@mui/material';
-import { useAuth } from './authContext';
+import { UseAuth } from './authContext';
 
 
 
@@ -15,7 +15,7 @@ registerLocale('ja', ja);
 
 // 予約ページの関数コンポーネント
 function ReservationPage() {
-    const { user } = useAuth(); // ログインユーザーの情報を取得
+    const { user } = UseAuth(); // ログインユーザーの情報を取得
     // ユーザ情報が存在することを確認（ログインしているかどうか）
     if (!user) {
         throw new Error('User is not logged in.');
