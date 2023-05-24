@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import { Reservation, Employee } from './types';
+import { Reservation, Bento, Employee } from './types';
+import { getReservations, getBento, getEmployees } from './API';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
+import { UseAuth } from './authContext';
+import { CheckCircleOutline as CheckCircleOutlineIcon, HighlightOff as HighlightOffIcon, ChevronLeft, ChevronRight } from '@mui/icons-material';
 
-// Dummy Data
+
+// Define dummy data
 const dummyReservations: Reservation[] = [
     { id: 1, employee_id: 1, reservation_date: '2023-05-15', bento_id: 1, quantity: 1, is_delivered: true },
     { id: 2, employee_id: 1, reservation_date: '2023-05-20', bento_id: 2, quantity: 2, is_delivered: false },
@@ -14,37 +17,101 @@ const dummyEmployees: Employee[] = [
     { id: 1, name: 'John Doe', workplace_id: 1 },
 ];
 
-// Mocked API Functions
-const getReservations = () => Promise.resolve(dummyReservations);
-const getEmployees = () => Promise.resolve(dummyEmployees);
+export default function TestReservationHistoryPage() {
+    // const { user } = UseAuth();
 
-function TestReservationHistoryPage() {
+    // if(!user) {
+    //     throw new Error('User is not logged in.');
+    // }
+
+    const today = new Date();
+    const [month, setMonth] = useState(today.getMonth());
+    const [year, setYear] = useState(today.getFullYear());
     const [reservations, setReservations] = useState<Reservation[]>([]);
+    const [employeeList, setEmployeeList] = useState<Employee[]>([]);
 
     useEffect(() => {
-        getReservations().then(setReservations);
+        setReservations(dummyReservations);
+        setEmployeeList(dummyEmployees);
     }, []);
 
-    const reservedDates = reservations.map(reservation => new Date(reservation.reservation_date));
+    const getDaysInMonth = (month: number, year: number) => {
+        return new Date(year, month + 1, 0).getDate();
+    };
 
-    type View = 'month' | 'year' | 'decade' | 'century';
-    type TileContentProps = { date: Date; view: View };
+    const getFirstDayOfMonth = (month: number, year: number) => {
+        return new Date(year, month, 1).getDay();
+    };
 
-    const tileContent = ({ date, view }: TileContentProps) => {
-        if (view === 'month' && reservedDates.some(d => d.getTime() === date.getTime())) {
-            return <p>予約済</p>;
+    const getReservationStatus = (date: string, employeeId: number) => {
+        const reservation = reservations.find(
+            reservation => reservation.employee_id === employeeId && reservation.reservation_date === date
+        );
+        return reservation ? "予約済" : "";
+    };
+
+    const decreaseMonth = () => {
+        setMonth(month - 1);
+        if (month - 1 < 0) {
+            setMonth(11);
+            setYear(year - 1);
         }
-        return null;
+    };
+
+    const increaseMonth = () => {
+        setMonth(month + 1);
+        if (month + 1 > 11) {
+            setMonth(0);
+            setYear(year + 1);
+        }
     };
 
     return (
-        <div>
-            <h3>予約一覧</h3>
-            <Calendar
-                tileContent={tileContent}
-            />
-        </div>
+        <Box>
+            <IconButton onClick={decreaseMonth}>
+                <ChevronLeft />
+            </IconButton>
+            <IconButton onClick={increaseMonth}>
+                <ChevronRight />
+            </IconButton>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Employee / Date</TableCell>
+                            {["日", "月", "火", "水", "木", "金", "土"].map(day => (
+                                <TableCell>{day}</TableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {employeeList.map(employee => {
+                            let rows = [];
+                            let cells = [];
+                            cells.push(<TableCell>{employee.name}</TableCell>);
+                            for (let i = 0; i < getFirstDayOfMonth(month, year); i++) {
+                                cells.push(<TableCell></TableCell>);
+                            }
+                            for (let day = 1; day <= getDaysInMonth(month, year); day++) {
+                                const date = `${year}-${month + 1}-${day}`;
+                                const reservationStatus = getReservationStatus(date, employee.id);
+                                cells.push(<TableCell style={reservationStatus ? {backgroundColor: "yellow"} : {}}>{reservationStatus}</TableCell>);
+                                if (cells.length % 7 === 0) {
+                                    rows.push(<TableRow>{cells}</TableRow>);
+                                    cells = [];
+                                }
+                            }
+                            if (cells.length > 0) {
+                                while (cells.length < 7) {
+                                    cells.push(<TableCell></TableCell>);
+                                }
+                                rows.push(<TableRow>{cells}</TableRow>);
+                            }
+                            return rows;
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
     );
-};
-
-export default TestReservationHistoryPage;
+}
