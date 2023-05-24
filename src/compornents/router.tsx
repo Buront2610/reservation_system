@@ -14,6 +14,7 @@ import { styled } from '@mui/material/styles';
 import { Button } from '@mui/material';
 import TestReservationPage from './testUserReserve';
 import TestReservationHistoryPage from './testUserReserveInfo';
+import TestAdminReservationPage from './testAdminReserveList';
 
 interface setStateProps{
     setStateProp: object;
@@ -39,6 +40,7 @@ function routerCompornent() {
                 <Route path="/test2" element={<ReservationInfoPage />} />
                 <Route path="/test3" element={<TestReservationPage />} />
                 <Route path="/test4" element={<TestReservationHistoryPage />} />
+                <Route path="/test5" element={<TestAdminReservationPage />} />
                 {user && (
                     <>
                     <Route path="/user/*" element={<SideMenu />}>

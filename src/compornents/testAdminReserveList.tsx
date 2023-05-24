@@ -1,44 +1,56 @@
 import {DataGrid, GridToolbarContainer, GridToolbarExport} from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { UseAuth } from "./authContext";
-import { getReservations, getEmployees, getBento, getWorkplaces } from "./API";
 import { Reservation, Employee, Bento, Workplace } from "./types";
 
 function CustomToolbar() {
-    return (
-      <GridToolbarContainer>
-        <GridToolbarExport />
-      </GridToolbarContainer>
-    );
-  }
+  return (
+    <GridToolbarContainer>
+      <GridToolbarExport />
+    </GridToolbarContainer>
+  );
+}
 
-export default function AdminReservationPage() {
-  const { user } = UseAuth();
+export default function TestAdminReservationPage() {
+//   const { user } = UseAuth();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [bento, setBento] = useState<Bento[]>([]);
   const [workplaces, setWorkplaces] = useState<Workplace[]>([]);
 
   useEffect(() => {
-    async function fetchData() {
-      // Reservation, Employee, Bento, Workplaceデータの取得
-      const fetchedReservations = await getReservations();
-      const fetchedEmployees = await getEmployees();
-      const fetchedBento = await getBento();
-      const fetchedWorkplaces = await getWorkplaces();
+    // Dummy data
+    const dummyReservations: Reservation[] = [
+      { id: 1, employee_id: 1, reservation_date: '2023-05-25', bento_id: 1, quantity: 2, is_delivered: true },
+      { id: 2, employee_id: 2, reservation_date: '2023-05-26', bento_id: 1, quantity: 3, is_delivered: false },
+      { id: 3, employee_id: 3, reservation_date: '2023-05-27', bento_id: 1, quantity: 1, is_delivered: true },
+      // more dummy data...
+    ];
+    const dummyEmployees: Employee[] = [
+      { id: 1, name: 'John Doe', workplace_id: 1 },
+      { id: 2, name: 'Jane Doe', workplace_id: 2 },
+      { id: 3, name: 'Jim Doe', workplace_id: 3 },
+      // more dummy data...
+    ];
+    const dummyBento: Bento[] = [
+      { id: 1, name: 'Bento A', price: 500 },
+    ];
+    const dummyWorkplaces: Workplace[] = [
+      { id: 1, name: 'Office A', location: 'Tokyo' },
+      { id: 2, name: 'Office B', location: 'Osaka' },
+      { id: 3, name: 'Office C', location: 'Fukuoka' },
+      // more dummy data...
+    ];
 
-      setReservations(fetchedReservations);
-      setEmployees(fetchedEmployees);
-      setBento(fetchedBento);
-      setWorkplaces(fetchedWorkplaces);
-    }
-    
-    fetchData();
+    setReservations(dummyReservations);
+    setEmployees(dummyEmployees);
+    setBento(dummyBento);
+    setWorkplaces(dummyWorkplaces);
   }, []);
 
-  if (!user || user.role !== "admin") {
-    return <div>Unauthorized</div>;
-  }
+//   if (!user || user.role !== "admin") {
+//     return <div>Unauthorized</div>;
+//   }
 
   // DataGrid用のカラム定義
   const columns = [
@@ -68,13 +80,12 @@ export default function AdminReservationPage() {
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGrid
-            rows={rows}
-            columns={columns}
-            //pageSize={5}
-            slots={{
-            toolbar: CustomToolbar,
-            }}
-        />
+        rows={rows}
+        columns={columns}
+        slots={{
+          toolbar: CustomToolbar,
+        }}
+      />
     </div>
   );
 }
