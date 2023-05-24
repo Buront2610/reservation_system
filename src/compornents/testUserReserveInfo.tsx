@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Reservation, Bento, Employee } from './types';
-import { getReservations, getBento, getEmployees } from './API';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
-import { UseAuth } from './authContext';
-import { CheckCircleOutline as CheckCircleOutlineIcon, HighlightOff as HighlightOffIcon, ChevronLeft, ChevronRight } from '@mui/icons-material';
+import { Reservation, Employee } from './types';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton,Tooltip } from '@mui/material';
+import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 
 
 // Define dummy data
@@ -18,15 +16,9 @@ const dummyEmployees: Employee[] = [
 ];
 
 export default function TestReservationHistoryPage() {
-    // const { user } = UseAuth();
-
-    // if(!user) {
-    //     throw new Error('User is not logged in.');
-    // }
-
     const today = new Date();
-    const [month, setMonth] = useState(today.getMonth());
-    const [year, setYear] = useState(today.getFullYear());
+    const [currentDate, setCurrentDate] = useState(today);
+
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [employeeList, setEmployeeList] = useState<Employee[]>([]);
 
@@ -35,12 +27,12 @@ export default function TestReservationHistoryPage() {
         setEmployeeList(dummyEmployees);
     }, []);
 
-    const getDaysInMonth = (month: number, year: number) => {
-        return new Date(year, month + 1, 0).getDate();
+    const getDaysInMonth = (date: Date) => {
+        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
     };
 
-    const getFirstDayOfMonth = (month: number, year: number) => {
-        return new Date(year, month, 1).getDay();
+    const getFirstDayOfMonth = (date: Date) => {
+        return (new Date(date.getFullYear(), date.getMonth(), 1).getDay() + 6) % 7;
     };
 
     const getReservationStatus = (date: string, employeeId: number) => {
@@ -51,26 +43,26 @@ export default function TestReservationHistoryPage() {
     };
 
     const decreaseMonth = () => {
-        setMonth(month - 1);
-        if (month - 1 < 0) {
-            setMonth(11);
-            setYear(year - 1);
-        }
+        setCurrentDate(prevDate => new Date(prevDate.getFullYear(), prevDate.getMonth() - 1));
     };
 
     const increaseMonth = () => {
-        setMonth(month + 1);
-        if (month + 1 > 11) {
-            setMonth(0);
-            setYear(year + 1);
-        }
+        setCurrentDate(prevDate => new Date(prevDate.getFullYear(), prevDate.getMonth() + 1));
     };
 
-    return (
+    const formatDate = (date: Date) => {
+        const y = date.getFullYear();
+        const m = ("00" + (date.getMonth() + 1)).slice(-2);
+        const d = ("00" + date.getDate()).slice(-2);
+        return `${y}-${m}-${d}`;
+    };
+
+     return (
         <Box>
             <IconButton onClick={decreaseMonth}>
                 <ChevronLeft />
             </IconButton>
+            <h2>{`${currentDate.getFullYear()}年 ${currentDate.getMonth() + 1}月`}</h2>
             <IconButton onClick={increaseMonth}>
                 <ChevronRight />
             </IconButton>
@@ -79,33 +71,34 @@ export default function TestReservationHistoryPage() {
                     <TableHead>
                         <TableRow>
                             <TableCell>Employee / Date</TableCell>
-                            {["日", "月", "火", "水", "木", "金", "土"].map(day => (
-                                <TableCell>{day}</TableCell>
+                            {["日", "月", "火", "水", "木", "金", "土"].map((day, index) => (
+                                <TableCell key={index}>{day}</TableCell>
                             ))}
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {employeeList.map(employee => {
+                        {employeeList.map((employee, employeeIndex) => {
                             let rows = [];
                             let cells = [];
-                            cells.push(<TableCell>{employee.name}</TableCell>);
-                            for (let i = 0; i < getFirstDayOfMonth(month, year); i++) {
-                                cells.push(<TableCell></TableCell>);
+                            cells.push(<TableCell key={`employee-${employee.id}`}>{employee.name}</TableCell>);
+                            for (let i = 0; i < getFirstDayOfMonth(currentDate); i++) {
+                                cells.push(<TableCell key={`empty-${employeeIndex}-${i}`}></TableCell>);
                             }
-                            for (let day = 1; day <= getDaysInMonth(month, year); day++) {
-                                const date = `${year}-${month + 1}-${day}`;
+                            for (let day = 1; day <= getDaysInMonth(currentDate); day++) {
+                                const date = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
                                 const reservationStatus = getReservationStatus(date, employee.id);
-                                cells.push(<TableCell style={reservationStatus ? {backgroundColor: "yellow"} : {}}>{reservationStatus}</TableCell>);
-                                if (cells.length % 7 === 0) {
-                                    rows.push(<TableRow>{cells}</TableRow>);
-                                    cells = [];
+                                cells.push(
+                                    <TableCell key={`day-${employeeIndex}-${day}`} style={reservationStatus ? {backgroundColor: "yellow"} : {}}>
+                                        <Tooltip title={`Employee: ${employee.name}\nDate: ${date}`}>
+                                            <span>{day}</span>
+                                        </Tooltip>
+                                        {reservationStatus}
+                                    </TableCell>
+                                );
+                                if ((day + getFirstDayOfMonth(currentDate)) % 7 === 0 || day === getDaysInMonth(currentDate)) {
+                                    rows.push(<TableRow key={`row-${employeeIndex}-${rows.length}`}>{cells}</TableRow>);
+                                    cells = [<TableCell key={`employee-${employee.id}`}>{employee.name}</TableCell>];
                                 }
-                            }
-                            if (cells.length > 0) {
-                                while (cells.length < 7) {
-                                    cells.push(<TableCell></TableCell>);
-                                }
-                                rows.push(<TableRow>{cells}</TableRow>);
                             }
                             return rows;
                         })}
