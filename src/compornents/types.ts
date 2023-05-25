@@ -23,7 +23,6 @@ export interface Reservation {
     reservation_date: string;
     bento_id: number;
     quantity: number;
-    is_delivered: boolean;
 }
 
 export interface User {

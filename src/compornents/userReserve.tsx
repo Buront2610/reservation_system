@@ -39,7 +39,7 @@ function ReservationPage() {
     // 'reservations'が変更されたときに予約を確認
     const checkReservation = (reservations: Reservation[]) => {
         const employeeReservation = reservations.find(
-            reservation => reservation.employee_id === user.id && !reservation.is_delivered
+            reservation => reservation.employee_id === user.id 
         );
         setHasReservation(!!employeeReservation);
     };
@@ -51,7 +51,6 @@ function ReservationPage() {
             reservation_date: new Date().toISOString().split('T')[0], // 今日の日付
             bento_id: bentoList[0].id, // デフォルトのベントウ
             quantity: 1, // デフォルトの数量
-            is_delivered: false,
         };
         addReservation(newReservation).then(() => setHasReservation(true));
     };
@@ -59,7 +58,7 @@ function ReservationPage() {
     // 予約キャンセルハンドル
     const handleCancellation = () => {
         const reservationToCancel = reservations.find(
-            reservation => reservation.employee_id === user.id && !reservation.is_delivered
+            reservation => reservation.employee_id === user.id
         );
         if (reservationToCancel) {
             deleteReservation(reservationToCancel.id).then(() => setHasReservation(false));
@@ -94,7 +93,6 @@ function ReservationPage() {
                         reservation_date: date.toISOString().split('T')[0],
                         bento_id: bentoId,
                         quantity: 1,
-                        is_delivered: false
                     });
                 })
             );

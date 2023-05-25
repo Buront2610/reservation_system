@@ -191,7 +191,6 @@ def update_reservation(id):
     reservation.date = date
     reservation.meal = meal
     reservation.price = price
-    reservation.is_delivered = is_delivered
     db.session.commit()
     return jsonify(reservation.to_dict())
 
