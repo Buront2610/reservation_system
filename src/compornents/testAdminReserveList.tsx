@@ -21,9 +21,9 @@ export default function TestAdminReservationPage() {
   useEffect(() => {
     // Dummy data
     const dummyReservations: Reservation[] = [
-      { id: 1, employee_id: 1, reservation_date: '2023-05-25', bento_id: 1, quantity: 2, is_delivered: true },
-      { id: 2, employee_id: 2, reservation_date: '2023-05-26', bento_id: 1, quantity: 3, is_delivered: false },
-      { id: 3, employee_id: 3, reservation_date: '2023-05-27', bento_id: 1, quantity: 1, is_delivered: true },
+      { id: 1, employee_id: 1, reservation_date: '2023-05-25', bento_id: 1, quantity: 2,  },
+      { id: 2, employee_id: 2, reservation_date: '2023-05-26', bento_id: 1, quantity: 3,  },
+      { id: 3, employee_id: 3, reservation_date: '2023-05-27', bento_id: 1, quantity: 1, },
       // more dummy data...
     ];
     const dummyEmployees: Employee[] = [

@@ -19,16 +19,19 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import LoginIcon from '@mui/icons-material/Login';
 import HomeIcon from '@mui/icons-material/Home';
-import WbSunnyIcon from '@mui/icons-material/WbSunny';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import SettingsIcon from '@mui/icons-material/Settings';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
+import AddBusinessIcon from '@mui/icons-material/AddBusiness';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import HistoryIcon from '@mui/icons-material/History';
 import { Link as RouterLink, useLocation, Outlet  } from 'react-router-dom';
 
 import userReserve from './userReserve';
 import dashBoard from    './adminReserveList';
 import Login from './login';
 import { textAlign } from '@mui/system';
+import { ManageAccounts } from '@mui/icons-material';
 
 
     interface setStateProps {
@@ -113,7 +116,7 @@ import { textAlign } from '@mui/system';
     );
 
 
-    export default function UserSideMenu() {
+    export default function TestUserSideMenu() {
 
       const location = useLocation();
       const Path = location.pathname;
@@ -128,18 +131,48 @@ import { textAlign } from '@mui/system';
         setOpen(false);
       };
 
-      const itemsList =([
+      const itemsList = [
+        {
+          text: "ログイン",
+          icon: <LoginIcon />,
+          path: "/login"
+        },
         {
           text: "予約",
-          icon: <InboxIcon />,
-          path: "/element"
+          icon: <AddBusinessIcon />,
+          path: "/test"
         },
         {
-          text: "予約一覧",
-          icon: <MenuIcon />,
-          path: "/email"
+          text: "予約情報",
+          icon: <HistoryIcon />,
+          path: "/test2"
         },
-      ]);
+        {
+          text: "テスト予約",
+          icon: <AddBusinessIcon />,
+          path: "/test3"
+        },
+        {
+          text: "テスト予約履歴",
+          icon: <HistoryIcon />,
+          path: "/test4"
+        },
+        {
+          text: "テスト管理者予約",
+          icon: <ManageAccountsIcon />,
+          path: "/test5"
+        },
+        {
+          text: "テスト管理者予約統計",
+          icon: <AnalyticsIcon />,
+          path: "/test6"
+        },
+        {
+            text: "テストユーザ追加",
+            icon: <ManageAccountsIcon />,
+            path: "/test7"
+        }
+      ];
 
       return (
         <Box sx={{ display: 'flex' }}>
@@ -169,40 +202,39 @@ import { textAlign } from '@mui/system';
                 {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
               </IconButton>
             </DrawerHeader>
+            
             <Divider />
 
-            <Divider />
-            <List component ="div">
-              {itemsList.map(({text, icon: Icon, path}) => {
-                return(
-                <ListItem
-                key={text}
-                disablePadding
-                component={RouterLink}
-                to = {path}
-                sx={{ display: 'block' }}>
+            <List component="div">
+                {itemsList.map(({ text, icon: Icon, path }) => (
+                    <ListItem
+                    key={text}
+                    disablePadding
+                    component={RouterLink}
+                    to={path}
+                    sx={{ display: 'block' }}
+                    >
                     <ListItemButton
                         sx={{
-                            minHeight: 48,
-                            justifyContent: open ? 'initial' : 'center',
-                            px: 2.5,
-                            }}>
+                        minHeight: 48,
+                        justifyContent: open ? 'initial' : 'center',
+                        px: 2.5,
+                        }}
+                    >
                         <ListItemIcon
                         sx={{
                             minWidth: 0,
                             mr: open ? 3 : 'auto',
                             justifyContent: 'center',
-                        }}>
-                            {Icon}
+                        }}
+                        >
+                        {Icon}
                         </ListItemIcon>
-                    <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                        <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
                     </ListItemButton>
-                </ListItem>
-                )
-            })}
-
+                    </ListItem>
+                ))}
             </List>
-
           </Drawer>
           <Box
             component="main"
