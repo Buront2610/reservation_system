@@ -55,7 +55,7 @@ export default function TestAdminManage() {
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
-                <h1>Admin Page</h1>
+                <h1>ユーザ登録ページ</h1>
 
                 {/* Add Employee/User Form */}
                 <form onSubmit={handleAddEmployeeUserSubmit}>

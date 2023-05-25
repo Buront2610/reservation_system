@@ -25,6 +25,7 @@ import AnalyticsIcon from '@mui/icons-material/Analytics';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import HistoryIcon from '@mui/icons-material/History';
+import CalculateIcon from '@mui/icons-material/Calculate';
 import { Link as RouterLink, useLocation, Outlet  } from 'react-router-dom';
 
 import userReserve from './userReserve';
@@ -171,7 +172,12 @@ import { ManageAccounts } from '@mui/icons-material';
             text: "テストユーザ追加",
             icon: <ManageAccountsIcon />,
             path: "/test7"
-        }
+        },
+        {
+            text:"テスト予約集計",
+            icon: <CalculateIcon />,
+            path: "/test8"
+        },
       ];
 
       return (
