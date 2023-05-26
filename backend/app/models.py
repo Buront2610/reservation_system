@@ -4,6 +4,7 @@ from app import db
 class User(db.User):
     """
     ユーザ情報テーブル
+    ID:社員番号
     """
     id = db.Column(db.Integer, primary_key=True)
     PassWord = db.Column(db.String(100), nullable=False)
@@ -21,6 +22,7 @@ class User(db.User):
 class Employee(db.Model):
     """
     社員テーブル
+    ID:社員番号
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
