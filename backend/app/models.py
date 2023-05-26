@@ -26,13 +26,15 @@ class Employee(db.Model):
     name = db.Column(db.String(100), nullable=False)
     workplace_id = db.Column(db.Integer, db.ForeignKey('workplace.id'), nullable=False)
     reservations = db.relationship('Reservation', backref='employee', lazy=True)
+    mailadress = db.Column(db.String(100), nullable=False)
 
     def to_dict(self):
         # 社員情報を辞書形式に変換
         return {
             'id': self.id,
             'name': self.name,
-            'workplace_id': self.workplace_id
+            'workplace_id': self.workplace_id,
+            'mailadress': self.mailadress
         }
     def __repr__(self):
         return f"<Employee id={self.id}, name={self.name}, workplace_id={self.workplace_id}>"
@@ -49,7 +51,8 @@ class Workplace(db.Model):
         # 勤務場所情報を辞書形式に変換
         return {
             'id': self.id,
-            'name': self.name
+            'name': self.name,
+            'employees': self.employees
         }
     def __repr__(self):
         return f"<Employee id={self.id}, name={self.name}>"
@@ -80,6 +83,8 @@ class Reservation(db.Model):
     bento_id = db.Column(db.Integer, db.ForeignKey('bento.id'), nullable=False)
     reservation_date = db.Column(db.Date, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
+    remarks = db.Column(db.String(100), nullable=True)
+
 
     def to_dict(self):
         # 予約情報を辞書形式に変換
@@ -88,7 +93,8 @@ class Reservation(db.Model):
             'employee_id': self.employee_id,
             'bento_id': self.bento_id,
             'reservation_date': self.reservation_date.isoformat(),
-            'quantity': self.quantity
+            'quantity': self.quantity,
+            'remarks': self.remarks,
         }
     def __repr__(self):
         return f"<Employee id={self.id}, name={self.name}, bento_id={self.bento_id}, reservation_date ={self.reservation_date.isoformat()}, quantity ={self.quantity}>"
