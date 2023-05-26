@@ -65,6 +65,7 @@ class Bento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Integer, nullable=False)
+    choose_flag = db.Column(db.Boolean, nullable=False)
     reservations = db.relationship('Reservation', backref='bento', lazy=True)
 
     def to_dict(self):
@@ -72,7 +73,8 @@ class Bento(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'price': self.price
+            'price': self.price,
+            'choose_flag': self.choose_flag
         }
     def __repr__(self):
         return f"<Employee id={self.id}, name={self.name}, price={self.price}>"
