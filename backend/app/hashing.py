@@ -34,7 +34,7 @@ def check_password(password, hashed_password):
 def generate_token(user):
     payload = {
         'user_id': user.id,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)  # 有効期限を設定することができます。
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24) 
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
     return token.decode('utf-8')

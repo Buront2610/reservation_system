@@ -5,9 +5,11 @@ import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
 import { UseAuth } from './authContext';
 import { CheckCircleOutline as CheckCircleOutlineIcon, HighlightOff as HighlightOffIcon, ChevronLeft, ChevronRight } from '@mui/icons-material';
 
+
 function ReservationHistoryPage() {
     const { user } = UseAuth();
 
+    //リダイレクトに書き換える
     if(!user) {
         throw new Error('User is not logged in.');
     }
