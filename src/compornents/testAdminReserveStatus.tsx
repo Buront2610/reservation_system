@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DataGrid ,GridValueGetterParams} from '@mui/x-data-grid';
+import { DataGrid ,GridValueGetterParams,jaJP, GridToolbar} from '@mui/x-data-grid';
 import { Employee, Reservation,Bento } from './types';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -8,7 +8,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 // Demo Data
 const demoEmployees: Employee[] = [
-    { id: 1, name: "A太郎", workplace_id: 1 },
+    { id: 1, name: "testA", workplace_id: 1 },
     { id: 3018, name: "Test Doe", workplace_id: 2}
     // ...other employees
   ];
@@ -85,7 +85,8 @@ export default function TestAdminOrderSummaryPage() {
     }, [employees, reservations, selectedYear]);
     
     const columns = [
-        { field: 'name', headerName: 'Employee', width: 130 },
+        { field: 'id', headerName: '社員ID', width: 70 },
+        { field: 'name', headerName: '社員名', width: 130 },
         ...Array(12).fill(null).map((_, month) => ({
             field: `${month + 1}月`,
             headerName: `${month + 1}月`,
@@ -114,7 +115,11 @@ export default function TestAdminOrderSummaryPage() {
             </Select>
           </FormControl>
           <div style={{ height: 400, width: '100%' }}>
-            <DataGrid rows={rows} columns={columns}  />
+            <DataGrid rows={rows} columns={columns}
+            slots={{
+              toolbar: GridToolbar,
+            }}
+            localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}  />
           </div>
         </div>
       );

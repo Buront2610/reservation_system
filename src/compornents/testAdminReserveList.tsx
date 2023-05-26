@@ -21,8 +21,8 @@ export default function TestAdminReservationPage() {
   useEffect(() => {
     // Dummy data
     const dummyReservations: Reservation[] = [
-      { id: 1, employee_id: 1, reservation_date: '2023-05-25', bento_id: 1, quantity: 2,  },
-      { id: 2, employee_id: 2, reservation_date: '2023-05-26', bento_id: 1, quantity: 3,  },
+      { id: 1, employee_id: 1, reservation_date: '2023-05-25', bento_id: 1, quantity: 1,  },
+      { id: 2, employee_id: 2, reservation_date: '2023-05-26', bento_id: 1, quantity: 1,  },
       { id: 3, employee_id: 3, reservation_date: '2023-05-27', bento_id: 1, quantity: 1, },
       // more dummy data...
     ];
@@ -36,9 +36,9 @@ export default function TestAdminReservationPage() {
       { id: 1, name: 'Bento A', price: 500 },
     ];
     const dummyWorkplaces: Workplace[] = [
-      { id: 1, name: 'Office A', location: 'Tokyo' },
-      { id: 2, name: 'Office B', location: 'Osaka' },
-      { id: 3, name: 'Office C', location: 'Fukuoka' },
+      { id: 1, name: 'Office A', location: '1F' },
+      { id: 2, name: 'Office B', location: '2F' },
+      { id: 3, name: 'Office C', location: '3F' },
       // more dummy data...
     ];
 

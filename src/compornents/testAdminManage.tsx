@@ -3,7 +3,7 @@ import { Workplace, Bento, User, Employee } from './types';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { Box, Grid } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid,GridToolbar,jaJP } from '@mui/x-data-grid';
 
 // Demo Data
 const demoEmployees: Employee[] = [
@@ -60,10 +60,10 @@ export default function TestAdminManage() {
                 {/* Add Employee/User Form */}
                 <form onSubmit={handleAddEmployeeUserSubmit}>
                     <Box mb={2}>
-                        <TextField fullWidth label="ID" value={newEntry.id || ''} onChange={e => setNewEntry({ ...newEntry, id: parseInt(e.target.value) })} />
+                        <TextField fullWidth label="社員番号" value={newEntry.id || ''} onChange={e => setNewEntry({ ...newEntry, id: parseInt(e.target.value) })} />
                     </Box>
                     <Box mb={2}>
-                        <TextField fullWidth label="Name" value={newEntry.name || ''} onChange={e => setNewEntry({ ...newEntry, name: e.target.value })} />
+                        <TextField fullWidth label="社員名" value={newEntry.name || ''} onChange={e => setNewEntry({ ...newEntry, name: e.target.value })} />
                     </Box>
                     <Box mb={2}>
                         <TextField fullWidth label="Password" value={newEntry.password || ''} onChange={e => setNewEntry({ ...newEntry, password: e.target.value })} />
@@ -82,8 +82,8 @@ export default function TestAdminManage() {
                 <DataGrid
                     rows={employees.map(e => ({ ...e, role: users.find(u => u.id === e.id)?.role, password: users.find(u => u.id === e.id)?.password }))}
                     columns={[
-                        { field: 'id', headerName: 'ID', width: 90 },
-                        { field: 'name', headerName: 'Name', width: 150 },
+                        { field: 'id', headerName: '社員番号', width: 90 },
+                        { field: 'name', headerName: '社員名', width: 150 },
                         { field: 'role', headerName: 'Role', width: 130 },
                         { field: 'password', headerName: 'Password', width: 160 },
                         {
@@ -91,12 +91,15 @@ export default function TestAdminManage() {
                             headerName: 'Action',
                             width: 150,
                             renderCell: (params) => (
-                                <Button onClick={() => handleDeleteEmployeeUser(params.row.id)}>Delete</Button>
+                                <Button onClick={() => handleDeleteEmployeeUser(params.row.id)}>削除</Button>
                             ),
                         },
-                    ]}
-
-                />
+                        ]}
+                        slots={{
+                          toolbar: GridToolbar,
+                        }}
+                        localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}  
+                    />
             </Grid>
         </Grid>
     );

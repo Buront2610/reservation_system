@@ -8,7 +8,7 @@ registerLocale('ja', ja);
 
 function TestReservationPage() {
     const theme = useTheme();
-    const hasReservation = true;
+    const [hasReservation, setHasReservation] = useState(false);
     const [activeTab, setActiveTab] = useState(0);
     const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
     const [selectedDates, setSelectedDates] = useState<Date[]>([]);
@@ -25,6 +25,10 @@ function TestReservationPage() {
     const handleMonthChange = (date: Date) => {
         setSelectedMonth(date);
         setCurrentMonth(new Date(date.getFullYear(), date.getMonth(), 1));
+    };
+    
+    const handleReservationToggle = () => {
+        setHasReservation(!hasReservation);
     };
 
     const handleDateChange = (date: Date | null) => {
@@ -62,11 +66,11 @@ function TestReservationPage() {
                         {formatTime(currentTime)}
                     </Paper>
                     {hasReservation ? (
-                        <Button variant="outlined" color="secondary" sx={{ fontSize: '1.5em' }}>
+                        <Button variant="outlined" color="secondary" sx={{ fontSize: '1.5em' }} onClick={handleReservationToggle}>
                             予約キャンセル
                         </Button>
                     ) : (
-                        <Button variant="contained" color="primary" sx={{ fontSize: '1.5em' }}>
+                        <Button variant="contained" color="primary" sx={{ fontSize: '1.5em' }} onClick={handleReservationToggle}>
                             予約
                         </Button>
                     )}
