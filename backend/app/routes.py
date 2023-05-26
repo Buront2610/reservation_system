@@ -100,7 +100,8 @@ def add_employee():
     data = request.get_json()
     id  = data.get('id')
     name = data.get('name')
-    location = data.get('location')
+    Workplace_id = data.get('Workplace_id')
+    mailadress = data.get('mailadress')
 
     if not name or not location or not id:
         return jsonify({'error': 'すべてのフィールドが必要です'}), 400
@@ -115,8 +116,9 @@ def add_employee():
 def update_employee(id):
     data = request.get_json()
     name = data.get('name')
-    location = data.get('location')
-
+    workplace_id = data.get('workplace_id')
+    reservations = data.get('reservations')
+    mail_adress = data.get('mail_adress')
     if not name or not location:
         return jsonify({'error': 'すべてのフィールドが必要です'}), 400
 
@@ -159,38 +161,39 @@ def get_reservation(id):
 def add_reservation():
     data = request.get_json()
     employee_id = data.get('employee_id')
-    date = data.get('date')
-    meal = data.get('meal')
-    price = data.get('price')
+    bento_id = data.get('bento_id')
+    reservation_date = data.get('reservation_date')
+    quantity = data.get('quantity')
+    remarks = data.get('remarks')
 
-    if not employee_id or not date or not meal or not price:
-        return jsonify({'error': 'すべてのフィールドが必要です'}), 400
+    if not employee_id or not bento_id or not reservation_date or not quantity :
+        return jsonify({'error': '未入力の必須情報があります。'}), 400
 
-    reservation = Reservation(employee_id=employee_id, date=date, meal=meal, price=price)
+    reservation = Reservation(employee_id=employee_id, bento_id=bento_id, reservation_date=reservation_date, quantity=quantity, remarks=remarks)
     db.session.add(reservation)
     db.session.commit()
     return jsonify(reservation.to_dict()), 201
     
 
 # 既存の予約情報を更新
-#
 @bp.route('/reservations/<int:id>', methods=['PUT'])
 def update_reservation(id):
     data = request.get_json()
     employee_id = data.get('employee_id')
-    date = data.get('date')
-    meal = data.get('meal')
-    price = data.get('price')
-    is_delivered = data.get('is_delivered')
+    bento_id = data.get('bento_id')
+    reservation_date = data.get('reservation_date')
+    quantity = data.get('quantity')
+    remarks = data.get('remarks')
 
-    if not employee_id or not date or not meal or not price:
+    if not employee_id or not bento_id or not reservation_date or not quantity :
         return jsonify({'error': 'すべてのフィールドが必要です'}), 400
 
     reservation = Reservation.query.get_or_404(id)
     reservation.employee_id = employee_id
-    reservation.date = date
-    reservation.meal = meal
-    reservation.price = price
+    reservation.bento_id = bento_id
+    reservation.reservation_date = reservation_date
+    reservation.quantity = quantity
+    reservation.remarks = remarks
     db.session.commit()
     return jsonify(reservation.to_dict())
 

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Workplace, Bento, Employee, Reservation, User, Login } from './types';
+import { UseAuth } from './authContext';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
