@@ -12,4 +12,3 @@ export function hashPassword(password: string): string {
 
   return hashedPassword;
 }
-// Compare this snippet from src\compornents\sideMenu.tsx:
