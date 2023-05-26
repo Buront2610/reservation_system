@@ -100,3 +100,35 @@ class Reservation(db.Model):
         }
     def __repr__(self):
         return f"<Employee id={self.id}, name={self.name}, bento_id={self.bento_id}, reservation_date ={self.reservation_date.isoformat()}, quantity ={self.quantity}>"
+
+class Exclude(db.Model):
+    """
+    除外日テーブル
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    exclude_date = db.Column(db.Date, nullable=False)
+
+    def to_dict(self):
+        # 除外日情報を辞書形式に変換
+        return {
+            'id': self.id,
+            'exclude_date': self.exclude_date.isoformat(),
+        }
+    def __repr__(self):
+        return f"<Employee id={self.id}, exclude_date={self.exclude_date.isoformat()}, workplace_id={self.workplace_id}>"
+
+class TimeFlag(db.Model):
+    """
+    時間フラグテーブル
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    timeflag = db.Column(db.Integer, nullable=False)
+
+    def to_dict(self):
+        # 時間フラグ情報を辞書形式に変換
+        return {
+            'id': self.id,
+            'timeflag': self.timeflag,
+        }
+    def __repr__(self):
+        return f"<Employee id={self.id}, timeflag={self.timeflag}>"
