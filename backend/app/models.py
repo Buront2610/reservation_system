@@ -28,7 +28,7 @@ class Employee(db.Model):
     name = db.Column(db.String(100), nullable=False)
     workplace_id = db.Column(db.Integer, db.ForeignKey('workplace.id'), nullable=False)
     reservations = db.relationship('Reservation', backref='employee', lazy=True)
-    mail_adress = db.Column(db.String(100), nullable=False)
+    mail_adress = db.Column(db.String(100), nullable=True)
 
     def to_dict(self):
         # 社員情報を辞書形式に変換

@@ -103,10 +103,10 @@ def add_employee():
     Workplace_id = data.get('Workplace_id')
     mailadress = data.get('mailadress')
 
-    if not name or not location or not id:
+    if not name or not Workplace_id or not id:
         return jsonify({'error': 'すべてのフィールドが必要です'}), 400
 
-    employee = Employee(id = id ,name=name, location=location)
+    employee = Employee(id = id ,name=name, Workplace_id=Workplace_id, mailadress=mailadress)
     db.session.add(employee)
     db.session.commit()
     return jsonify(employee.to_dict()), 201
@@ -119,12 +119,14 @@ def update_employee(id):
     workplace_id = data.get('workplace_id')
     reservations = data.get('reservations')
     mail_adress = data.get('mail_adress')
-    if not name or not location:
+    if not name or not workplace_id or not reservations:
         return jsonify({'error': 'すべてのフィールドが必要です'}), 400
 
     employee = Employee.query.get_or_404(id)
     employee.name = name
-    employee.location = location
+    employee.workplace_id = workplace_id
+    employee.reservations = reservations
+    employee.mail_adress = mail_adress
     db.session.commit()
     return jsonify(employee.to_dict())
 
