@@ -8,6 +8,8 @@
 ・予約テーブル(Reservation)
 ・除外日テーブル(Exclude)
 ・時間帯テーブル(TimeFlag)
+現状のDBではSQLiteを使用している。
+ユーザ数上昇やアクセス数によりパフォーマンスが劣化した場合、別途MySQLなどのRDBMSを検討すること
 """
 
 from app import db
