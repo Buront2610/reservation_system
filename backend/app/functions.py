@@ -1,6 +1,8 @@
 import bcrypt
 import jwt
 import datetime
+from datetime import datetime, timedelta, timezone
+import holidays
 import secrets
 import os
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -46,3 +48,33 @@ def generate_token(user):
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
     return token.decode('utf-8')
+
+
+#土日祝日取得関数
+def get_exclude_dates(year):
+    #土日祝日を取得
+    jp_holidays = holidays.Japan(years=year)
+
+    #除外日をリストに格納
+    exclude_dates = []
+
+    #4月1にから翌年3月31日までの日付を取得する
+    start_date = date(year, 4, 1)
+    end_date = date(year + 1, 3, 31)    
+    delta = timedelta(days=1)
+
+    #土日祝日を除外日リストに追加
+    while start_date <= end_date:
+        if start_date.weekday() >= 5 or start_date in jp_holidays:
+            exclude_dates.append(start_date)
+        start_date += delta 
+    return exclude_dates
+
+#取得した土日祝日をDBに格納
+def insert_exclude_dates(year):
+    exclude_dates = get_exclude_dates(year)
+    for exclude_date in exclude_dates:
+        exclude_date = ExcludeDate(date=exclude_date)
+        db.session.add(exclude_date)
+        db.session.commit() 
+    return exclude_dates
