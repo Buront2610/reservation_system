@@ -7,6 +7,7 @@ import secrets
 import os
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+from app.models import Exclude
 
 """
 以下に各種関数を定義
@@ -70,11 +71,14 @@ def get_exclude_dates(year):
         start_date += delta 
     return exclude_dates
 
-#取得した土日祝日をDBに格納
+
+#除外日をDBに登録する関数
 def insert_exclude_dates(year):
     exclude_dates = get_exclude_dates(year)
     for exclude_date in exclude_dates:
-        exclude_date = ExcludeDate(date=exclude_date)
-        db.session.add(exclude_date)
-        db.session.commit() 
+        exclude = Exclude(date=exclude_date)
+        db.session.add(exclude)
+    db.session.commit() 
     return exclude_dates
+
+
