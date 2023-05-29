@@ -6,6 +6,13 @@ import os
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
+"""
+以下に各種関数を定義
+主に認証関連の関数を定義
+フロントから入力されたパスをさらにハッシュ化してDBに保存する
+トークン生成用関数を後々追加
+"""
+
 def schedule_secret_key_regeneration():
     scheduler = BackgroundScheduler()
     scheduler.add_job(set_secret_key_env, CronTrigger(hour=0, minute=0))

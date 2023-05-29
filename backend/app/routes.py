@@ -8,6 +8,9 @@ from backend.app.functions import check_password, hash_password,generate_token
 bp = Blueprint('api', __name__)
 
 app =create_app()
+###routeの並びがめちゃめちゃで可読性悪い
+###後で直す　CRUDエンドポイントに並べなおすこと
+###ここでもAPIにアクセスされないようトークン認証を行うようにする
 
 # 例: ユーザー認証
 @bp.route('/login', methods=['POST'])
@@ -33,6 +36,7 @@ def login():
         return jsonify({'error': 'パスワードが間違っています'}), 401
     
 #以下にAPIの実装を行う
+
 # 勤務場所情報取得
 @bp.route("/workplaces", methods=["GET"])
 def get_workplaces():

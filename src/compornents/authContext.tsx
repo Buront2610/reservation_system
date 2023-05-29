@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { login } from "./API";
 import { Login } from "./types";
 
+//login認証情報の保持などを行う
 
 //Login処理用のContext
 interface AuthContextProps {

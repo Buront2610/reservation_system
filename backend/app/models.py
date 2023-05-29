@@ -1,4 +1,7 @@
 from app import db
+"""
+各種データテーブルの定義ファイル
+"""
 
 
 class User(db.User):
@@ -44,6 +47,8 @@ class Employee(db.Model):
 class Workplace(db.Model):
     """
     勤務場所テーブル
+    id:勤務場所ID
+    多分employeesいらない
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -58,9 +63,12 @@ class Workplace(db.Model):
         }
     def __repr__(self):
         return f"<Employee id={self.id}, name={self.name}>"
+
 class Bento(db.Model):
     """
     弁当テーブル
+    月ごとに注文社を変えるとのこと
+    Flagで判断
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -81,6 +89,7 @@ class Bento(db.Model):
 class Reservation(db.Model):
     """
     予約テーブル
+    いろいろなデータとつながる
     """
     id = db.Column(db.Integer, primary_key=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=False)
@@ -106,6 +115,7 @@ class Reservation(db.Model):
 class Exclude(db.Model):
     """
     除外日テーブル
+    DatePickerの除外日制御に使用
     """
     id = db.Column(db.Integer, primary_key=True)
     exclude_date = db.Column(db.Date, nullable=True)
