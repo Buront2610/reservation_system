@@ -1,4 +1,7 @@
-//型定義ファイル
+/*型定義ファイル
+  ここで型定義を行うことで、コンポーネント間のデータのやり取りを行う  
+  UserとLoginは同じ型定義を使うため、後でどちらかを削除する
+*/
 export interface Workplace {
     id: number;
     name: string;

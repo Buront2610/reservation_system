@@ -1,3 +1,8 @@
+/*
+  AuthContext.tsx
+  ログイン認証用のContext
+  全体のProviderとして使用する
+  */
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { login } from "./API";
 import { Login } from "./types";

@@ -1,11 +1,15 @@
+/*
+API実装ファイル
+APIの定義に関してはbackend/app/routes.pyを参照すること
+types.tsに定義されている型を使用すること
+*/
 import axios from 'axios';
 import { Workplace, Bento, Employee, Reservation, User, Login } from './types';
 import { UseAuth } from './authContext';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
-//以下にAPIを実装する
-//APIの元に関してはbackend/app/routes.pyを参照すること
+
 
 export async function login(id: number, password: string): Promise<Login | null> {
     const users = await getUsers();

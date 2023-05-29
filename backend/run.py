@@ -1,3 +1,6 @@
+"""
+Flaskアプリケーションのエントリーポイント
+"""
 from app import create_app
 from backend.app.functions import schedule_secret_key_regeneration, set_secret_key_env
 import os

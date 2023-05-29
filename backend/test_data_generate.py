@@ -1,8 +1,11 @@
+"""
+テストデータ生成用プログラム
+"""
 from app import db
 from datetime import date, timedelta
 from random import randint, choice
 import bcrypt
-from app.models import User,Workplace,Employee,Bento,Reservation
+from app.models import User,Workplace,Employee,Bento,Reservation,Exclude,TimeFlag
 from app.functions import hash_password
 
 # Create test data for User table

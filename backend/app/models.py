@@ -1,7 +1,17 @@
-from app import db
 """
 各種データテーブルの定義ファイル
+現状定義しているデータテーブルは以下になる
+・ユーザ情報テーブル(User)
+・社員テーブル(Employee)
+・勤務場所テーブル(Workplace)
+・弁当テーブル(Bento)
+・予約テーブル(Reservation)
+・除外日テーブル(Exclude)
+・時間帯テーブル(TimeFlag)
 """
+
+from app import db
+
 
 
 class User(db.User):

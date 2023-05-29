@@ -1,3 +1,9 @@
+"""
+ユーザ操作で各種DB操作を行うAPI
+トークン認証などによりセキュリティ対策を行っている
+各種CRUD操作を行うエンドポイントと、統計情報を取得するエンドポイントを用意
+その他追加があれば随時追加
+"""
 from flask import Flask, request, jsonify,Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, extract

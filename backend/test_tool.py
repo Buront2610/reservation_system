@@ -1,3 +1,8 @@
+"""
+簡易バックエンドテストツール
+バックエンドのAPI処理確認にはこれを用いること
+その他funcitonの処理確認にも用いる
+"""
 # test_api.py
 import pytest
 import json
