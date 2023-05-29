@@ -24,8 +24,8 @@ def send_mail():
 
             # メールの内容を作成
             msg = Message('予約のお知らせ', recipients=[user.email])
-            msg.body = f'{user.name}さん、{reservation.date}の予約があります。'
-            msg.html = f'<p>{user.name}さん、{reservation.date}の予約があります。</p>'
+            msg.body = f'{user.name}さん、{reservation.date}に弁当の予約があります。'
+            msg.html = f'<p>{user.name}さん、{reservation.date}に弁当の予約があります。</p>'
 
             # メールを送信
             with app.app_context():
