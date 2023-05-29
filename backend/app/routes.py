@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify,Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, extract
 from app import create_app, db
-from app.models import Employee, Workplace, Bento, Reservation, User
+from app.models import Employee, Workplace, Bento, Reservation, User, Exclude,TimeFlag
 from backend.app.functions import check_password, hash_password,generate_token
 
 bp = Blueprint('api', __name__)
@@ -145,6 +145,7 @@ def delete_employee(id):
     db.session.commit()
     return jsonify({'message': '社員情報を削除しました'}), 200
 
+###予約情報に対するCRUDエンドポイント###
 # 全ての予約情報を取得
 @bp.route('/reservations', methods=['GET'])
 def get_reservations():
@@ -207,6 +208,7 @@ def delete_reservation(id):
     db.session.commit()
     return jsonify({'message': '予約情報を削除しました'}), 200
 
+
 # 統計情報の取得
 @bp.route("/statistics", methods=["GET"])
 def get_statistics():
@@ -262,3 +264,84 @@ def get_statistics():
     }
 
     return jsonify(result)
+
+##除外日に対するCRUDエンドポイント
+@bp.route("/exclude", methods=["GET"])
+def get_exclude():
+    excludes = Exclude.query.all()
+    return jsonify([exclude.to_dict() for exclude in excludes])
+
+@bp.route("/exclude", methods=["POST"])
+def create_exclude():
+    data = request.get_json()
+    exclude_date = data.get('exclude_date')
+    if not exclude_date:
+        return jsonify({'error': '未入力の必須情報があります。'}), 400
+    exclude = Exclude(exclude_date=exclude_date)
+    db.session.add(exclude)
+    db.session.commit()
+    return jsonify(exclude.to_dict()), 201
+
+@bp.route("/exclude/<int:id>", methods=["GET"])
+def get_exclude_by_id(id):
+    exclude = Exclude.query.get_or_404(id)
+    return jsonify(exclude.to_dict())
+
+@bp.route("/exclude/<int:id>", methods=["DELETE"])
+def delete_exclude(id):
+    exclude = Exclude.query.get_or_404(id)
+    db.session.delete(exclude)
+    db.session.commit()
+    return jsonify({'message': '除外日を削除しました'}), 200
+
+@bp.route("/exclude/<int:id>", methods=["PUT"])
+def update_exclude(id):
+    data = request.get_json()
+    exclude_date = data.get('exclude_date')
+    if not exclude_date:
+        return jsonify({'error': '未入力の必須情報があります。'}), 400
+    exclude = Exclude.query.get_or_404(id)
+    exclude.exclude_date = exclude_date
+    db.session.commit()
+    return jsonify(exclude.to_dict()), 201
+
+@bp.route("/timeflag", methods=["GET"])
+def get_timeflag():
+    timeflags = TimeFlag.query.all()
+    return jsonify([timeflag.to_dict() for timeflag in timeflags])
+
+@bp.route("/timeflag", methods=["POST"])
+def create_timeflag():
+    data = request.get_json()
+    timeflag = data.get('timeflag')
+    if not timeflag:
+        return jsonify({'error': '未入力の必須情報があります。'}), 400
+    timeflag = TimeFlag(timeflag=timeflag)
+    db.session.add(timeflag)
+    db.session.commit()
+    return jsonify(timeflag.to_dict()), 201
+
+@bp.route("/timeflag/<int:id>", methods=["GET"])
+def get_timeflag_by_id(id):
+    timeflag = TimeFlag.query.get_or_404(id)
+    return jsonify(timeflag.to_dict())
+
+@bp.route("/timeflag/<int:id>", methods=["DELETE"])
+def delete_timeflag(id):
+    timeflag = TimeFlag.query.get_or_404(id)
+    db.session.delete(timeflag)
+    db.session.commit()
+    return jsonify({'message': '時間フラグを削除しました'}), 200
+
+@bp.route("/timeflag/<int:id>", methods=["PUT"])
+def update_timeflag(id):
+    data = request.get_json()
+    timeflag = data.get('timeflag')
+    if not timeflag:
+        return jsonify({'error': '未入力の必須情報があります。'}), 400
+    timeflag = TimeFlag.query.get_or_404(id)
+    timeflag.timeflag = timeflag
+    db.session.commit()
+    return jsonify(timeflag.to_dict()), 201
+
+

@@ -108,7 +108,7 @@ class Exclude(db.Model):
     除外日テーブル
     """
     id = db.Column(db.Integer, primary_key=True)
-    exclude_date = db.Column(db.Date, nullable=False)
+    exclude_date = db.Column(db.Date, nullable=True)
 
     def to_dict(self):
         # 除外日情報を辞書形式に変換
@@ -117,7 +117,7 @@ class Exclude(db.Model):
             'exclude_date': self.exclude_date.isoformat(),
         }
     def __repr__(self):
-        return f"<Employee id={self.id}, exclude_date={self.exclude_date.isoformat()}, workplace_id={self.workplace_id}>"
+        return f"<id={self.id}, exclude_date={self.exclude_date.isoformat()}>"
 
 class TimeFlag(db.Model):
     """
