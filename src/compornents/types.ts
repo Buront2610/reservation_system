@@ -39,3 +39,12 @@ export interface Login {
     password: string;
     role: string;
 }
+
+export interface Exclude{
+    Date: string;
+}
+
+export interface TimeFlag{
+    id: number;
+    TimeFlag: boolean;
+}

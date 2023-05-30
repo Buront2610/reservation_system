@@ -1,8 +1,7 @@
 """
 ユーザ操作で各種DB操作を行うAPI
 トークン認証などによりセキュリティ対策を行っている
-各種CRUD操作を行うエンドポイントと、統計情報を取得するエンドポイントを用意
-その他追加があれば随時追加
+各種CRUD操作を行うエンドポイントと、統計情報を取得するエンドポイントを用意こうしんが更新ががあれば随時追加
 """
 from flask import Flask, request, jsonify,Blueprint
 from flask_sqlalchemy import SQLAlchemy
@@ -14,9 +13,10 @@ from backend.app.functions import check_password, hash_password,generate_token
 bp = Blueprint('api', __name__)
 
 app =create_app()
+
 ###routeの並びがめちゃめちゃで可読性悪い
 ###後で直す　CRUDエンドポイントに並べなおすこと
-###ここでもAPIにアクセスされないようトークン認証を行うようにする
+###ここでもAPIに外部アクセスされないようトークン認証を行うようにする
 
 # 例: ユーザー認証
 @bp.route('/login', methods=['POST'])

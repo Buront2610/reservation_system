@@ -25,6 +25,7 @@ export async function login(id: number, password: string): Promise<Login | null>
 }
 
 export async function getWorkplaces(): Promise<Workplace[]> {
+    
     const response = await axios.get<Workplace[]>(`${API_BASE_URL}/workplaces`);
     return response.data;
 }
@@ -89,3 +90,30 @@ export async function updateReservation(id: number, updatedReservation: Partial<
 export async function deleteReservation(id: number): Promise<void> {
     await axios.delete(`${API_BASE_URL}/reservations/${id}`);
 }
+
+export async function getExcludes(): Promise<string[]> {
+    const response = await axios.get<string[]>(`${API_BASE_URL}/excludes`);
+    return response.data;
+}
+
+export async function addExclude(newExclude: Partial<string>): Promise<string> {
+    const response = await axios.post<string>(`${API_BASE_URL}/excludes`, newExclude);
+    return response.data;
+}
+
+export async function deleteExclude(id: number): Promise<void> {
+    await axios.delete(`${API_BASE_URL}/excludes/${id}`);
+}
+
+//時間帯フラグの取得
+export async function getTimeFlag(): Promise<boolean> {
+    const response = await axios.get<boolean>(`${API_BASE_URL}/timeflag`);
+    return response.data;
+}
+
+//時間帯フラグの更新
+export async function updateTimeFlag(newTimeFlag: Partial<boolean>): Promise<boolean> {
+    const response = await axios.post<boolean>(`${API_BASE_URL}/timeflag`, newTimeFlag);
+    return response.data;
+}
+
