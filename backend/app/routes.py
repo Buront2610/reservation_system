@@ -45,25 +45,25 @@ def login():
 
 # 勤務場所情報取得
 @bp.route("/workplaces", methods=["GET"])
-def get_workplaces():
+def get_workplaces() -> dict:
     workplaces = Workplace.query.all()
     return jsonify([w.to_dict() for w in workplaces])
 
 # 弁当情報取得
 @bp.route("/bento", methods=["GET"])
-def get_bento():
+def get_bento() -> dict:
     bento = Bento.query.all()
     return jsonify([b.to_dict() for b in bento])
 
 #ユーザ取得
 @bp.route("/users", methods=["GET"])
-def get_users():
+def get_users() -> dict:
     users = User.query.all()
     return jsonify([u.to_dict() for u in users])
 
 #個別ユーザ取得
 @bp.route("/User/<int:User_id>", methods=["GET"])
-def get_user(User_id):
+def get_user(User_id) -> dict:
     user = User.query.get(User_id)
     if user is None:
         return jsonify({"error": "User not found"}), 404
@@ -72,7 +72,7 @@ def get_user(User_id):
 
 # 全ての社員情報を取得
 @bp.route('/employees', methods=['GET'])
-def get_employees():
+def get_employees() -> dict:
     employees = Employee.query.all()
     return jsonify([e.to_dict() for e in employees])
 
@@ -123,7 +123,7 @@ def add_employee():
 
 # 既存の社員情報を更新
 @bp.route('/employees/<int:id>', methods=['PUT'])
-def update_employee(id):
+def update_employee(id) -> dict:
     data = request.get_json()
     name = data.get('name')
     workplace_id = data.get('workplace_id')

@@ -70,7 +70,6 @@ export default function TestReservationHistoryPage() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>社員名 / 日付</TableCell>
                             {["日", "月", "火", "水", "木", "金", "土"].map((day, index) => (
                                 <TableCell key={index}>{day}</TableCell>
                             ))}
@@ -80,16 +79,16 @@ export default function TestReservationHistoryPage() {
                         {employeeList.map((employee, employeeIndex) => {
                             let rows = [];
                             let cells = [];
-                            cells.push(<TableCell key={`employee-${employee.id}`}>{employee.name}</TableCell>);
+                            cells.push(<TableCell key={`employee-${employee.id}`}></TableCell>);
                             for (let i = 0; i < getFirstDayOfMonth(currentDate); i++) {
-                                cells.push(<TableCell key={`empty-${employeeIndex}-${i}`}></TableCell>);
+                                cells.push(<TableCell key={`empty-${employeeIndex-1}-${i}`}></TableCell>);
                             }
                             for (let day = 1; day <= getDaysInMonth(currentDate); day++) {
                                 const date = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
                                 const reservationStatus = getReservationStatus(date, employee.id);
                                 cells.push(
                                     <TableCell key={`day-${employeeIndex}-${day}`} style={reservationStatus ? {backgroundColor: "yellow"} : {}}>
-                                        <Tooltip title={`Employee: ${employee.name}\nDate: ${date}`}>
+                                        <Tooltip title={`Date: ${date}`}>
                                             <span>{day}</span>
                                         </Tooltip>
                                         {reservationStatus}
@@ -97,7 +96,7 @@ export default function TestReservationHistoryPage() {
                                 );
                                 if ((day + getFirstDayOfMonth(currentDate)) % 7 === 0 || day === getDaysInMonth(currentDate)) {
                                     rows.push(<TableRow key={`row-${employeeIndex}-${rows.length}`}>{cells}</TableRow>);
-                                    cells = [<TableCell key={`employee-${employee.id}`}>{employee.name}</TableCell>];
+                                    cells = [];
                                 }
                             }
                             return rows;
