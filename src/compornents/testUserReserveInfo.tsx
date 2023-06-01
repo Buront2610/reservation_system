@@ -76,7 +76,7 @@ export default function TestReservationHistoryPage() {
                             ))}
                         </TableRow>
                     </TableHead>
-                    <TableBody>
+                    <TableBody> /*カレンダー部分*/
                         {employeeList.map((employee, employeeIndex) => {
                             let rows = [];
                             let cells = [];
