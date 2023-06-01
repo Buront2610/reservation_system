@@ -27,6 +27,7 @@ export default function TestReservationHistoryPage() {
         setEmployeeList(dummyEmployees);
     }, []);
 
+    
     const getDaysInMonth = (date: Date) => {
         return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
     };
@@ -79,25 +80,32 @@ export default function TestReservationHistoryPage() {
                         {employeeList.map((employee, employeeIndex) => {
                             let rows = [];
                             let cells = [];
-                            cells.push(<TableCell key={`employee-${employee.id}`}></TableCell>);
-                            for (let i = 0; i < getFirstDayOfMonth(currentDate); i++) {
-                                cells.push(<TableCell key={`empty-${employeeIndex-1}-${i}`}></TableCell>);
-                            }
-                            for (let day = 1; day <= getDaysInMonth(currentDate); day++) {
-                                const date = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
-                                const reservationStatus = getReservationStatus(date, employee.id);
-                                cells.push(
-                                    <TableCell key={`day-${employeeIndex}-${day}`} style={reservationStatus ? {backgroundColor: "yellow"} : {}}>
-                                        <Tooltip title={`Date: ${date}`}>
-                                            <span>{day}</span>
-                                        </Tooltip>
-                                        {reservationStatus}
-                                    </TableCell>
-                                );
-                                if ((day + getFirstDayOfMonth(currentDate)) % 7 === 0 || day === getDaysInMonth(currentDate)) {
+                            let dayOffset = getFirstDayOfMonth(currentDate);
+                            
+                            
+                            for (let day = 0 - dayOffset; day <= getDaysInMonth(currentDate); day++) {
+                                if ((day + dayOffset) % 7 === 0) {
                                     rows.push(<TableRow key={`row-${employeeIndex}-${rows.length}`}>{cells}</TableRow>);
                                     cells = [];
                                 }
+                                if (day <= 0) {
+                                    cells.push(<TableCell key={`empty-${employeeIndex+1}-${day}`}></TableCell>);
+                                } else {
+                                    const date = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
+                                    const reservationStatus = getReservationStatus(date, employee.id);
+                                    cells.push(
+                                        <TableCell key={`day-${employeeIndex}-${day}`} style={reservationStatus ? {backgroundColor: "yellow"} : {}}>
+                                            <Tooltip title={`Date: ${date}`}>
+                                                <span>{day}</span>
+                                            </Tooltip>
+                                            {reservationStatus}
+                                        </TableCell>
+                                    );
+                                }
+
+                            }
+                            if (cells.length > 0) {
+                                rows.push(<TableRow key={`row-${employeeIndex}-${rows.length}`}>{cells}</TableRow>);
                             }
                             return rows;
                         })}
