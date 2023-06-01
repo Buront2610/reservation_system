@@ -5,11 +5,10 @@ from datetime import datetime, timedelta, timezone
 from backend.app.models import Reservation, User
 from backend.app import db
 from backend.app.functions import generate_token
-from backend.app import app
-from flask_mail import Message
+from flask_mail import Mail ,Message
 
 # メール送信用の関数
-def send_mail():
+def send_mail()->None:
     # 現在の日時を取得
     now = datetime.now(timezone.utc)
 

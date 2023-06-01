@@ -8,6 +8,7 @@ import holidays
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from app.models import Exclude, User
+from app import db
 
 
 # 定期的にSECRET_KEYの再生成を行うためのスケジューラを設定

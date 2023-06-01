@@ -3,7 +3,8 @@
 トークン認証などによりセキュリティ対策を行っている
 各種CRUD操作を行うエンドポイントと、統計情報を取得するエンドポイントを用意こうしんが更新ががあれば随時追加
 """
-from flask import Flask, request, jsonify,Blueprint
+from flask import Flask, request, jsonify,Blueprint,Response
+from typing import Union, Tuple
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, extract
 from app import create_app, db
@@ -17,10 +18,13 @@ app =create_app()
 ###routeの並びがめちゃめちゃで可読性悪い
 ###後で直す　CRUDエンドポイントに並べなおすこと
 ###ここでもAPIに外部アクセスされないようトークン認証を行うようにする
+###型定義めちゃくちゃ問題
+###時代はやはり静的型付け言語だな
+###エラーハンドリングもどうにかする
 
 # 例: ユーザー認証
 @bp.route('/login', methods=['POST'])
-def login():
+def login() -> Tuple[Response, int]:
     data = request.get_json()
     id = data.get('id')
     password = data.get('password')
@@ -45,49 +49,49 @@ def login():
 
 # 勤務場所情報取得
 @bp.route("/workplaces", methods=["GET"])
-def get_workplaces() -> dict:
+def get_workplaces() -> Tuple[Response, int]:
     workplaces = Workplace.query.all()
-    return jsonify([w.to_dict() for w in workplaces])
+    return jsonify([w.to_dict() for w in workplaces]), 200
 
 # 弁当情報取得
 @bp.route("/bento", methods=["GET"])
-def get_bento() -> dict:
+def get_bento() -> Tuple[Response, int]:
     bento = Bento.query.all()
-    return jsonify([b.to_dict() for b in bento])
+    return jsonify([b.to_dict() for b in bento]),200
 
 #ユーザ取得
 @bp.route("/users", methods=["GET"])
-def get_users() -> dict:
+def get_users() -> Tuple[Response, int]:
     users = User.query.all()
-    return jsonify([u.to_dict() for u in users])
+    return jsonify([u.to_dict() for u in users]) , 200
 
 #個別ユーザ取得
 @bp.route("/User/<int:User_id>", methods=["GET"])
-def get_user(User_id) -> dict:
+def get_user(User_id: int) -> Tuple[Response, int]:
     user = User.query.get(User_id)
     if user is None:
         return jsonify({"error": "User not found"}), 404
 
-    return jsonify(user.to_dict())
+    return jsonify(user.to_dict()), 200
 
 # 全ての社員情報を取得
 @bp.route('/employees', methods=['GET'])
-def get_employees() -> dict:
+def get_employees() -> Tuple[Response, int]:
     employees = Employee.query.all()
-    return jsonify([e.to_dict() for e in employees])
+    return jsonify([e.to_dict() for e in employees]),200
 
 # IDで指定した社員情報を取得
 @bp.route("/employees/<int:employee_id>", methods=["GET"])
-def get_employee(employee_id):
+def get_employee(employee_id: int) -> Tuple[Response, int]:
     employee = Employee.query.get(employee_id)
     if employee is None:
         return jsonify({"error": "Employee not found"}), 404
 
-    return jsonify(employee.to_dict())
+    return jsonify(employee.to_dict()), 200
 
 
 @bp.route('/User', methods=['POST'])
-def add_user():
+def add_user() -> Tuple[Response, int]:
     data = request.get_json()
     id  = data.get('id')
     password = data.get('password')
@@ -106,7 +110,7 @@ def add_user():
 
 # 新しい社員を追加
 @bp.route('/employees', methods=['POST'])
-def add_employee():
+def add_employee() -> Tuple[Response, int]:
     data = request.get_json()
     id  = data.get('id')
     name = data.get('name')
@@ -123,7 +127,7 @@ def add_employee():
 
 # 既存の社員情報を更新
 @bp.route('/employees/<int:id>', methods=['PUT'])
-def update_employee(id) -> dict:
+def update_employee(id) -> Tuple[Response, int]:
     data = request.get_json()
     name = data.get('name')
     workplace_id = data.get('workplace_id')
@@ -138,10 +142,10 @@ def update_employee(id) -> dict:
     employee.reservations = reservations
     employee.mail_adress = mail_adress
     db.session.commit()
-    return jsonify(employee.to_dict())
+    return jsonify(employee.to_dict()), 200
 
 @bp.route('/User/<int:id>', methods=['DELETE'])
-def delete_user(id):
+def delete_user(id) -> Tuple[Response, int]:
     user = User.query.get_or_404(id)
     db.session.delete(user)
     db.session.commit()
@@ -149,7 +153,7 @@ def delete_user(id):
 
 # 社員情報を削除
 @bp.route('/employees/<int:id>', methods=['DELETE'])
-def delete_employee(id):
+def delete_employee(id:int) -> Tuple[Response, int]:
     employee = Employee.query.get_or_404(id)
     db.session.delete(employee)
     db.session.commit()
@@ -158,20 +162,20 @@ def delete_employee(id):
 ###予約情報に対するCRUDエンドポイント###
 # 全ての予約情報を取得
 @bp.route('/reservations', methods=['GET'])
-def get_reservations():
+def get_reservations()-> Tuple[Response, int]:
     reservations = Reservation.query.all()
-    return jsonify([r.to_dict() for r in reservations])
+    return jsonify([r.to_dict() for r in reservations]), 200
 
 
 # IDで指定した予約情報を取得
 @bp.route('/reservations/<int:id>', methods=['GET'])
-def get_reservation(id):
+def get_reservation(id:int)-> Tuple[Response, int]:
     reservation = Reservation.query.get_or_404(id)
-    return jsonify(reservation.to_dict())
+    return jsonify(reservation.to_dict()),200
 
 # 新しい予約を追加
 @bp.route('/reservations', methods=['POST'])
-def add_reservation():
+def add_reservation()-> Tuple[Response, int]:
     data = request.get_json()
     employee_id = data.get('employee_id')
     bento_id = data.get('bento_id')
@@ -190,7 +194,7 @@ def add_reservation():
 
 # 既存の予約情報を更新
 @bp.route('/reservations/<int:id>', methods=['PUT'])
-def update_reservation(id):
+def update_reservation(id:int)-> Tuple[Response, int]:
     data = request.get_json()
     employee_id = data.get('employee_id')
     bento_id = data.get('bento_id')
@@ -208,11 +212,11 @@ def update_reservation(id):
     reservation.quantity = quantity
     reservation.remarks = remarks
     db.session.commit()
-    return jsonify(reservation.to_dict())
+    return jsonify(reservation.to_dict()), 200
 
 # 予約情報を削除
 @bp.route('/reservations/<int:id>', methods=['DELETE'])
-def delete_reservation(id):
+def delete_reservation(id:int) -> Tuple[Response, int]:
     reservation = Reservation.query.get_or_404(id)
     db.session.delete(reservation)
     db.session.commit()
@@ -221,7 +225,7 @@ def delete_reservation(id):
 
 # 統計情報の取得
 @bp.route("/statistics", methods=["GET"])
-def get_statistics():
+def get_statistics() -> Tuple[Response, int]:
     month = request.args.get("month", type=int)
     year = request.args.get("year", type=int)
 
@@ -273,16 +277,16 @@ def get_statistics():
         "employee_monthly_order_amounts": {emp_id: {"name": name, "amount": amount} for emp_id, name, amount in employee_monthly_order_amounts}
     }
 
-    return jsonify(result)
+    return jsonify(result), 200
 
 ##除外日に対するCRUDエンドポイント
 @bp.route("/exclude", methods=["GET"])
-def get_exclude():
+def get_exclude() -> Tuple[Response, int]:
     excludes = Exclude.query.all()
-    return jsonify([exclude.to_dict() for exclude in excludes])
+    return jsonify([exclude.to_dict() for exclude in excludes]), 200
 
 @bp.route("/exclude", methods=["POST"])
-def create_exclude():
+def create_exclude() -> Tuple[Response, int]:
     data = request.get_json()
     exclude_date = data.get('exclude_date')
     if not exclude_date:
@@ -293,19 +297,19 @@ def create_exclude():
     return jsonify(exclude.to_dict()), 201
 
 @bp.route("/exclude/<int:id>", methods=["GET"])
-def get_exclude_by_id(id):
+def get_exclude_by_id(id:int) -> Tuple[Response, int]:
     exclude = Exclude.query.get_or_404(id)
-    return jsonify(exclude.to_dict())
+    return jsonify(exclude.to_dict()), 200
 
 @bp.route("/exclude/<int:id>", methods=["DELETE"])
-def delete_exclude(id):
+def delete_exclude(id:int) -> Tuple[Response, int]:
     exclude = Exclude.query.get_or_404(id)
     db.session.delete(exclude)
     db.session.commit()
     return jsonify({'message': '除外日を削除しました'}), 200
 
 @bp.route("/exclude/<int:id>", methods=["PUT"])
-def update_exclude(id):
+def update_exclude(id:int) -> Tuple[Response, int]:
     data = request.get_json()
     exclude_date = data.get('exclude_date')
     if not exclude_date:
@@ -318,10 +322,10 @@ def update_exclude(id):
 @bp.route("/timeflag", methods=["GET"])
 def get_timeflag():
     timeflags = TimeFlag.query.all()
-    return jsonify([timeflag.to_dict() for timeflag in timeflags])
+    return jsonify([timeflag.to_dict() for timeflag in timeflags]),200
 
 @bp.route("/timeflag", methods=["POST"])
-def create_timeflag():
+def create_timeflag() -> Tuple[Response, int]:
     data = request.get_json()
     timeflag = data.get('timeflag')
     if not timeflag:
@@ -332,19 +336,19 @@ def create_timeflag():
     return jsonify(timeflag.to_dict()), 201
 
 @bp.route("/timeflag/<int:id>", methods=["GET"])
-def get_timeflag_by_id(id):
+def get_timeflag_by_id(id:int) -> Tuple[Response, int]:
     timeflag = TimeFlag.query.get_or_404(id)
-    return jsonify(timeflag.to_dict())
+    return jsonify(timeflag.to_dict()),200
 
 @bp.route("/timeflag/<int:id>", methods=["DELETE"])
-def delete_timeflag(id):
+def delete_timeflag(id:int) -> Tuple[Response, int]:
     timeflag = TimeFlag.query.get_or_404(id)
     db.session.delete(timeflag)
     db.session.commit()
     return jsonify({'message': '時間フラグを削除しました'}), 200
 
 @bp.route("/timeflag/<int:id>", methods=["PUT"])
-def update_timeflag(id):
+def update_timeflag(id:int) -> Tuple[Response, int]:
     data = request.get_json()
     timeflag = data.get('timeflag')
     if not timeflag:
