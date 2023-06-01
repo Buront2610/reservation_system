@@ -76,7 +76,7 @@ export default function TestReservationHistoryPage() {
                             ))}
                         </TableRow>
                     </TableHead>
-                    <TableBody> /*カレンダー部分*/
+                    <TableBody> 
                         {employeeList.map((employee, employeeIndex) => {
                             let rows = [];
                             let cells = [];
@@ -112,6 +112,7 @@ export default function TestReservationHistoryPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+
         </Box>
     );
 }
