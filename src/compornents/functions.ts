@@ -2,10 +2,13 @@
 各関数集約ファイル
 ライブラリ的に使用してください
 */
+
+// 月の日数を取得
 export const getDaysInMonth = (date: Date): number => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
 };
 
+// 月の最初の曜日を取得
 export const getFirstDayOfMonth = (date: Date): number => {
     return (new Date(date.getFullYear(), date.getMonth(), 1).getDay() + 6) % 7;
 };

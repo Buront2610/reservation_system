@@ -41,7 +41,6 @@ class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     workplace_id = db.Column(db.Integer, db.ForeignKey('workplace.id'), nullable=False)
-    reservations = db.relationship('Reservation', backref='employee', lazy=True)
     mailadress = db.Column(db.String(100), nullable=True)
     telephone = db.Column(db.String(100), nullable=True)
     hide_flag = db.Column(db.Boolean, nullable=False)
@@ -66,17 +65,17 @@ class Workplace(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    employees = db.relationship('Employee', backref='workplace', lazy=True)
+    location = db.relationship('location', backref='workplace', lazy=True)
 
     def to_dict(self) -> Dict[str, str]:
         # 勤務場所情報を辞書形式に変換
         return {
             'id': self.id,
             'name': self.name,
-            'employees': self.employees
+            'location': self.location
         }
     def __repr__(self) -> str:
-        return f"<Employee id={self.id}, name={self.name}>"
+        return f"<Employee id={self.id}, name={self.name}, location={self.location}>"
 
 class Bento(db.Model):
     """
@@ -88,7 +87,6 @@ class Bento(db.Model):
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Integer, nullable=False)
     choose_flag = db.Column(db.Boolean, nullable=False)
-    reservations = db.relationship('Reservation', backref='bento', lazy=True)
 
     def to_dict(self) -> Dict[str, str]:
         # 弁当情報を辞書形式に変換
