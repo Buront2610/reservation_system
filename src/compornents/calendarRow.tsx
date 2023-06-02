@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { Employee } from './types';
 import { TableRow, TableCell } from '@mui/material';
 import { getFirstDayOfMonth, getDaysInMonth, formatDate } from './functions';
-import CalenderCell from './calenderCell';
+import CalendarCell from './calendarCell';
 
 type CalendarRowProps = {
   employee: Employee;
@@ -27,7 +27,7 @@ const CalendarRow: FC<CalendarRowProps> = ({ employee, currentDate, getReservati
       const date = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
       const reservationStatus = getReservationStatus(date, employee.id);
       cells.push(
-        <CalenderCell key={`day-${employee.id}-${day}`} day={day} reservationStatus={reservationStatus} date={date} />
+        <CalendarCell key={`day-${employee.id}-${day}`} day={day} reservationStatus={reservationStatus} date={date} />
       );
     }
   }

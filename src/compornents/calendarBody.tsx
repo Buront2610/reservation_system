@@ -1,7 +1,7 @@
 // CalendarBody.tsx
 import React, { FC } from 'react';
 import { Employee } from './types';
-import CalendarRow from './calenderRow';
+import CalendarRow from './calendarRow';
 
 type CalendarBodyProps = {
   currentDate: Date;

@@ -10,7 +10,7 @@ type CalendarHeaderProps = {
 
 const CalenderHeader: FC<CalendarHeaderProps> = ({ changeMonth, currentDate }) => {
   return (
-    <Box>
+    <Box style={{ display: 'flex', alignItems: 'center' }}>
       <IconButton onClick={() => changeMonth(-1)}>
         <ChevronLeft />
       </IconButton>

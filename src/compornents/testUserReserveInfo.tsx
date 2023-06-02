@@ -1,11 +1,21 @@
 import { useState, FC } from 'react';
 import { Reservation, Employee } from './types';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import  CalenderHeader  from './calenderHeader';
-import CalendarBody from './calenderBody';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,Button } from '@mui/material';
+import  CalenderHeader  from './calendarHeader';
+import CalendarBody from './calendarBody';
 // Define dummy data
 const dummyReservations: Reservation[] = [
     { id: 1, employee_id: 1, reservation_date: '2023-05-15', bento_id: 1, quantity: 1, },
+    { id: 1, employee_id: 1, reservation_date: '2023-05-14', bento_id: 1, quantity: 1, },
+
+    { id: 1, employee_id: 1, reservation_date: '2023-05-16', bento_id: 1, quantity: 1, },
+
+    { id: 1, employee_id: 1, reservation_date: '2023-05-17', bento_id: 1, quantity: 1, },
+
+    { id: 1, employee_id: 1, reservation_date: '2023-05-18', bento_id: 1, quantity: 1, },
+
+    { id: 1, employee_id: 1, reservation_date: '2023-05-19', bento_id: 1, quantity: 1, },
+
     { id: 2, employee_id: 1, reservation_date: '2023-05-20', bento_id: 2, quantity: 2, },
     { id: 3, employee_id: 1, reservation_date: '2023-05-30', bento_id: 1, quantity: 1, },
 ];
@@ -62,6 +72,14 @@ const Calendar: FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Box display="flex" justifyContent="center" marginTop={2}>
+        <Button variant="contained" color="primary" >
+          予約
+        </Button>
+        <Button variant="contained" color="secondary">
+          予約キャンセル
+        </Button>
+      </Box>
     </Box>
   );
 }
