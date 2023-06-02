@@ -15,12 +15,18 @@ const CalendarRow: FC<CalendarRowProps> = ({ employee, currentDate, getReservati
   let rows = [];
   let cells = [];
   let dayOffset = getFirstDayOfMonth(currentDate);
+  let count = 0;
 
   for (let day = 0 - dayOffset; day <= getDaysInMonth(currentDate); day++) {
-    if ((day + dayOffset) % 7 === 0 && cells.length > 0) {
+    if(day==-6 && cells.length==0){
+      day = 1;
+    }
+
+    if ((day + dayOffset) % 7 === 0) {
       rows.push(<TableRow key={`row-${employee.id}-${rows.length}`}>{cells}</TableRow>);
       cells = [];
     }
+
     if (day <= 0) {
       cells.push(<TableCell key={`empty-${employee.id}-${day}`}></TableCell>);
     } else {
