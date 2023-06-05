@@ -33,6 +33,7 @@ import dashBoard from    './adminReserveList';
 import Login from './login';
 import { textAlign } from '@mui/system';
 import { ManageAccounts } from '@mui/icons-material';
+import LockIcon from '@mui/icons-material/Lock';
 
 
     interface setStateProps {
@@ -178,6 +179,11 @@ import { ManageAccounts } from '@mui/icons-material';
             icon: <CalculateIcon />,
             path: "/test8"
         },
+        {
+            text:"テスト予約ロック",
+            icon: <LockIcon />,
+            path: "/lock"
+        }
       ];
 
       return (
