@@ -21,7 +21,7 @@ const dummyReservations: Reservation[] = [
 ];
 
 const dummyEmployees: Employee[] = [
-    { id: 1, name: 'John Doe', workplace_id: 1 },
+    { id: 1, name: 'John Doe', workplace_id: 1, mailaddress: 'test@test.co.jp',  hide_flag: false, telephone: '8888'},
 ];
 
 

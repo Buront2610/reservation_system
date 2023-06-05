@@ -12,12 +12,17 @@ export interface Bento {
     id: number;
     name: string;
     price: number;
+    choose_flag: boolean;
 }
 
 export interface Employee {
     id: number;
     name: string;
     workplace_id: number;
+    mailaddress: string;
+    telephone: string;
+    hide_flag: boolean;
+
 }
 
 export interface Reservation {
@@ -41,6 +46,7 @@ export interface Login {
 }
 
 export interface Exclude{
+    id: number;
     Date: string;
 }
 
