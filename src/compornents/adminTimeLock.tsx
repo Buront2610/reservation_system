@@ -1,31 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/system';
 import { Box, Button, Card } from '@mui/material';
+import ClockDisplay from './clockDisplay';
 
 const RootDiv = styled('div')({
   display: 'flex',
+  flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
   height: '100vh',
   size: 'large'
 });
 
-interface TimeFlag {
-  id: number;
-  timeFlag: boolean;
-}
+const StyledCard = styled(Card)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom: theme.spacing(2),
+  padding: theme.spacing(2),
+  minWidth: '50%',
+}));
 
-export default function AdminTimeLock() {
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+const AdminTimeLock: React.FC = () => {
   const [isReservationStopped, setIsReservationStopped] = useState<boolean>(false);
-
-  //時計用useEffect
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const handleToggleReservation = () => {
     setIsReservationStopped((prevState) => !prevState);
@@ -33,38 +31,37 @@ export default function AdminTimeLock() {
 
   return (
     <RootDiv>
-      <Card sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
-          <div style={{ fontSize: '1.5em', marginBottom: '2em', padding: '1em', backgroundColor: '#222', color: '#fff', textAlign: 'center' }}>
-            {`${currentTime.getFullYear()}-${String(currentTime.getMonth() + 1).padStart(2, '0')}-${String(currentTime.getDate()).padStart(2, '0')}`}<br/>
-            {`${String(currentTime.getHours()).padStart(2, '0')}:${String(currentTime.getMinutes()).padStart(2, '0')}:${String(currentTime.getSeconds()).padStart(2, '0')}`}
-          </div>
+      <StyledCard>
+        <Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2, width: '80%', height: '30vh' ,color:'black'}}>
+          <ClockDisplay />
+        </Card>
+        <Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '80%', height: '10vh' }}>
           <ReservationButton
             onClick={handleToggleReservation}
-            disabled={isReservationStopped}
-            label="予約機能停止"
+            isReservationStopped={isReservationStopped}
           />
-          <ReservationButton
-            onClick={handleToggleReservation}
-            disabled={!isReservationStopped}
-            label="予約機能再開"
-          />
-        </Box>
-      </Card>
+        </Card>
+      </StyledCard>
     </RootDiv>
   );
-}
+};
 
 interface ReservationButtonProps {
   onClick: () => void;
-  disabled: boolean;
-  label: string;
+  isReservationStopped: boolean;
 }
 
-const ReservationButton: React.FC<ReservationButtonProps> = ({ onClick, disabled, label }) => {
+const ReservationButton: React.FC<ReservationButtonProps> = ({ onClick, isReservationStopped }) => {
   return (
-    <Button variant="contained" color={disabled ? 'secondary' : 'primary'} onClick={onClick} disabled={disabled} sx={{ padding: 2, fontSize: 18 }}>
-      {label}
+    <Button 
+      variant="contained" 
+      color="primary" 
+      onClick={onClick} 
+      sx={{ padding: 2, fontSize: 18 }}
+    >
+      {isReservationStopped ? '予約機能再開' : '予約機能停止'}
     </Button>
   );
 };
+
+export default AdminTimeLock;
