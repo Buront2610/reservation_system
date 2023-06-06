@@ -15,10 +15,6 @@
 from app import db
 
 class User(db.Model):
-    """
-    ユーザ情報テーブル
-    ID:社員番号
-    """
     id = db.Column(db.Integer, primary_key=True)
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(100), nullable=False)
@@ -28,31 +24,38 @@ class User(db.Model):
     hide_flag = db.Column(db.Boolean, nullable=False)
     workplace_id = db.Column(db.Integer, db.ForeignKey('workplace.id'), nullable=False)
 
+    def to_dict(self):
+        return {        
+            'id': self.id,
+            'role': self.role,
+            'name': self.name,
+            'email_address': self.email_address,
+            'telephone': self.telephone,
+            'hide_flag': self.hide_flag,
+            'workplace_id': self.workplace_id,
+        }
+
+
 class Workplace(db.Model):
-    """
-    勤務場所テーブル
-    id:勤務場所ID
-    """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100), nullable=False)
 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
 class Bento(db.Model):
-    """
-    弁当テーブル
-    月ごとに注文社を変えるとのこと
-    Flagで判断
-    """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Integer, nullable=False)
     choose_flag = db.Column(db.Boolean, nullable=False)
 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
 class Reservation(db.Model):
-    """
-    予約テーブル
-    IDで他テーブルと一対多の関係を持つ
-    """
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     bento_id = db.Column(db.Integer, db.ForeignKey('bento.id'), nullable=False)
@@ -60,17 +63,21 @@ class Reservation(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     remarks = db.Column(db.String(100), nullable=True)
 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
 class Exclude(db.Model):
-    """
-    除外日テーブル
-    DatePickerの除外日制御に使用
-    """
     id = db.Column(db.Integer, primary_key=True)
     exclude_date = db.Column(db.Date, nullable=True)
 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
 class TimeFlag(db.Model):
-    """
-    時間フラグテーブル
-    """
     id = db.Column(db.Integer, primary_key=True)
     time_flag = db.Column(db.Integer, nullable=False)
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

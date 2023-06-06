@@ -1,7 +1,7 @@
 """
 ユーザ操作で各種DB操作を行うAPI
 トークン認証などによりセキュリティ対策を行っている
-各種CRUD操作を行うエンドポイントと、統計情報を取得するエンドポイントを用意こうしんが更新ががあれば随時追加
+各種CRUD操作を行うエンドポイントと、統計情報を取得するエンドポイントを用意 更新があれば随時追加
 """
 from flask import Flask, request, jsonify,Blueprint,Response
 from typing import Union, Tuple
@@ -10,17 +10,103 @@ from sqlalchemy import func, extract
 from app import create_app, db
 from app.models import Workplace, Bento, Reservation, User, Exclude,TimeFlag
 from app.functions import check_password, hash_password,generate_token
+import traceback
 
 bp = Blueprint('api', __name__)
 
 app =create_app()
 
-###routeの並びがめちゃめちゃで可読性悪い
-###後で直す　CRUDエンドポイントに並べなおすこと
-###ここでもAPIに外部アクセスされないようトークン認証を行うようにする
-###型定義めちゃくちゃ問題
-###時代はやはり静的型付け言語だな
-###エラーハンドリングもどうにかする
+
+
+
+class UserService:
+    @staticmethod
+    def get_user_by_id(user_id):
+        # Get a user by ID, or return None if not found
+        user = User.query.get(user_id)
+        return user
+
+    @staticmethod
+    def get_all_users():
+        # Get all users
+        users = User.query.all()
+        return users
+
+    @staticmethod
+    def create_user(data):
+        # Validate and create a new user
+        id  = data.get('id')
+        password = data.get('password')
+        role = data.get('role')
+        name = data.get('name')
+        email_address = data.get('email_address')
+        telephone = data.get('telephone')
+        hide_flag = data.get('hide_flag')
+        workplace_id = data.get('workplace_id')
+
+        # フロントエンドでハッシュ化されたパスワードをさらにハッシュ化
+        hashed_password = hash_password(password)
+        try:
+            user = User(id=id, password=hashed_password, role=role, name=name, email_address=email_address, telephone=telephone, hide_flag=hide_flag, workplace_id=workplace_id)
+            db.session.add(user)
+            db.session.commit()
+            return user
+        except Exception as e:
+            app.logger.error(f'Error while creating user: {e}\n{traceback.format_exc()}')            
+            return None
+    
+    @staticmethod
+    def update_user(user_id, data):
+        user = User.query.get(user_id)
+        if user is None:
+            return None
+
+        password = data.get('password')
+        role = data.get('role')
+        name = data.get('name')
+        email_address = data.get('email_address')
+        telephone = data.get('telephone')
+        hide_flag = data.get('hide_flag')
+        workplace_id = data.get('workplace_id')
+
+        if password is not None:
+            # フロントエンドでハッシュ化されたパスワードをさらにハッシュ化
+            hashed_password = hash_password(password)
+            user.password = hashed_password
+
+        if role is not None:
+            user.role = role
+
+        if name is not None:
+            user.name = name
+
+        if email_address is not None:
+            user.email_address = email_address
+
+        if telephone is not None:
+            user.telephone = telephone
+
+        if hide_flag is not None:
+            user.hide_flag = hide_flag
+
+        if workplace_id is not None:
+            user.workplace_id = workplace_id
+
+        db.session.commit()
+
+        return user
+
+    @staticmethod
+    def delete_user(user_id):
+        # Delete a user by ID
+        user = User.query.get(user_id)
+        if user is None:
+            return False
+
+        db.session.delete(user)
+        db.session.commit()
+        return True
+
 
 # 例: ユーザー認証
 @bp.route('/login', methods=['POST'])
@@ -47,6 +133,45 @@ def login() -> Tuple[Response, int]:
     
 #以下にAPIの実装を行う
 
+##ユーザに対するCRUD操作
+@bp.route("/users", methods=["GET"])
+def get_users() -> Tuple[Response, int]:
+    users = UserService.get_all_users()
+    return jsonify([u.to_dict() for u in users]) , 200
+
+@bp.route('/users/<int:user_id>', methods=['GET'])
+def get_user(user_id: int) -> Tuple[Response, int]:
+    user = UserService.get_user_by_id(user_id)
+    if user is None:
+        return jsonify({"error": "ユーザーが見つかりません"}), 404
+    return jsonify(user.to_dict()), 200
+
+@bp.route('/users', methods=['POST'])
+def add_user() -> Tuple[Response, int]:
+    data = request.get_json()
+    app.logger.info(f"Received data: {data}")
+
+    user = UserService.create_user(data)
+    if user is None:
+        return jsonify({'error': 'すべてのフィールドが必要です'}), 400
+    return jsonify(user.to_dict()), 201
+
+@bp.route('/users/<int:user_id>', methods=['PUT'])
+def update_user(user_id) -> Tuple[Response, int]:
+    data = request.get_json()
+    user = UserService.update_user(user_id, data)
+    if user is None:
+        return jsonify({'error': '更新するユーザーが見つかりません'}), 404
+    return jsonify(user.to_dict()), 200
+
+@bp.route('/users/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id) -> Tuple[Response, int]:
+    if UserService.delete_user(user_id):
+        return jsonify({'message': 'ユーザー情報を削除しました'}), 200
+    else:
+        return jsonify({"error": "ユーザーが見つかりません"}), 404
+
+
 # 勤務場所情報取得
 @bp.route("/workplaces", methods=["GET"])
 def get_workplaces() -> Tuple[Response, int]:
@@ -58,50 +183,6 @@ def get_workplaces() -> Tuple[Response, int]:
 def get_bento() -> Tuple[Response, int]:
     bento = Bento.query.all()
     return jsonify([b.to_dict() for b in bento]),200
-
-#ユーザ取得
-@bp.route("/users", methods=["GET"])
-def get_users() -> Tuple[Response, int]:
-    users = User.query.all()
-    return jsonify([u.to_dict() for u in users]) , 200
-
-#個別ユーザ取得
-@bp.route("/User/<int:User_id>", methods=["GET"])
-def get_user(User_id: int) -> Tuple[Response, int]:
-    user = User.query.get(User_id)
-    if user is None:
-        return jsonify({"error": "User not found"}), 404
-
-    return jsonify(user.to_dict()), 200
-
-
-
-@bp.route('/User', methods=['POST'])
-def add_user() -> Tuple[Response, int]:
-    data = request.get_json()
-    id  = data.get('id')
-    password = data.get('password')
-    role = data.get('role')
-
-    if not password or not role or not id:
-        return jsonify({'error': 'すべてのフィールドが必要です'}), 400
-
-    # フロントエンドでハッシュ化されたパスワードをさらにハッシュ化
-    hashed_password = hash_password(password)
-
-    user = User(id=id, password=hashed_password, role=role)
-    db.session.add(user)
-    db.session.commit()
-    return jsonify(user.to_dict()), 201
-
-
-
-@bp.route('/User/<int:id>', methods=['DELETE'])
-def delete_user(id) -> Tuple[Response, int]:
-    user = User.query.get_or_404(id)
-    db.session.delete(user)
-    db.session.commit()
-    return jsonify({'message': 'ユーザー情報を削除しました'}), 200
 
 
 

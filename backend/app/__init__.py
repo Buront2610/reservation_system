@@ -6,6 +6,7 @@ from flask_mail import Mail
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+from app.routes import bp
 
 
 db = SQLAlchemy()
@@ -39,7 +40,6 @@ def create_app(config_class=Config):
     setup_logger(app)
 
     with app.app_context():
-        from app.routes import bp as main_bp
-        app.register_blueprint(main_bp, url_prefix='/api')
+        app.register_blueprint(bp, url_prefix='/api')
 
     return app
