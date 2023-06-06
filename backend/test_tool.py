@@ -6,13 +6,17 @@ from werkzeug.security import generate_password_hash
 
 @pytest.fixture
 def app():
+    # テスト用の設定を行う
     app = create_app()
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     app.config['TESTING'] = True
+
+    # アプリケーションコンテキスト内でデータベースを生成する
     with app.app_context():
         db.create_all()
-    yield app
-    with app.app_context():
+        yield app
+        # テストが終わったらデータベースを削除する
+        db.session.remove()
         db.drop_all()
 
 @pytest.fixture

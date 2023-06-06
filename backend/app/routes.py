@@ -3,18 +3,17 @@
 トークン認証などによりセキュリティ対策を行っている
 各種CRUD操作を行うエンドポイントと、統計情報を取得するエンドポイントを用意 更新があれば随時追加
 """
-from flask import Flask, request, jsonify,Blueprint,Response
+from flask import Flask, current_app, request, jsonify,Blueprint,Response
 from typing import Union, Tuple
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, extract
-from app import create_app, db
+from app import db
 from app.models import Workplace, Bento, Reservation, User, Exclude,TimeFlag
 from app.functions import check_password, hash_password,generate_token
 import traceback
 
 bp = Blueprint('api', __name__)
 
-app =create_app()
 
 
 
@@ -52,7 +51,7 @@ class UserService:
             db.session.commit()
             return user
         except Exception as e:
-            app.logger.error(f'Error while creating user: {e}\n{traceback.format_exc()}')            
+            current_app.logger.error(f'Error while creating user: {e}\n{traceback.format_exc()}')            
             return None
     
     @staticmethod
@@ -149,7 +148,7 @@ def get_user(user_id: int) -> Tuple[Response, int]:
 @bp.route('/users', methods=['POST'])
 def add_user() -> Tuple[Response, int]:
     data = request.get_json()
-    app.logger.info(f"Received data: {data}")
+    current_app.logger.info(f"Received data: {data}")
 
     user = UserService.create_user(data)
     if user is None:
