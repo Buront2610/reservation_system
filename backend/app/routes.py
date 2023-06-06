@@ -8,8 +8,8 @@ from typing import Union, Tuple
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, extract
 from app import create_app, db
-from app.models import Employee, Workplace, Bento, Reservation, User, Exclude,TimeFlag
-from backend.app.functions import check_password, hash_password,generate_token
+from app.models import Workplace, Bento, Reservation, User, Exclude,TimeFlag
+from app.functions import check_password, hash_password,generate_token
 
 bp = Blueprint('api', __name__)
 
@@ -74,20 +74,6 @@ def get_user(User_id: int) -> Tuple[Response, int]:
 
     return jsonify(user.to_dict()), 200
 
-# 全ての社員情報を取得
-@bp.route('/employees', methods=['GET'])
-def get_employees() -> Tuple[Response, int]:
-    employees = Employee.query.all()
-    return jsonify([e.to_dict() for e in employees]),200
-
-# IDで指定した社員情報を取得
-@bp.route("/employees/<int:employee_id>", methods=["GET"])
-def get_employee(employee_id: int) -> Tuple[Response, int]:
-    employee = Employee.query.get(employee_id)
-    if employee is None:
-        return jsonify({"error": "Employee not found"}), 404
-
-    return jsonify(employee.to_dict()), 200
 
 
 @bp.route('/User', methods=['POST'])
@@ -108,41 +94,7 @@ def add_user() -> Tuple[Response, int]:
     db.session.commit()
     return jsonify(user.to_dict()), 201
 
-# 新しい社員を追加
-@bp.route('/employees', methods=['POST'])
-def add_employee() -> Tuple[Response, int]:
-    data = request.get_json()
-    id  = data.get('id')
-    name = data.get('name')
-    Workplace_id = data.get('Workplace_id')
-    mailadress = data.get('mailadress')
 
-    if not name or not Workplace_id or not id:
-        return jsonify({'error': 'すべてのフィールドが必要です'}), 400
-
-    employee = Employee(id = id ,name=name, Workplace_id=Workplace_id, mailadress=mailadress)
-    db.session.add(employee)
-    db.session.commit()
-    return jsonify(employee.to_dict()), 201
-
-# 既存の社員情報を更新
-@bp.route('/employees/<int:id>', methods=['PUT'])
-def update_employee(id) -> Tuple[Response, int]:
-    data = request.get_json()
-    name = data.get('name')
-    workplace_id = data.get('workplace_id')
-    reservations = data.get('reservations')
-    mail_adress = data.get('mail_adress')
-    if not name or not workplace_id or not reservations:
-        return jsonify({'error': 'すべてのフィールドが必要です'}), 400
-
-    employee = Employee.query.get_or_404(id)
-    employee.name = name
-    employee.workplace_id = workplace_id
-    employee.reservations = reservations
-    employee.mail_adress = mail_adress
-    db.session.commit()
-    return jsonify(employee.to_dict()), 200
 
 @bp.route('/User/<int:id>', methods=['DELETE'])
 def delete_user(id) -> Tuple[Response, int]:
@@ -151,13 +103,7 @@ def delete_user(id) -> Tuple[Response, int]:
     db.session.commit()
     return jsonify({'message': 'ユーザー情報を削除しました'}), 200
 
-# 社員情報を削除
-@bp.route('/employees/<int:id>', methods=['DELETE'])
-def delete_employee(id:int) -> Tuple[Response, int]:
-    employee = Employee.query.get_or_404(id)
-    db.session.delete(employee)
-    db.session.commit()
-    return jsonify({'message': '社員情報を削除しました'}), 200
+
 
 ###予約情報に対するCRUDエンドポイント###
 # 全ての予約情報を取得
@@ -234,31 +180,31 @@ def get_statistics() -> Tuple[Response, int]:
 
     # 各勤務場所の予約数
     location_order_counts = db.session.query(Workplace.name, func.count(Reservation.id)).\
-        join(Employee, Workplace.id == Employee.workplace_id).\
-        join(Reservation, Employee.id == Reservation.employee_id).\
+        join(User, Workplace.id == User.workplace_id).\
+        join(Reservation, User.id == Reservation.employee_id).\
         filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
         group_by(Workplace.name).all()
 
     # 各勤務場所の注文金額
     location_order_amounts = db.session.query(Workplace.name, func.sum(Bento.price * Reservation.quantity)).\
-        join(Employee, Workplace.id == Employee.workplace_id).\
-        join(Reservation, Employee.id == Reservation.employee_id).\
+        join(User, Workplace.id == User.workplace_id).\
+        join(Reservation, User.id == Reservation.employee_id).\
         join(Bento, Reservation.bento_id == Bento.id).\
         filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
         group_by(Workplace.name).all()
 
     # 社員ごとの月次予約数
-    employee_monthly_order_counts = db.session.query(Employee.id, Employee.name, func.count(Reservation.id)).\
-        join(Reservation, Employee.id == Reservation.employee_id).\
+    employee_monthly_order_counts = db.session.query(User.id, User.name, func.count(Reservation.id)).\
+        join(Reservation, User.id == Reservation.employee_id).\
         filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
-        group_by(Employee.id).all()
+        group_by(User.id).all()
 
     # 社員ごとの月次注文金額
-    employee_monthly_order_amounts = db.session.query(Employee.id, Employee.name, func.sum(Bento.price * Reservation.quantity)).\
-        join(Reservation, Employee.id == Reservation.employee_id).\
+    employee_monthly_order_amounts = db.session.query(User.id, User.name, func.sum(Bento.price * Reservation.quantity)).\
+        join(Reservation, User.id == Reservation.employee_id).\
         join(Bento, Reservation.bento_id == Bento.id).\
         filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
-        group_by(Employee.id).all()
+        group_by(User.id).all()
     
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)

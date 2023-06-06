@@ -13,7 +13,6 @@
 """
 
 from app import db
-from typing import Dict
 
 class User(db.Model):
     """
@@ -52,7 +51,7 @@ class Bento(db.Model):
 class Reservation(db.Model):
     """
     予約テーブル
-    いろいろなデータとつながる
+    IDで他テーブルと一対多の関係を持つ
     """
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
