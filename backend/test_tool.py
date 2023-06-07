@@ -1,3 +1,4 @@
+from turtle import update
 import pytest
 from app import db, create_app
 from app.models import User, Workplace, Bento, Reservation, Exclude, TimeFlag
@@ -95,107 +96,80 @@ class TestUserService:
             user = UserService.get_user_by_id(1)
         assert user is None
 
-def test_create_workplace(client):
-    # Prepare
-    workplace_data = {
-        "id": 1, 
-        "name": "Workplace 1",
-        "location": "Hiroshima",
-    }
+class TestWorkplaceService:
 
-    # Act
-    response = client.post('/api/workplaces', json=workplace_data)
+    @pytest.fixture(autouse=True)
+    def setup_method(self, client, app):
+        self.client = client
+        self.workplace_data = {
+            "id": 1,
+            "name": "Workplace 1",
+            "location": "Hiroshima",
+        }
+        with app.app_context():
+            self.workplace = WorkplaceService.create_workplace(self.workplace_data)
 
-    # Assert
-    assert response.status_code == 201
-    workplace = WorkplaceService.get_workplace_by_id(1)
-    assert workplace is not None
-    assert workplace.id == 1
 
-def test_get_all_workplaces(client):
-    # Prepare
-    workplace_data = {
-        "id": 1, 
-        "name": "Workplace 1",
-        "location": "Hiroshima",
-    }
-    workplace_data2 ={
-        "id": 2,
-        "name": "Workplace 2",
-        "location": "Tokyo",
-    }
-    workplace = Workplace(**workplace_data)
-    db.session.add(workplace)
-    db.session.commit()
-    workplace = Workplace(**workplace_data2)
-    db.session.add(workplace)
-    db.session.commit()
+    def test_create_workplace(self, app):
+        # Prepare
+        new_workplace_data = self.workplace_data.copy()
+        new_workplace_data['id'] = 2
 
-    # Act
-    response = client.get('/api/workplaces')
 
-    # Assert
-    assert response.status_code == 200
-    assert len(response.get_json()) == 2
-    assert response.get_json()[0]['id'] == 1
+        # Act
+        response = self.client.post('/api/workplaces', json=new_workplace_data)
 
-def test_get_workplace_by_id(client):   
-    # Prepare
-    workplace_data = {
-        "id": 1, 
-        "name": "Workplace 1",
-        "location": "Hiroshima",
-    }
-    workplace = Workplace(**workplace_data)
-    db.session.add(workplace)
-    db.session.commit()
+        # Assert
+        assert response.status_code == 201
+        with app.app_context():
+            workplace = WorkplaceService.get_workplace_by_id(2)
+        assert workplace is not None
+        assert workplace.id == 2
 
-    # Act
-    response = client.get('/api/workplaces/1')
+    def test_get_all_workplaces(self):
+        # Act
+        response = self.client.get('/api/workplaces')
 
-    # Assert
-    assert response.status_code == 200
-    assert response.get_json()['id'] == 1
+        # Assert
+        assert response.status_code == 200
+        assert len(response.get_json()) == 1
+        assert response.get_json()[0]['id'] == 1
 
-def test_update_workplace(client):
-    # Prepare
-    workplace_data = {
-        "id": 1, 
-        "name": "Workplace 1",
-        "location": "Hiroshima",
-    }
-    workplace = Workplace(**workplace_data)
-    db.session.add(workplace)
-    db.session.commit()
+    def test_get_workplace_by_id(self):   
 
-    # Act
-    update_data = {"name": "Workplace 2"}
-    response = client.put('/api/workplaces/1', json=update_data)
+        # Act
+        response = self.client.get('/api/workplaces/1')
 
-    # Assert
-    assert response.status_code == 200
-    workplace = WorkplaceService.get_workplace_by_id(1)
-    assert workplace is not None
-    assert workplace.name == "Workplace 2"
+        # Assert
+        assert response.status_code == 200
+        assert response.get_json()['id'] == 1
 
-def test_delete_workplace(client):
-    # Prepare
-    workplace_data = {
-        "id": 1, 
-        "name": "Workplace 1",
-        "location": "Hiroshima",
-    }
-    workplace = Workplace(**workplace_data)
-    db.session.add(workplace)
-    db.session.commit()
+    def test_update_workplace(self,app):
+        # Prepare
+        update_data = {"name": "Workplace 2"}
 
-    # Act
-    response = client.delete('/api/workplaces/1')
 
-    # Assert
-    assert response.status_code == 200
-    workplace = WorkplaceService.get_workplace_by_id(1)
-    assert workplace is None
+
+        # Act
+        update_data = {"name": "Workplace 2"}
+        response = self.client.put('/api/workplaces/1', json=update_data)
+
+        # Assert
+        assert response.status_code == 200
+        with app.app_context():
+            workplace = WorkplaceService.get_workplace_by_id(1)
+        assert workplace is not None
+        assert workplace.name == "Workplace 2"
+
+    def test_delete_workplace(self,app):
+        #
+        response = self.client.delete('/api/workplaces/1')
+
+        # Assert
+        assert response.status_code == 200
+        with app.app_context():
+            workplace = WorkplaceService.get_workplace_by_id(1)
+        assert workplace is None
 
 def test_create_bento(client):
     # Prepare
