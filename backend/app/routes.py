@@ -11,101 +11,266 @@ from app import db
 from app.models import Workplace, Bento, Reservation, User, Exclude,TimeFlag
 from app.functions import check_password, hash_password,generate_token
 import traceback
+import re
 
 bp = Blueprint('api', __name__)
 
 
 
 
-
+# ユーザー操作用のエンドポイント
 class UserService:
-    @staticmethod
-    def get_user_by_id(user_id):
-        # Get a user by ID, or return None if not found
-        user = User.query.get(user_id)
-        return user
-
-    @staticmethod
-    def get_all_users():
-        # Get all users
-        users = User.query.all()
-        return users
-
-    @staticmethod
-    def create_user(data):
-        # Validate and create a new user
-        id  = data.get('id')
-        password = data.get('password')
-        role = data.get('role')
-        name = data.get('name')
-        email_address = data.get('email_address')
-        telephone = data.get('telephone')
-        hide_flag = data.get('hide_flag')
-        workplace_id = data.get('workplace_id')
-
-        # フロントエンドでハッシュ化されたパスワードをさらにハッシュ化
-        hashed_password = hash_password(password)
+    @classmethod
+    def get_user_by_id(cls, user_id):
         try:
-            user = User(id=id, password=hashed_password, role=role, name=name, email_address=email_address, telephone=telephone, hide_flag=hide_flag, workplace_id=workplace_id)
+            return db.session.get(User, user_id)
+        except Exception as e:
+            current_app.logger.error(f'Error while retrieving user: {e}\n{traceback.format_exc()}')
+            raise
+
+    @classmethod
+    def get_all_users(cls):
+        return User.query.all()
+
+    @classmethod
+    def create_user(cls, data):
+        cls._validate_user_data_for_creation(data)
+        
+        hashed_password = hash_password(data.get('password'))
+        
+        try:
+            user = User(id=data.get('id'), password=hashed_password, role=data.get('role'), 
+                        name=data.get('name'), email_address=data.get('email_address'), 
+                        telephone=data.get('telephone'), hide_flag=data.get('hide_flag'), 
+                        workplace_id=data.get('workplace_id'))
             db.session.add(user)
             db.session.commit()
             return user
         except Exception as e:
-            current_app.logger.error(f'Error while creating user: {e}\n{traceback.format_exc()}')            
-            return None
-    
-    @staticmethod
-    def update_user(user_id, data):
-        user = User.query.get(user_id)
-        if user is None:
-            return None
+            current_app.logger.error(f'Error while creating user: {e}\n{traceback.format_exc()}')
+            raise
 
-        password = data.get('password')
-        role = data.get('role')
-        name = data.get('name')
-        email_address = data.get('email_address')
-        telephone = data.get('telephone')
-        hide_flag = data.get('hide_flag')
-        workplace_id = data.get('workplace_id')
-
-        if password is not None:
-            # フロントエンドでハッシュ化されたパスワードをさらにハッシュ化
-            hashed_password = hash_password(password)
-            user.password = hashed_password
-
-        if role is not None:
-            user.role = role
-
-        if name is not None:
-            user.name = name
-
-        if email_address is not None:
-            user.email_address = email_address
-
-        if telephone is not None:
-            user.telephone = telephone
-
-        if hide_flag is not None:
-            user.hide_flag = hide_flag
-
-        if workplace_id is not None:
-            user.workplace_id = workplace_id
+    @classmethod
+    def update_user(cls, user_id, data):
+        cls._validate_user_data_for_update(data)
+        
+        user = cls.get_user_by_id(user_id)
+        
+        if 'password' in data:
+            user.password = hash_password(data['password'])
+        if 'role' in data:
+            user.role = data['role']
+        if 'name' in data:
+            user.name = data['name']
+        if 'email_address' in data:
+            user.email_address = data['email_address']
+        if 'telephone' in data:
+            user.telephone = data['telephone']
+        if 'hide_flag' in data:
+            user.hide_flag = data['hide_flag']
+        if 'workplace_id' in data:
+            user.workplace_id = data['workplace_id']
 
         db.session.commit()
 
         return user
 
-    @staticmethod
-    def delete_user(user_id):
-        # Delete a user by ID
-        user = User.query.get(user_id)
-        if user is None:
-            return False
+    @classmethod
+    def delete_user(cls, user_id):
+        user = cls.get_user_by_id(user_id)
 
         db.session.delete(user)
         db.session.commit()
+
         return True
 
+    
+    @staticmethod
+    def _validate_user_data_for_creation(data):
+        # Check if the required fields are present
+        required_fields = ['id', 'password', 'role', 'name', 'email_address']
+        for field in required_fields:
+            if field not in data:
+                raise ValueError(f"Missing required field: {field}")
+
+        # Check if the email address is in the correct format
+        email_address = data.get('email_address')
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email_address):
+            raise ValueError("Invalid email address format")
+
+        # Check if the password meets minimum security requirements
+        password = data.get('password')
+        if len(password) < 8:
+            raise ValueError("Password must be at least 8 characters")
+
+        # Check if role is a valid role
+        valid_roles = ['admin', 'user', 'guest']
+        role = data.get('role')
+        if role not in valid_roles:
+            raise ValueError("Invalid role")
+
+        # Further validations can be added here based on the specific requirements
+
+    @staticmethod
+    def _validate_user_data_for_update(data):
+        # Check if the fields that are present are valid
+        if 'email_address' in data and not re.match(r"[^@]+@[^@]+\.[^@]+", data['email_address']):
+            raise ValueError("Invalid email address format")
+            
+        if 'password' in data and len(data['password']) < 8:
+            raise ValueError("Password must be at least 8 characters")
+            
+        valid_roles = ['admin', 'user', 'guest']
+        if 'role' in data and data['role'] not in valid_roles:
+            raise ValueError("Invalid role")
+
+        # Further validations can be added here based on the specific requirements
+
+class WorkplaceService:
+    @classmethod
+    def get_all_workplaces(cls):
+        try:
+            return Workplace.query.all()
+        except Exception as e:
+            current_app.logger.error(f'Error while retrieving workplaces: {e}\n{traceback.format_exc()}')
+            raise
+
+    @classmethod
+    def get_workplace_by_id(cls, workplace_id):
+        try:
+            return db.session.get(Workplace, workplace_id)
+        except Exception as e:
+            current_app.logger.error(f'Error while retrieving workplace: {e}\n{traceback.format_exc()}')
+            raise
+
+    @classmethod
+    def create_workplace(cls, data):
+        cls._validate_workplace_data_for_creation(data)
+        
+        try:
+            workplace = Workplace(id=data.get('id'), name=data.get('name'), location=data.get('location'))
+            db.session.add(workplace)
+            db.session.commit()
+            return workplace
+        except Exception as e:
+            current_app.logger.error(f'Error while creating workplace: {e}\n{traceback.format_exc()}')
+            raise
+
+    @classmethod
+    def update_workplace(cls, workplace_id, data):
+        cls._validate_workplace_data_for_update(data)
+        
+        workplace = cls.get_workplace_by_id(workplace_id)
+        
+        if 'name' in data:
+            workplace.name = data['name']
+        if 'location' in data:
+            workplace.location = data['location']
+
+        db.session.commit()
+
+        return workplace
+
+    @classmethod
+    def delete_workplace(cls, workplace_id):
+        workplace = cls.get_workplace_by_id(workplace_id)
+
+        db.session.delete(workplace)
+        db.session.commit()
+
+        return True
+
+    @staticmethod
+    def _validate_workplace_data_for_creation(data):
+        # Check if the required fields are present
+        required_fields = ['id', 'name', 'location']
+        for field in required_fields:
+            if field not in data:
+                raise ValueError(f"Missing required field: {field}")
+
+        # Check that fields are within the maximum length
+        if len(data.get('name', '')) > 100:
+            raise ValueError("Workplace name is too long")
+
+        if len(data.get('location', '')) > 100:
+            raise ValueError("Workplace location is too long")
+
+        # Check that fields are not None
+        if data.get('name') is None:
+            raise ValueError("Workplace name cannot be None")
+
+        if data.get('location') is None:
+            raise ValueError("Workplace location cannot be None")
+        
+    @staticmethod
+    def _validate_workplace_data_for_update(data):
+        # Check that fields are within the maximum length
+        if 'name' in data and data['name'] is not None and len(data['name']) > 100:
+            raise ValueError("Workplace name is too long")
+
+        if 'location' in data and data['location'] is not None and len(data['location']) > 100:
+            raise ValueError("Workplace location is too long")
+
+
+
+class BentoService:
+    @staticmethod
+    def get_all_bentos():
+        bentos = Bento.query.all()
+        return bentos
+    
+    @staticmethod
+    def get_bento_by_id(bento_id):
+        bento = db.session.get(Bento, bento_id)
+        return bento
+    
+    @staticmethod
+    def create_bento(data):
+        id = data.get('id')
+        name = data.get('name')
+        price = data.get('price')
+        choose_flag = data.get('choose_flag')
+        try:
+            bento = Bento(id=id,name=name, price=price, choose_flag=choose_flag)
+            db.session.add(bento)
+            db.session.commit()
+            return bento
+        except Exception as e:
+            current_app.logger.error(f'Error while creating bento: {e}\n{traceback.format_exc()}')            
+            return None
+        
+    @staticmethod
+    def update_bento(bento_id, data):
+        bento = db.session.get(Bento, bento_id)
+        if bento is None:
+            return None
+
+        name = data.get('name')
+        price = data.get('price')
+        choose_flag = data.get('choose_flag')
+
+        if name is not None:
+            bento.name = name
+
+        if price is not None:
+            bento.price = price
+
+        if choose_flag is not None:
+            bento.choose_flag = choose_flag
+
+        db.session.commit()
+
+        return bento
+    
+    @staticmethod
+    def delete_bento(bento_id):
+        bento = db.session.get(Bento, bento_id)
+        if bento is None:
+            return False
+
+        db.session.delete(bento)
+        db.session.commit()
+        return True
 
 # 例: ユーザー認証
 @bp.route('/login', methods=['POST'])
@@ -171,18 +336,80 @@ def delete_user(user_id) -> Tuple[Response, int]:
         return jsonify({"error": "ユーザーが見つかりません"}), 404
 
 
+###勤務場所に対するCRUDエンドポイント###
 # 勤務場所情報取得
 @bp.route("/workplaces", methods=["GET"])
 def get_workplaces() -> Tuple[Response, int]:
-    workplaces = Workplace.query.all()
+    workplaces = WorkplaceService.get_all_workplaces()
     return jsonify([w.to_dict() for w in workplaces]), 200
+
+@bp.route("/workplaces/<int:workplace_id>", methods=["GET"])
+def get_workplace(workplace_id: int) -> Tuple[Response, int]:
+    workplace = WorkplaceService.get_workplace_by_id(workplace_id)
+    if workplace is None:
+        return jsonify({"error": "勤務場所が見つかりません"}), 404
+    return jsonify(workplace.to_dict()), 200
+
+@bp.route("/workplaces", methods=["POST"])
+def add_workplace() -> Tuple[Response, int]:
+    data = request.get_json()
+    current_app.logger.info(f"Received data: {data}")
+
+    workplace = WorkplaceService.create_workplace(data)
+    if workplace is None:
+        return jsonify({'error': 'すべてのフィールドが必要です'}), 400
+    return jsonify(workplace.to_dict()), 201
+
+@bp.route("/workplaces/<int:workplace_id>", methods=["PUT"])
+def update_workplace(workplace_id:int) -> Tuple[Response, int]:
+    data = request.get_json()
+    workplace = WorkplaceService.update_workplace(workplace_id, data)
+    if workplace is None:
+        return jsonify({'error': '更新する勤務場所が見つかりません'}), 404
+    return jsonify(workplace.to_dict()), 200
+
+@bp.route("/workplaces/<int:workplace_id>", methods=["DELETE"])
+def delete_workplace(workplace_id:int) -> Tuple[Response, int]:
+    if WorkplaceService.delete_workplace(workplace_id):
+        return jsonify({'message': '勤務場所情報を削除しました'}), 200
+    else:
+        return jsonify({"error": "勤務場所が見つかりません"}), 404
 
 # 弁当情報取得
 @bp.route("/bento", methods=["GET"])
 def get_bento() -> Tuple[Response, int]:
-    bento = Bento.query.all()
+    bento = BentoService.get_all_bentos()
     return jsonify([b.to_dict() for b in bento]),200
 
+@bp.route("/bento/<int:bento_id>", methods=["GET"])
+def get_bento_by_id(bento_id:int) -> Tuple[Response, int]:
+    bento = BentoService.get_bento_by_id(bento_id)
+    return jsonify(bento.to_dict()), 200
+
+@bp.route("/bento", methods=["POST"])
+def add_bento() -> Tuple[Response, int]:
+    data = request.get_json()
+    current_app.logger.info(f"Received data: {data}")
+
+    bento = BentoService.create_bento(data)
+    if bento is None:
+        return jsonify({'error': 'すべてのフィールドが必要です'}), 400
+    return jsonify(bento.to_dict()), 201
+
+@bp.route("/bento/<int:bento_id>", methods=["PUT"])
+def update_bento(bento_id:int) -> Tuple[Response, int]:
+    data = request.get_json()
+    bento = BentoService.update_bento(bento_id, data)
+    if bento is None:
+        return jsonify({'error': '更新する項目が見つかりません'}), 404
+    return jsonify(bento.to_dict()), 200
+
+@bp.route("/bento/<int:bento_id>", methods=["DELETE"])
+def delete_bento(bento_id:int) -> Tuple[Response, int]:
+    if BentoService.delete_bento(bento_id):
+        return jsonify({'message': '弁当情報を削除しました'}), 200
+    else:
+        return jsonify({"error": "弁当が見つかりません"}), 404
 
 
 ###予約情報に対するCRUDエンドポイント###
