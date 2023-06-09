@@ -6,13 +6,14 @@ types.tsに定義されている型を使用すること
 import axios from 'axios';
 import { Workplace, Bento, Reservation, User, Login } from './types';
 import { UseAuth } from './authContext';
+import { th } from 'date-fns/locale';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
 
 
 export async function login(id: number, password: string): Promise<Login | null> {
-    const users = await getUsers();
+    const users = await getAllUsers();
     const foundUser = users.find(user => user.id === id && user.password === password);
     if (!foundUser) {
         return null;
@@ -74,27 +75,42 @@ export async function deleteBento(id: number): Promise<void> {
     await axios.delete(`${API_BASE_URL}/bento/${id}`);
 }
 
-export async function getUser(id: number): Promise<User> {
-    const response = await axios.get<User>(`${API_BASE_URL}/User/${id}`);
-    return response.data;
+
+export const getAllUsers = async (): Promise<User[]> => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/users`);
+        console.log(response);
+        return response.data;
+    } catch (error) {
+        console.error("Error in getAllUsers:", error);
+        return [];
+    }
 }
-export async function getUsers(): Promise<User[]> {
-    const response = await axios.get<User[]>(`${API_BASE_URL}/users`);
+
+export const getUserById = async (userId: number): Promise<User> => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/users/${userId}`);
+        console.log(response);
+        return response.data;
+    } catch (error) {
+        console.error("Error in getUserById:", error);
+        throw error;
+        // Here, decide what to return in case of an error.
+    }
+}
+
+export const createUser = async (userData: Partial<User>): Promise<User> => {
+    const response = await axios.post(`${API_BASE_URL}/users`, userData);
     return response.data;
 }
 
-export async function addUser(newUser: Partial<User>): Promise<User> {
-    const response = await axios.post<User>(`${API_BASE_URL}/User`, newUser);
+export const updateUser = async (userId: number, userData: Partial<User>): Promise<User> => {
+    const response = await axios.put(`${API_BASE_URL}/users/${userId}`, userData);
     return response.data;
 }
 
-export async function updateUser(id: number, updatedUser: Partial<User>): Promise<User> {
-    const response = await axios.put<User>(`${API_BASE_URL}/User/${id}`, updatedUser);
-    return response.data;
-}
-
-export async function deleteUser(id: number): Promise<void> {
-    await axios.delete(`${API_BASE_URL}/User/${id}`);
+export const deleteUser = async (userId: number): Promise<void> => {
+    await axios.delete(`${API_BASE_URL}/users/${userId}`);
 }
 
 export async function getReservationByID(id: number): Promise<Reservation> {

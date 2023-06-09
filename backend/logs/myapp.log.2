@@ -1,4 +1,73 @@
-2023-06-09 13:48:55,435 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
+2023-06-09 13:16:05,728 ERROR: Exception on /api/users/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
+Traceback (most recent call last):
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\reservation_system\backend\app\routes.py", line 476, in get_user
+    user = UserService.get_user_by_id(user_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\reservation_system\backend\app\routes.py", line 27, in get_user_by_id
+    return db.session.get(User, user_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\orm\scoping.py", line 1006, in get
+    return self._proxied.get(
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\orm\session.py", line 3540, in get
+    return self._get_impl(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\orm\session.py", line 3672, in _get_impl
+    return db_load_fn(
+           ^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\orm\loading.py", line 668, in load_on_pk_identity
+    session.execute(
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\orm\session.py", line 2229, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\orm\session.py", line 2114, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\orm\session.py", line 1981, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\orm\session.py", line 1108, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\engine\base.py", line 3251, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\engine\base.py", line 145, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\engine\base.py", line 3275, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\pool\base.py", line 455, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\pool\base.py", line 1271, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\pool\base.py", line 719, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\pool\impl.py", line 157, in _do_get
+    raise exc.TimeoutError(
+sqlalchemy.exc.TimeoutError: QueuePool limit of size 5 overflow 10 reached, connection timed out, timeout 30.00 (Background on this error at: https://sqlalche.me/e/20/3o7r)
+2023-06-09 13:36:30,261 INFO: MyApp startup [in D:\reservation_system\backend\app\__init__.py:27]
+2023-06-09 13:48:47,013 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
 Traceback (most recent call last):
   File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
     response = self.full_dispatch_request()
@@ -16,7 +85,7 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: get_reservation() got an unexpected keyword argument 'id'
-2023-06-09 13:48:57,611 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
+2023-06-09 13:48:54,981 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
 Traceback (most recent call last):
   File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
     response = self.full_dispatch_request()
@@ -34,61 +103,7 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: get_reservation() got an unexpected keyword argument 'id'
-2023-06-09 13:50:33,204 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
-Traceback (most recent call last):
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
-    response = self.full_dispatch_request()
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
-    return cors_after_request(app.make_response(f(*args, **kwargs)))
-                                                ^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
-    rv = self.dispatch_request()
-         ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: get_reservation() got an unexpected keyword argument 'id'
-2023-06-09 13:50:33,457 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
-Traceback (most recent call last):
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
-    response = self.full_dispatch_request()
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
-    return cors_after_request(app.make_response(f(*args, **kwargs)))
-                                                ^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
-    rv = self.dispatch_request()
-         ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: get_reservation() got an unexpected keyword argument 'id'
-2023-06-09 13:50:33,537 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
-Traceback (most recent call last):
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
-    response = self.full_dispatch_request()
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
-    return cors_after_request(app.make_response(f(*args, **kwargs)))
-                                                ^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
-    rv = self.dispatch_request()
-         ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: get_reservation() got an unexpected keyword argument 'id'
-2023-06-09 13:50:33,775 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
+2023-06-09 13:48:55,248 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
 Traceback (most recent call last):
   File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
     response = self.full_dispatch_request()

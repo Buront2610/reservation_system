@@ -469,7 +469,7 @@ def login() -> Tuple[Response, int]:
 @bp.route("/users", methods=["GET"])
 def get_users() -> Tuple[Response, int]:
     users = UserService.get_all_users()
-    return jsonify([u.to_dict() for u in users]) , 200
+    return jsonify([users.to_dict() for users in users]) , 200
 
 @bp.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id: int) -> Tuple[Response, int]:

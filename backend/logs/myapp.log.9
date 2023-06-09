@@ -1,5 +1,20 @@
-2023-06-09 11:53:48,181 ERROR: Error while retrieving user: QueuePool limit of size 5 overflow 10 reached, connection timed out, timeout 30.00 (Background on this error at: https://sqlalche.me/e/20/3o7r)
+2023-06-09 13:16:05,367 ERROR: Exception on /api/users/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
 Traceback (most recent call last):
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\reservation_system\backend\app\routes.py", line 476, in get_user
+    user = UserService.get_user_by_id(user_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "D:\reservation_system\backend\app\routes.py", line 27, in get_user_by_id
     return db.session.get(User, user_id)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -51,9 +66,23 @@ Traceback (most recent call last):
   File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\pool\impl.py", line 157, in _do_get
     raise exc.TimeoutError(
 sqlalchemy.exc.TimeoutError: QueuePool limit of size 5 overflow 10 reached, connection timed out, timeout 30.00 (Background on this error at: https://sqlalche.me/e/20/3o7r)
- [in D:\reservation_system\backend\app\routes.py:29]
-2023-06-09 11:54:07,879 ERROR: Error while retrieving user: QueuePool limit of size 5 overflow 10 reached, connection timed out, timeout 30.00 (Background on this error at: https://sqlalche.me/e/20/3o7r)
+2023-06-09 13:16:05,506 ERROR: Exception on /api/users/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
 Traceback (most recent call last):
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\reservation_system\backend\app\routes.py", line 476, in get_user
+    user = UserService.get_user_by_id(user_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "D:\reservation_system\backend\app\routes.py", line 27, in get_user_by_id
     return db.session.get(User, user_id)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -105,4 +134,3 @@ Traceback (most recent call last):
   File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\sqlalchemy\pool\impl.py", line 157, in _do_get
     raise exc.TimeoutError(
 sqlalchemy.exc.TimeoutError: QueuePool limit of size 5 overflow 10 reached, connection timed out, timeout 30.00 (Background on this error at: https://sqlalche.me/e/20/3o7r)
- [in D:\reservation_system\backend\app\routes.py:29]

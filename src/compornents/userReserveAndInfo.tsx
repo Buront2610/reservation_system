@@ -28,6 +28,8 @@ const dummyEmployees: User[] = [
 
 const userReservations = getReservationByID(1);
 
+console.log(userReservations);
+
 
 const DAYS_OF_WEEK = ["日", "月", "火", "水", "木", "金", "土"];
 
@@ -89,5 +91,7 @@ const Calendar: FC = () => {
 }
 
 export default function TestReservationHistoryPage() {
+  console.log(userReservations);
+
   return <Calendar />;
 }

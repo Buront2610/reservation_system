@@ -6,6 +6,7 @@ from flask_mail import Mail
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+from flask_cors import CORS
 
 
 db = SQLAlchemy()
@@ -33,6 +34,8 @@ def create_app(config_class=Config):
     app.config['MAIL_USERNAME'] = 'your_email_address'
     app.config['MAIL_PASSWORD'] = 'your_password'
 
+
+    CORS(app, origins=['http://localhost:9999'])  #      
     db.init_app(app)
     migrate.init_app(app, db)
 

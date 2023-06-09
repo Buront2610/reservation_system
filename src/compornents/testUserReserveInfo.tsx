@@ -1,33 +1,47 @@
 import { useState, FC } from 'react';
-import { Reservation, Employee } from './types';
+import { Reservation, User} from './types';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,Button } from '@mui/material';
 import  CalenderHeader  from './calendarHeader';
 import CalendarBody from './calendarBody';
+import { getReservationByID, getUserById, getAllUsers } from './API';
 // Define dummy data
 const dummyReservations: Reservation[] = [
-    { id: 1, employee_id: 1, reservation_date: '2023-05-15', bento_id: 1, quantity: 1, },
-    { id: 1, employee_id: 1, reservation_date: '2023-05-14', bento_id: 1, quantity: 1, },
+    { id: 1, user_id: 1, reservation_date: '2023-05-15', bento_id: 1, quantity: 1, remarks:""},
+    { id: 1, user_id: 1, reservation_date: '2023-05-17', bento_id: 1, quantity: 1, remarks:""},
 
-    { id: 1, employee_id: 1, reservation_date: '2023-05-16', bento_id: 1, quantity: 1, },
+    { id: 1, user_id: 1, reservation_date: '2023-05-19', bento_id: 1, quantity: 1, remarks:""},
 
-    { id: 1, employee_id: 1, reservation_date: '2023-05-17', bento_id: 1, quantity: 1, },
+    { id: 1, user_id: 1, reservation_date: '2023-05-20', bento_id: 1, quantity: 1, remarks:""},
 
-    { id: 1, employee_id: 1, reservation_date: '2023-05-18', bento_id: 1, quantity: 1, },
+    { id: 1, user_id: 1, reservation_date: '2023-05-21', bento_id: 1, quantity: 1, remarks:""},
 
-    { id: 1, employee_id: 1, reservation_date: '2023-05-19', bento_id: 1, quantity: 1, },
+    { id: 1, user_id: 1, reservation_date: '2023-05-22', bento_id: 1, quantity: 1, remarks:""},
 
-    { id: 2, employee_id: 1, reservation_date: '2023-05-20', bento_id: 2, quantity: 2, },
-    { id: 3, employee_id: 1, reservation_date: '2023-05-30', bento_id: 1, quantity: 1, },
+    { id: 1, user_id: 1, reservation_date: '2023-05-24', bento_id: 1, quantity: 1, remarks:""},
+    { id: 1, user_id: 1, reservation_date: '2023-05-25', bento_id: 1, quantity: 1, remarks:""},
 ];
 
-const dummyEmployees: Employee[] = [
-    { id: 1, name: 'John Doe', workplace_id: 1, mailaddress: 'test@test.co.jp',  hide_flag: false, telephone: '8888'},
+const dummyEmployees: User[] = [
+    { id: 1, name: 'John Doe', workplace_id: 1, email_address: 'test@test.co.jp',  hide_flag: false, telephone: '8888',password:"test",role:"user"},
 ];
+
+
+const fetchUserData = async () => {
+  console.log("fetchUserData");
+  const userReservations = await getReservationByID(1);
+  const allUser = await getAllUsers();
+
+  console.log("userReservations:", userReservations);
+  console.log("allUser:", allUser);
+  return userReservations;
+}
+
+
 
 
 const DAYS_OF_WEEK = ["日", "月", "火", "水", "木", "金", "土"];
 
-const useCalendar = (initialReservations: Reservation[], initialEmployees: Employee[]) => {
+const useCalendar = (initialReservations: Reservation[], initialEmployees: User[]) => {
   const today = new Date();
   const [currentDate, setCurrentDate] = useState<Date>(today);
   
@@ -37,7 +51,7 @@ const useCalendar = (initialReservations: Reservation[], initialEmployees: Emplo
 
   const isReservationExists = (reservations: Reservation[], date: string, employeeId: number) => {
     return reservations.find(
-      reservation => reservation.employee_id === employeeId && reservation.reservation_date === date
+      reservation => reservation.user_id === employeeId && reservation.reservation_date === date
     );
   };
 
@@ -85,5 +99,8 @@ const Calendar: FC = () => {
 }
 
 export default function TestReservationHistoryPage() {
+  fetchUserData();
+  console.log(fetchUserData)
+
   return <Calendar />;
 }
