@@ -151,7 +151,6 @@ class TestWorkplaceService:
 
 
         # Act
-        update_data = {"name": "Workplace 2"}
         response = self.client.put('/api/workplaces/1', json=update_data)
 
         # Assert
@@ -171,111 +170,80 @@ class TestWorkplaceService:
             workplace = WorkplaceService.get_workplace_by_id(1)
         assert workplace is None
 
-def test_create_bento(client):
-    # Prepare
-    bento_data = {
-        "id": 1, 
-        "name": "Bento 1",
-        "price": 1000,
-        "choose_flag": False
-    }
+class TestBentoService:
+    
+    @pytest.fixture(autouse=True)
+    def setup_method(self, app):
+        self.client = client
+        self.bento_data = {
+            "id": 1,
+            "name": "Bento 1",
+            "price": 1000,
+            "choose_flag": False
+        }
+        with app.app_context():
+            self.bento = BentoService.create_bento(self.bento_data)
 
-    # Act
-    response = client.post('/api/bento', json=bento_data)
+    def test_create_bento(self,app):
+        # Prepare
+        new_bento_data = self.bento_data.copy()
+        new_bento_data['id'] = 2
 
-    # Assert
-    assert response.status_code == 201
-    bento = BentoService.get_bento_by_id(1)
-    assert bento is not None
-    assert bento.id == 1
+        # Act
+        response = self.client.post('/api/bento', json=new_bento_data)
 
-def test_get_all_bentos(client):
-    # Prepare
-    bento_data = {
-        "id": 1, 
-        "name": "Bento 1",
-        "price": 1000,
-        "choose_flag": False
-    }
-    bento_data2 ={
-        "id": 2,
-        "name": "Bento 2",
-        "price": 2000,
-        "choose_flag": False
+        # Assert
+        assert response.status_code == 201
+        with app.app_context():
+            bento = BentoService.get_bento_by_id(2)
+        assert bento is not None
+        assert bento.id == 2
 
-    }
-    bento = Bento(**bento_data)
-    db.session.add(bento)
-    db.session.commit()
-    bento = Bento(**bento_data2)
-    db.session.add(bento)
-    db.session.commit()
+    def test_get_all_bentos(self):
+        # Prepare
+        new_bento_data = self.bento_data.copy()
+        new_bento_data['id'] = 3
+        add = self.client.post('/api/bento', json=new_bento_data)
 
-    # Act
-    response = client.get('/api/bento')
+        # Act
+        response = self.client.get('/api/bento')
 
-    # Assert
-    assert response.status_code == 200
-    assert len(response.get_json()) == 2
-    assert response.get_json()[0]['id'] == 1
+        # Assert
+        assert response.status_code == 200
+        assert len(response.get_json()) == 2
+        assert response.get_json()[0]['id'] == 1
 
-def test_get_bento_by_id(client):
-    # Prepare
-    bento_data = {
-        "id": 1, 
-        "name": "Bento 1",
-        "price": 1000,
-        "choose_flag": False
-    }
-    bento = Bento(**bento_data)
-    db.session.add(bento)
-    db.session.commit()
+    def test_get_bento_by_id(self):
 
-    # Act
-    response = client.get('/api/bento/1')
+        # Act
+        response = self.client.get('/api/bento/1')
 
-    # Assert
-    assert response.status_code == 200
-    assert response.get_json()['id'] == 1
+        # Assert
+        assert response.status_code == 200
+        assert response.get_json()['id'] == 1
 
-def test_update_bento(client):
-    # Prepare
-    bento_data = {
-        "id": 1, 
-        "name": "Bento 1",
-        "price": 1000,
-        "choose_flag": False
-    }
-    bento = Bento(**bento_data)
-    db.session.add(bento)
-    db.session.commit()
+    def test_update_bento(self):
+        # Prepare
+        update_data = {"price": 1500}
 
-    # Act
-    update_data = {"name": "Bento 2"}
-    response = client.put('/api/bento/1', json=update_data)
 
-    # Assert
-    assert response.status_code == 200
-    bento = BentoService.get_bento_by_id(1)
-    assert bento is not None
-    assert bento.name == "Bento 2"
+        # Act
+        response = self.client.put('/api/bento/1', json=update_data)
 
-def test_delete_bento(client):
-    # Prepare
-    bento_data = {
-        "id": 1, 
-        "name": "Bento 1",
-        "price": 1000,
-        "choose_flag": False
-    }
-    bento = Bento(**bento_data)
-    db.session.add(bento)
-    db.session.commit()
+        # Assert
+        assert response.status_code == 200
+        bento = BentoService.get_bento_by_id(1)
+        assert bento is not None
+        assert bento.price == 1500
 
-    # Act
-    response = client.delete('/api/bento/1')
+    def test_delete_bento(self,app):
+    
+        # Act
+        response = self.client.delete('/api/bento/1')
 
-    # Assert
-    assert response.status_code == 200
-    bento = BentoService.get_bento_by_id(1)
-    assert bento is None
+        # Assert
+        assert response.status_code == 200
+        with app.app_context():
+            bento = BentoService.get_bento_by_id(1)
+        assert bento is None
+

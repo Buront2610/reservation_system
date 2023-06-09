@@ -28,4 +28,4 @@ def send_mail()->None:
 
             # メールを送信
             with app.app_context():
-                mail.send(msg)
+                Mail.send(msg)

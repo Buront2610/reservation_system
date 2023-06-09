@@ -12,6 +12,7 @@ from app.models import Workplace, Bento, Reservation, User, Exclude,TimeFlag
 from app.functions import check_password, hash_password,generate_token
 import traceback
 import re
+import datetime
 
 bp = Blueprint('api', __name__)
 
@@ -214,17 +215,17 @@ class WorkplaceService:
 
 
 class BentoService:
-    @staticmethod
+    @classmethod
     def get_all_bentos():
         bentos = Bento.query.all()
         return bentos
     
-    @staticmethod
+    @classmethod
     def get_bento_by_id(bento_id):
         bento = db.session.get(Bento, bento_id)
         return bento
     
-    @staticmethod
+    @classmethod
     def create_bento(data):
         id = data.get('id')
         name = data.get('name')
@@ -239,7 +240,7 @@ class BentoService:
             current_app.logger.error(f'Error while creating bento: {e}\n{traceback.format_exc()}')            
             return None
         
-    @staticmethod
+    @classmethod
     def update_bento(bento_id, data):
         bento = db.session.get(Bento, bento_id)
         if bento is None:
@@ -262,7 +263,7 @@ class BentoService:
 
         return bento
     
-    @staticmethod
+    @classmethod
     def delete_bento(bento_id):
         bento = db.session.get(Bento, bento_id)
         if bento is None:
@@ -271,6 +272,173 @@ class BentoService:
         db.session.delete(bento)
         db.session.commit()
         return True
+
+    @staticmethod
+    def _validate_bento_data_for_creation(data):
+        # Check if the required fields are present
+        required_fields = ['id', 'name', 'price', 'choose_flag']
+        for field in required_fields:
+            if field not in data:
+                raise ValueError(f"Missing required field: {field}")
+
+        # Check that fields are within the maximum length
+        if len(data.get('name', '')) > 100:
+            raise ValueError("Bento name is too long")
+
+        # Check that fields are not None
+        if data.get('name') is None:
+            raise ValueError("Bento name cannot be None")
+
+        if data.get('price') is None:
+            raise ValueError("Bento price cannot be None")
+
+        if data.get('choose_flag') is None:
+            raise ValueError("Bento choose_flag cannot be None")
+    
+    @staticmethod
+    def _validate_bento_data_for_update(data):
+        #型チェック
+        if not isinstance(data.get('name'), str):
+            raise ValueError("Bento name must be string")
+        if not isinstance(data.get('price'), int):
+            raise ValueError("Bento price must be integer")
+        if not isinstance(data.get('choose_flag'), bool):
+            raise ValueError("Bento choose_flag must be boolean")
+        return True
+
+    
+class TestReservationService:
+
+    @classmethod
+    def get_all_test_reservations():
+        test_reservations = Reservation.query.all()
+        return test_reservations
+    
+    @classmethod
+    def get_reservation_by_id_for_Emp(user_id):
+        reservation = db.session.get(Reservation, user_id)
+        return reservation
+    
+    @classmethod
+    def create_reservation(data):
+        id = data.get('id')
+        user_id = data.get('user_id')
+        bento_id = data.get('bento_id')
+        reservation_date = data.get('reservation_date')
+        quantity = data.get('quantity')
+        remarks = data.get('remarks')
+
+        try:
+            reservation = Reservation(id=id, user_id=user_id, bento_id=bento_id, reservation_date=reservation_date, quantity=quantity, remarks=remarks)
+            db.session.add(reservation)
+            db.session.commit()
+            return reservation
+        except Exception as e:
+            current_app.logger.error(f'Error while creating reservation: {e}\n{traceback.format_exc()}')
+            return None
+    
+    @classmethod
+    def update_reservation(reservation_id, data):
+        reservation = db.session.get(Reservation, reservation_id)
+
+        if reservation is None:
+            return None
+        
+        user_id = data.get('user_id')
+        bento_id = data.get('bento_id')
+        reservation_date = data.get('reservation_date')
+        quantity = data.get('quantity')
+        remarks = data.get('remarks')
+
+        if user_id is not None:
+            reservation.user_id = user_id
+        
+        if bento_id is not None:
+            reservation.bento_id = bento_id
+        
+        if reservation_date is not None:
+            reservation.reservation_date = reservation_date
+        
+        if quantity is not None:
+            reservation.quantity = quantity
+        
+        if remarks is not None:
+            reservation.remarks = remarks
+        
+        db.session.commit()
+
+        return reservation
+    
+    @classmethod
+    def delete_reservation(reservation_id):
+        reservation = db.session.get(Reservation, reservation_id)
+        if reservation is None:
+            return False
+
+        db.session.delete(reservation)
+        db.session.commit()
+        return True
+    
+    @staticmethod
+    def _validate_reservation_data_for_creation(data):
+        # Check that required fields are present
+        required_fields = ['user_id', 'bento_id', 'reservation_date', 'quantity']
+        for field in required_fields:
+            if field not in data:
+                raise ValueError(f"Missing required field: {field}")
+
+        # Check that fields are not None
+        if data.get('user_id') is None:
+            raise ValueError("Reservation user_id cannot be None")
+
+        if data.get('bento_id') is None:
+            raise ValueError("Reservation bento_id cannot be None")
+        
+        if data.get('reservation_date') is None:
+            raise ValueError("Reservation reservation_date cannot be None")
+        
+        if data.get('quantity') is None:
+            raise ValueError("Reservation quantity cannot be None")
+    
+    @staticmethod
+    def _validate_reservation_data_for_update(data):
+        validation_errors = []
+
+        # user_id validation
+        user_id = data.get('user_id')
+        if user_id is not None:
+            if type(user_id) is not int:
+                validation_errors.append("user_id must be an integer")
+
+        # bento_id validation
+        bento_id = data.get('bento_id')
+        if bento_id is not None:
+            if type(bento_id) is not int:
+                validation_errors.append("bento_id must be an integer")
+
+        # reservation_date validation
+        reservation_date = data.get('reservation_date')
+        if reservation_date is not None:
+            if type(reservation_date) is not datetime.date:
+                validation_errors.append("reservation_date must be a date object")
+
+        # quantity validation
+        quantity = data.get('quantity')
+        if quantity is not None:
+            if type(quantity) is not int or quantity <= 0:
+                validation_errors.append("quantity must be a positive integer")
+
+        # remarks validation
+        remarks = data.get('remarks')
+        if remarks is not None:
+            if type(remarks) is not str:
+                validation_errors.append("remarks must be a string")
+        
+        if validation_errors:
+            return False, validation_errors
+
+        return True, "Valid data"
+
 
 # 例: ユーザー認証
 @bp.route('/login', methods=['POST'])
@@ -375,6 +543,7 @@ def delete_workplace(workplace_id:int) -> Tuple[Response, int]:
     else:
         return jsonify({"error": "勤務場所が見つかりません"}), 404
 
+##弁当情報に対するCRADエンドポイント##
 # 弁当情報取得
 @bp.route("/bento", methods=["GET"])
 def get_bento() -> Tuple[Response, int]:
@@ -422,8 +591,8 @@ def get_reservations()-> Tuple[Response, int]:
 
 # IDで指定した予約情報を取得
 @bp.route('/reservations/<int:id>', methods=['GET'])
-def get_reservation(id:int)-> Tuple[Response, int]:
-    reservation = Reservation.query.get_or_404(id)
+def get_reservation(user_id:int)-> Tuple[Response, int]:
+    reservation = Reservation.query.get_or_404(user_id)
     return jsonify(reservation.to_dict()),200
 
 # 新しい予約を追加

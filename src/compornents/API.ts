@@ -4,7 +4,7 @@ APIの定義に関してはbackend/app/routes.pyを参照すること
 types.tsに定義されている型を使用すること
 */
 import axios from 'axios';
-import { Workplace, Bento, Employee, Reservation, User, Login } from './types';
+import { Workplace, Bento, Reservation, User, Login } from './types';
 import { UseAuth } from './authContext';
 
 const API_BASE_URL = 'http://localhost:5000/api';
@@ -30,9 +30,48 @@ export async function getWorkplaces(): Promise<Workplace[]> {
     return response.data;
 }
 
+export async function getWorkplace(id: number): Promise<Workplace> {
+    const response = await axios.get<Workplace>(`${API_BASE_URL}/workplaces/${id}`);
+    return response.data;
+}
+
+export async function addWorkplace(newWorkplace: Partial<Workplace>): Promise<Workplace> {
+    const response = await axios.post<Workplace>(`${API_BASE_URL}/workplaces`, newWorkplace);
+    return response.data;
+}
+
+export async function updateWorkplace(id: number, updatedWorkplace: Partial<Workplace>): Promise<Workplace> {
+    const response = await axios.put<Workplace>(`${API_BASE_URL}/workplaces/${id}`, updatedWorkplace);
+    return response.data;
+}
+
+export async function deleteWorkplace(id: number): Promise<void> {
+    await axios.delete(`${API_BASE_URL}/workplaces/${id}`);
+}
+
+
+export async function getBentoByID(id: number): Promise<Bento> {
+    const response = await axios.get<Bento>(`${API_BASE_URL}/bento/${id}`);
+    return response.data;
+}
+
 export async function getBento(): Promise<Bento[]> {
     const response = await axios.get<Bento[]>(`${API_BASE_URL}/bento`);
     return response.data;
+}
+
+export async function addBento(newBento: Partial<Bento>): Promise<Bento> {
+    const response = await axios.post<Bento>(`${API_BASE_URL}/bento`, newBento);
+    return response.data;
+}
+
+export async function updateBento(id: number, updatedBento: Partial<Bento>): Promise<Bento> {
+    const response = await axios.put<Bento>(`${API_BASE_URL}/bento/${id}`, updatedBento);
+    return response.data;
+}
+
+export async function deleteBento(id: number): Promise<void> {
+    await axios.delete(`${API_BASE_URL}/bento/${id}`);
 }
 
 export async function getUser(id: number): Promise<User> {
@@ -44,23 +83,13 @@ export async function getUsers(): Promise<User[]> {
     return response.data;
 }
 
-export async function getEmployees(): Promise<Employee[]> {
-    const response = await axios.get<Employee[]>(`${API_BASE_URL}/employees`);
-    return response.data;
-}
-
 export async function addUser(newUser: Partial<User>): Promise<User> {
     const response = await axios.post<User>(`${API_BASE_URL}/User`, newUser);
     return response.data;
 }
 
-export async function addEmployee(newEmployee: Partial<Employee>): Promise<Employee> {
-    const response = await axios.post<Employee>(`${API_BASE_URL}/employees`, newEmployee);
-    return response.data;
-}
-
-export async function updateEmployee(id: number, updatedEmployee: Partial<Employee>): Promise<Employee> {
-    const response = await axios.put<Employee>(`${API_BASE_URL}/employees/${id}`, updatedEmployee);
+export async function updateUser(id: number, updatedUser: Partial<User>): Promise<User> {
+    const response = await axios.put<User>(`${API_BASE_URL}/User/${id}`, updatedUser);
     return response.data;
 }
 
@@ -68,14 +97,16 @@ export async function deleteUser(id: number): Promise<void> {
     await axios.delete(`${API_BASE_URL}/User/${id}`);
 }
 
-export async function deleteEmployee(id: number): Promise<void> {
-    await axios.delete(`${API_BASE_URL}/employees/${id}`);
+export async function getReservationByID(id: number): Promise<Reservation> {
+    const response = await axios.get<Reservation>(`${API_BASE_URL}/reservations/${id}`);
+    return response.data;
 }
 
 export async function getReservations(): Promise<Reservation[]> {
     const response = await axios.get<Reservation[]>(`${API_BASE_URL}/reservations`);
     return response.data;
 }
+
 
 export async function addReservation(newReservation: Partial<Reservation>): Promise<Reservation> {
     const response = await axios.post<Reservation>(`${API_BASE_URL}/reservations`, newReservation);
