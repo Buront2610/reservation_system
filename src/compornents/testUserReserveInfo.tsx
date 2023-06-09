@@ -41,20 +41,31 @@ const fetchUserData = async () => {
 
 const DAYS_OF_WEEK = ["日", "月", "火", "水", "木", "金", "土"];
 
+// カレンダーの初期状態を設定するためのフック
+// initialReservations: 予約情報の初期状態
+// initialEmployees: 従業員情報の初期状態
+// currentDate: 現在の日付
+// changeMonth: 月を変更する関数
+// getReservationStatus: 指定された日付と従業員IDに対する予約状況を返す関数
 const useCalendar = (initialReservations: Reservation[], initialEmployees: User[]) => {
   const today = new Date();
   const [currentDate, setCurrentDate] = useState<Date>(today);
   
+  //月変更用
   const changeMonth = (amount: number) => {
     setCurrentDate(prevDate => new Date(prevDate.getFullYear(), prevDate.getMonth() + amount));
   };
 
+  //指定された日付と従業員IDに予約が存在するかどうかを判定する
   const isReservationExists = (reservations: Reservation[], date: string, employeeId: number) => {
     return reservations.find(
       reservation => reservation.user_id === employeeId && reservation.reservation_date === date
     );
   };
 
+  //指定された日付と従業員IDに予約状況を取得する
+  // date: 日付
+  // employeeId: 従業員ID
   const getReservationStatus = (date: string, employeeId: number) => {
     return isReservationExists(initialReservations, date, employeeId) ? "予約済" : "";
   };
