@@ -7,6 +7,9 @@ from app.models import User, Workplace, Bento, Reservation, Exclude, TimeFlag
 from app.routes import UserService, WorkplaceService, BentoService, ReservationService
 from werkzeug.security import generate_password_hash
 from datetime import datetime, date, timedelta
+import datetime
+
+
 
 @pytest.fixture
 def app():
@@ -264,7 +267,7 @@ class TestReservationService:
             "id": 1,
             "user_id": 1,
             "bento_id": 1,
-            "reservation_date": datetime.date(2023-6-16) , # 直接dateオブジェクトを指定
+            "reservation_date": date(2023,6,16) , # 直接dateオブジェクトを指定
             "quantity": 2,
             "remarks": "Test reservation"
         }

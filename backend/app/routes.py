@@ -15,7 +15,7 @@ import traceback
 import re
 import datetime
     
-from datetime import datetime
+from datetime import date
 
 bp = Blueprint('api', __name__)
 
@@ -336,7 +336,7 @@ class ReservationService:
         bento_id = data.get('bento_id')
         reservation_date = data.get('reservation_date')   
         if isinstance(reservation_date, str):  # date is coming in ISO 8601 string format
-            reservation_date = datetime.date(reservation_date)  # convert to date object
+            reservation_date = date(reservation_date)  # convert to date object
         quantity = data.get('quantity')
         remarks = data.get('remarks')
 
