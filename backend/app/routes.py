@@ -3,6 +3,7 @@
 トークン認証などによりセキュリティ対策を行っている
 各種CRUD操作を行うエンドポイントと、統計情報を取得するエンドポイントを用意 更新があれば随時追加
 """
+from venv import logger
 from flask import Flask, current_app, request, jsonify,Blueprint,Response
 from typing import Union, Tuple
 from flask_sqlalchemy import SQLAlchemy
@@ -307,17 +308,26 @@ class BentoService:
         return True
 
     
-class TestReservationService:
+class ReservationService:
 
     @classmethod
-    def get_all_test_reservations():
-        test_reservations = Reservation.query.all()
-        return test_reservations
+    def get_all_reservations():
+        reservations = Reservation.query.all()
+        return reservations
     
     @classmethod
-    def get_reservation_by_id_for_Emp(user_id):
+    def get_reservation_by_id(user_id):
         reservation = db.session.get(Reservation, user_id)
         return reservation
+    
+    @classmethod
+    def get_reservations_by_user_id(cls, user_id):
+        reservations = Reservation.query.filter_by(user_id=user_id).all()
+        logger.info(f"reservations: {reservations}")
+        return [Reservation.to_dict() for reservation in reservations]
+
+
+
     
     @classmethod
     def create_reservation(data):
@@ -585,14 +595,14 @@ def delete_bento(bento_id:int) -> Tuple[Response, int]:
 # 全ての予約情報を取得
 @bp.route('/reservations', methods=['GET'])
 def get_reservations()-> Tuple[Response, int]:
-    reservations = Reservation.query.all()
+    reservations = ReservationService.get_all_reservations()
     return jsonify([r.to_dict() for r in reservations]), 200
 
 
 # IDで指定した予約情報を取得
-@bp.route('/reservations/<int:id>', methods=['GET'])
-def get_reservation(user_id:int)-> Tuple[Response, int]:
-    reservation = Reservation.query.get_or_404(user_id)
+@bp.route('/reservations/<int:user_id>', methods=['GET'])
+def get_reservation_user_id(user_id:int)-> Tuple[Response, int]:
+    reservation = ReservationService.get_reservations_by_user_id(user_id)
     return jsonify(reservation.to_dict()),200
 
 # 新しい予約を追加

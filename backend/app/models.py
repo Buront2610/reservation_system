@@ -64,7 +64,10 @@ class Reservation(db.Model):
     remarks = db.Column(db.String(100), nullable=True)
 
     def to_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        dict_repr = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        dict_repr['reservation_date'] = dict_repr['reservation_date'].isoformat() if dict_repr['reservation_date'] else None
+        return dict_repr
+
 
 
 class Exclude(db.Model):

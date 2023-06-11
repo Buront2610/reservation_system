@@ -33,6 +33,8 @@ backend/migrations/alembic.ini
 backend/migrations/versions/__pycache__/a4f5a0b60904_.cpython-311.pyc
 backend/instance/bento_reservation_system.db
 backend/migrations/__pycache__/env.cpython-311.pyc
+backend/migrations
+backend/logs
 2.1.0
 .gitignore
 1.0.0

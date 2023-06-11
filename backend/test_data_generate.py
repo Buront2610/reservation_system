@@ -1,43 +1,57 @@
-"""
-テストデータ生成用プログラム
-"""
 from app import create_app, db
 from app.models import User, Workplace, Bento, Reservation, Exclude, TimeFlag
 from werkzeug.security import generate_password_hash
-from datetime import date
+from datetime import date, timedelta
 import random
 import string
 
 app = create_app()
 with app.app_context():
-    # データベースにテストデータを追加する
+    # Remove all existing data
+    TimeFlag.query.delete()
+    Exclude.query.delete()
+    Reservation.query.delete()
+    Bento.query.delete()
+    User.query.delete()
+    Workplace.query.delete()
+
+    # Add test data to the database
     workplace = Workplace(name='Office1', location='Tokyo')
     db.session.add(workplace)
     db.session.commit()
 
-    for i in range(10):  # 10ユーザを作成します
-        random_password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))  # ランダムなパスワードを生成
-        hashed_password = generate_password_hash(random_password)  # ハッシュ化
+    users = []
+    for i in range(10):  # Create 10 users
+        random_password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))  # Generate a random password
+        hashed_password = generate_password_hash(random_password)  # Hashing
         user = User(
             password=hashed_password, 
-            role=random.choice(['admin', 'user']),  # ランダムな役割を選択
+            role=random.choice(['admin', 'user']),  # Select a random role
             name=f'User{i}', 
             email_address=f'user{i}@example.com', 
-            telephone=''.join(random.choices(string.digits, k=10)),  # ランダムな10桁の電話番号を生成
+            telephone=''.join(random.choices(string.digits, k=10)),  # Generate a random 10-digit phone number
             hide_flag=False, 
             workplace_id=1
         )
         db.session.add(user)
-        db.session.commit()
-
-    # 以下は先ほどの例と同じです
-    bento = Bento(name='Bento1', price=500, choose_flag=True)
-    db.session.add(bento)
+        users.append(user)
     db.session.commit()
 
-    reservation = Reservation(user_id=1, bento_id=1, reservation_date=date.today(), 
-                              quantity=2, remarks='No onions')
-    db.session.add(reservation)
+    bentos = []
+    for i in range(5):  # Create 5 bento options
+        bento = Bento(name=f'Bento{i+1}', price=random.randint(300, 1000), choose_flag=True)
+        db.session.add(bento)
+        bentos.append(bento)
+    db.session.commit()
+
+    for _ in range(50):  # Create 50 reservations
+        reservation = Reservation(
+            user_id=random.choice(users).id, 
+            bento_id=random.choice(bentos).id, 
+            reservation_date=date.today() + timedelta(days=random.randint(0, 10)), 
+            quantity=random.randint(1, 5), 
+            remarks=random.choice(['No onions', 'Extra meat', 'No soy sauce', '']))
+        db.session.add(reservation)
     db.session.commit()
 
     exclude = Exclude(exclude_date=date.today())

@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useState,useEffect, FC } from 'react';
 import { Reservation, User} from './types';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,Button } from '@mui/material';
 import  CalenderHeader  from './calendarHeader';
@@ -26,19 +26,6 @@ const dummyEmployees: User[] = [
 ];
 
 
-const fetchUserData = async () => {
-  console.log("fetchUserData");
-  const userReservations = await getReservationByID(1);
-  const allUser = await getAllUsers();
-
-  console.log("userReservations:", userReservations);
-  console.log("allUser:", allUser);
-  return userReservations;
-}
-
-
-
-
 const DAYS_OF_WEEK = ["日", "月", "火", "水", "木", "金", "土"];
 
 // カレンダーの初期状態を設定するためのフック
@@ -47,7 +34,7 @@ const DAYS_OF_WEEK = ["日", "月", "火", "水", "木", "金", "土"];
 // currentDate: 現在の日付
 // changeMonth: 月を変更する関数
 // getReservationStatus: 指定された日付と従業員IDに対する予約状況を返す関数
-const useCalendar = (initialReservations: Reservation[], initialEmployees: User[]) => {
+const useCalendar = (initialReservations: Reservation, initialEmployees: User[]) => {
   const today = new Date();
   const [currentDate, setCurrentDate] = useState<Date>(today);
   
@@ -56,11 +43,24 @@ const useCalendar = (initialReservations: Reservation[], initialEmployees: User[
     setCurrentDate(prevDate => new Date(prevDate.getFullYear(), prevDate.getMonth() + amount));
   };
 
+// Dateオブジェクトから 'YYYY-MM-DD' 形式の文字列を作成するヘルパー関数
+  const formatDate = (date: Date): string => {
+    let month = '' + (date.getMonth() + 1);
+    let day = '' + date.getDate();
+    const year = date.getFullYear();
+
+    if (month.length < 2) 
+      month = '0' + month;
+    if (day.length < 2) 
+      day = '0' + day;
+
+    return [year, month, day].join('-');
+  };
+
   //指定された日付と従業員IDに予約が存在するかどうかを判定する
-  const isReservationExists = (reservations: Reservation[], date: string, employeeId: number) => {
-    return reservations.find(
-      reservation => reservation.user_id === employeeId && reservation.reservation_date === date
-    );
+  const isReservationExists = (reservation: Reservation, date: string, employeeId: number) => {
+    const formattedReservationDate = formatDate(new Date(reservation.reservation_date));
+    return reservation.user_id === employeeId && formattedReservationDate === date;
   };
 
   //指定された日付と従業員IDに予約状況を取得する
@@ -72,9 +72,8 @@ const useCalendar = (initialReservations: Reservation[], initialEmployees: User[
 
   return { currentDate, initialEmployees, changeMonth, getReservationStatus };
 }
-
-const Calendar: FC = () => {
-  const { currentDate, initialEmployees, changeMonth, getReservationStatus } = useCalendar(dummyReservations, dummyEmployees);
+const Calendar: FC<{ userReservations: Reservation }> = ({userReservations}) => {
+  const { currentDate, initialEmployees, changeMonth, getReservationStatus } = useCalendar(userReservations, dummyEmployees);
 
   return (
     <Box>
@@ -110,8 +109,22 @@ const Calendar: FC = () => {
 }
 
 export default function TestReservationHistoryPage() {
-  fetchUserData();
-  console.log(fetchUserData)
+  const [userReservation, setUserReservation] = useState<Reservation | null>(null);
 
-  return <Calendar />;
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userRes = await getReservationByID(1);  // ユーザーIDを適切に変更
+        setUserReservation(userRes);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+  console.log(userReservation);
+
+  // userReservationがnullでない場合のみCalendarをレンダリング
+  return userReservation ? <Calendar userReservations={userReservation} /> : <div>Loading...</div>;
 }

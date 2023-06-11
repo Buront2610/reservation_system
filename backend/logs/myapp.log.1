@@ -1,108 +1,119 @@
-2023-06-09 13:48:55,435 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
+2023-06-11 23:55:11,702 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py:1744]
 Traceback (most recent call last):
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
     response = self.full_dispatch_request()
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
     rv = self.handle_user_exception(e)
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
     return cors_after_request(app.make_response(f(*args, **kwargs)))
                                                 ^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
     rv = self.dispatch_request()
          ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: get_reservation() got an unexpected keyword argument 'id'
-2023-06-09 13:48:57,611 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
+  File "C:\Users\Glutt\reservation_system\backend\app\routes.py", line 606, in get_reservation_user_id
+    return jsonify(reservation.to_dict()),200
+                   ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'to_dict'
+2023-06-11 23:55:11,960 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py:1744]
 Traceback (most recent call last):
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
     response = self.full_dispatch_request()
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
     rv = self.handle_user_exception(e)
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
     return cors_after_request(app.make_response(f(*args, **kwargs)))
                                                 ^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
     rv = self.dispatch_request()
          ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: get_reservation() got an unexpected keyword argument 'id'
-2023-06-09 13:50:33,204 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
+  File "C:\Users\Glutt\reservation_system\backend\app\routes.py", line 606, in get_reservation_user_id
+    return jsonify(reservation.to_dict()),200
+                   ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'to_dict'
+2023-06-11 23:55:19,157 INFO: MyApp startup [in C:\Users\Glutt\reservation_system\backend\app\__init__.py:27]
+2023-06-11 23:55:23,900 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py:1744]
 Traceback (most recent call last):
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
     response = self.full_dispatch_request()
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
     rv = self.handle_user_exception(e)
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
     return cors_after_request(app.make_response(f(*args, **kwargs)))
                                                 ^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
     rv = self.dispatch_request()
          ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: get_reservation() got an unexpected keyword argument 'id'
-2023-06-09 13:50:33,457 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
+  File "C:\Users\Glutt\reservation_system\backend\app\routes.py", line 605, in get_reservation_user_id
+    reservation = ReservationService.get_reservations_by_user_id(user_id)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Glutt\reservation_system\backend\app\routes.py", line 327, in get_reservations_by_user_id
+    return [reservation.to_dict() for reservation in reservations]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Glutt\reservation_system\backend\app\routes.py", line 327, in <listcomp>
+    return [reservation.to_dict() for reservation in reservations]
+            ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Reservation' object has no attribute 'to_dict'
+2023-06-11 23:55:24,145 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py:1744]
 Traceback (most recent call last):
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
     response = self.full_dispatch_request()
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
     rv = self.handle_user_exception(e)
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
     return cors_after_request(app.make_response(f(*args, **kwargs)))
                                                 ^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
     rv = self.dispatch_request()
          ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: get_reservation() got an unexpected keyword argument 'id'
-2023-06-09 13:50:33,537 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
+  File "C:\Users\Glutt\reservation_system\backend\app\routes.py", line 605, in get_reservation_user_id
+    reservation = ReservationService.get_reservations_by_user_id(user_id)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Glutt\reservation_system\backend\app\routes.py", line 327, in get_reservations_by_user_id
+    return [reservation.to_dict() for reservation in reservations]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Glutt\reservation_system\backend\app\routes.py", line 327, in <listcomp>
+    return [reservation.to_dict() for reservation in reservations]
+            ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Reservation' object has no attribute 'to_dict'
+2023-06-11 23:57:56,341 INFO: MyApp startup [in C:\Users\Glutt\reservation_system\backend\app\__init__.py:27]
+2023-06-11 23:58:03,205 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py:1744]
 Traceback (most recent call last):
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
     response = self.full_dispatch_request()
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
     rv = self.handle_user_exception(e)
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
     return cors_after_request(app.make_response(f(*args, **kwargs)))
                                                 ^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
     rv = self.dispatch_request()
          ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
+  File "C:\Users\Glutt\miniconda3\envs\reserve\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: get_reservation() got an unexpected keyword argument 'id'
-2023-06-09 13:50:33,775 ERROR: Exception on /api/reservations/1 [GET] [in C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py:1744]
-Traceback (most recent call last):
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 2528, in wsgi_app
-    response = self.full_dispatch_request()
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask_cors\extension.py", line 165, in wrapped_function
-    return cors_after_request(app.make_response(f(*args, **kwargs)))
-                                                ^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
-    rv = self.dispatch_request()
-         ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\hashino\AppData\Local\miniconda3\envs\reserve_system\Lib\site-packages\flask\app.py", line 1799, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: get_reservation() got an unexpected keyword argument 'id'
+  File "C:\Users\Glutt\reservation_system\backend\app\routes.py", line 606, in get_reservation_user_id
+    return jsonify(reservation.to_dict()),200
+                   ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'to_dict'
