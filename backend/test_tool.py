@@ -1,9 +1,12 @@
+from re import T
 from turtle import update
+from venv import logger
 import pytest
 from app import db, create_app
 from app.models import User, Workplace, Bento, Reservation, Exclude, TimeFlag
-from app.routes import UserService, WorkplaceService, BentoService
+from app.routes import UserService, WorkplaceService, BentoService, ReservationService
 from werkzeug.security import generate_password_hash
+from datetime import datetime, date, timedelta
 
 @pytest.fixture
 def app():
@@ -56,6 +59,7 @@ class TestUserService:
             user = UserService.get_user_by_id(2)
         assert user is not None
         assert user.id == 2
+        logger.info(f"user: {user}")
 
     def test_get_all_users(self):
         # Act
@@ -65,6 +69,8 @@ class TestUserService:
         assert response.status_code == 200
         assert len(response.get_json()) == 1
         assert response.get_json()[0]['id'] == 1
+        logger.info(f"user: {response.get_json()}")
+
 
     def test_get_user_by_id(self):
         # Act
@@ -173,7 +179,7 @@ class TestWorkplaceService:
 class TestBentoService:
     
     @pytest.fixture(autouse=True)
-    def setup_method(self, app):
+    def setup_method(self,client, app):
         self.client = client
         self.bento_data = {
             "id": 1,
@@ -247,3 +253,91 @@ class TestBentoService:
             bento = BentoService.get_bento_by_id(1)
         assert bento is None
 
+class TestReservationService:
+
+    @pytest.fixture(autouse=True)
+
+
+    def setup_method(self, client, app):
+        self.client = client
+        self.reservation_data = {
+            "id": 1,
+            "user_id": 1,
+            "bento_id": 1,
+            "reservation_date": datetime.date(2023-6-16) , # 直接dateオブジェクトを指定
+            "quantity": 2,
+            "remarks": "Test reservation"
+        }
+
+        with app.app_context():
+            self.reservation = ReservationService.create_reservation(self.reservation_data)
+
+    def test_create_reservation(self, app):
+        # Prepare
+        new_reservation_data = self.reservation_data.copy()
+        new_reservation_data['id'] = 2
+        new_reservation_data['user_id'] = 2
+
+        # Act
+        response = self.client.post('/api/reservations', json=new_reservation_data)
+
+        # Assert
+        assert response.status_code == 201
+        with app.app_context():
+            reservation = ReservationService.get_reservation_by_id(2)
+        assert reservation is not None
+        assert reservation.id == 2
+        logger.info(f"response: {response.get_json()}")
+        print(f"reponse:{response.get_json()}")
+        assert response.get_json()['id'] == 2
+
+    def test_get_all_reservations(self, app):
+        # Act
+        response = self.client.get('/api/reservations')
+
+        # Assert
+        assert response.status_code == 200
+        assert len(response.get_json()) == 1
+        assert response.get_json()[0]['id'] == 1
+
+    def test_get_reservation_by_id(self, app):
+        # Act
+        response = self.client.get('/api/reservations/1')
+
+        # Assert
+        assert response.status_code == 200
+        assert response.get_json()['id'] == 1
+
+    def test_get_reservations_by_user_id(self):
+        # Act
+        response = self.client.get('/api/reservations/user/1')
+
+        # Assert
+        assert response.status_code == 200
+        assert len(response.get_json()) == 1
+        assert response.get_json()[0]['id'] == 1
+
+    def test_update_reservation(self, app):
+        # Prepare
+        updated_reservation_data = self.reservation_data.copy()
+        updated_reservation_data['quantity'] = 3
+
+        # Act
+        response = self.client.put('/api/reservations/1', json=updated_reservation_data)
+
+        # Assert
+        assert response.status_code == 200
+        with app.app_context():
+            reservation = ReservationService.get_reservation_by_id(1)
+        assert reservation is not None
+        assert reservation.quantity == 3
+
+    def test_delete_reservation(self, app):
+        # Act
+        response = self.client.delete('/api/reservations/1')
+
+        # Assert
+        assert response.status_code == 200
+        with app.app_context():
+            reservation = ReservationService.get_reservation_by_id(1)
+        assert reservation is None

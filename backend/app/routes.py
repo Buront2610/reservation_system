@@ -14,6 +14,8 @@ from app.functions import check_password, hash_password,generate_token
 import traceback
 import re
 import datetime
+    
+from datetime import datetime
 
 bp = Blueprint('api', __name__)
 
@@ -217,17 +219,17 @@ class WorkplaceService:
 
 class BentoService:
     @classmethod
-    def get_all_bentos():
+    def get_all_bentos(cls):
         bentos = Bento.query.all()
         return bentos
     
     @classmethod
-    def get_bento_by_id(bento_id):
+    def get_bento_by_id(cls,bento_id):
         bento = db.session.get(Bento, bento_id)
         return bento
     
     @classmethod
-    def create_bento(data):
+    def create_bento(cls,data):
         id = data.get('id')
         name = data.get('name')
         price = data.get('price')
@@ -242,7 +244,7 @@ class BentoService:
             return None
         
     @classmethod
-    def update_bento(bento_id, data):
+    def update_bento(cls,bento_id, data):
         bento = db.session.get(Bento, bento_id)
         if bento is None:
             return None
@@ -265,7 +267,7 @@ class BentoService:
         return bento
     
     @classmethod
-    def delete_bento(bento_id):
+    def delete_bento(cls,bento_id):
         bento = db.session.get(Bento, bento_id)
         if bento is None:
             return False
@@ -311,12 +313,12 @@ class BentoService:
 class ReservationService:
 
     @classmethod
-    def get_all_reservations():
+    def get_all_reservations(cls):
         reservations = Reservation.query.all()
         return reservations
     
     @classmethod
-    def get_reservation_by_id(user_id):
+    def get_reservation_by_id(cls,user_id):
         reservation = db.session.get(Reservation, user_id)
         return reservation
     
@@ -324,31 +326,40 @@ class ReservationService:
     def get_reservations_by_user_id(cls, user_id):
         reservations = Reservation.query.filter_by(user_id=user_id).all()
         logger.info(f"reservations: {reservations}")
-        return [Reservation.to_dict() for reservation in reservations]
+        return [Reservation.to_dict() for Reservation in reservations]
 
 
-
-    
     @classmethod
-    def create_reservation(data):
+    def create_reservation(cls, data):
         id = data.get('id')
         user_id = data.get('user_id')
         bento_id = data.get('bento_id')
-        reservation_date = data.get('reservation_date')
+        reservation_date = data.get('reservation_date')   
+        if isinstance(reservation_date, str):  # date is coming in ISO 8601 string format
+            reservation_date = datetime.date(reservation_date)  # convert to date object
         quantity = data.get('quantity')
         remarks = data.get('remarks')
 
         try:
-            reservation = Reservation(id=id, user_id=user_id, bento_id=bento_id, reservation_date=reservation_date, quantity=quantity, remarks=remarks)
+            reservation = Reservation(
+                id=id,
+                user_id=user_id,
+                bento_id=bento_id,
+                reservation_date=reservation_date,
+                quantity=quantity,
+                remarks=remarks
+            )
             db.session.add(reservation)
             db.session.commit()
             return reservation
         except Exception as e:
             current_app.logger.error(f'Error while creating reservation: {e}\n{traceback.format_exc()}')
             return None
+
+
     
     @classmethod
-    def update_reservation(reservation_id, data):
+    def update_reservation(cls, reservation_id, data):
         reservation = db.session.get(Reservation, reservation_id)
 
         if reservation is None:
@@ -380,7 +391,7 @@ class ReservationService:
         return reservation
     
     @classmethod
-    def delete_reservation(reservation_id):
+    def delete_reservation(cls,reservation_id):
         reservation = db.session.get(Reservation, reservation_id)
         if reservation is None:
             return False
@@ -609,16 +620,16 @@ def get_reservation_user_id(user_id:int)-> Tuple[Response, int]:
 @bp.route('/reservations', methods=['POST'])
 def add_reservation()-> Tuple[Response, int]:
     data = request.get_json()
-    employee_id = data.get('employee_id')
+    user_id = data.get('user_id')
     bento_id = data.get('bento_id')
     reservation_date = data.get('reservation_date')
     quantity = data.get('quantity')
     remarks = data.get('remarks')
 
-    if not employee_id or not bento_id or not reservation_date or not quantity :
+    if not user_id or not bento_id or not reservation_date or not quantity :
         return jsonify({'error': '未入力の必須情報があります。'}), 400
 
-    reservation = Reservation(employee_id=employee_id, bento_id=bento_id, reservation_date=reservation_date, quantity=quantity, remarks=remarks)
+    reservation = Reservation(user_id=user_id, bento_id=bento_id, reservation_date=reservation_date, quantity=quantity, remarks=remarks)
     db.session.add(reservation)
     db.session.commit()
     return jsonify(reservation.to_dict()), 201
@@ -628,17 +639,17 @@ def add_reservation()-> Tuple[Response, int]:
 @bp.route('/reservations/<int:id>', methods=['PUT'])
 def update_reservation(id:int)-> Tuple[Response, int]:
     data = request.get_json()
-    employee_id = data.get('employee_id')
+    user_id = data.get('user_id')
     bento_id = data.get('bento_id')
     reservation_date = data.get('reservation_date')
     quantity = data.get('quantity')
     remarks = data.get('remarks')
 
-    if not employee_id or not bento_id or not reservation_date or not quantity :
+    if not user_id or not bento_id or not reservation_date or not quantity :
         return jsonify({'error': 'すべてのフィールドが必要です'}), 400
 
     reservation = Reservation.query.get_or_404(id)
-    reservation.employee_id = employee_id
+    reservation.user_id = user_id
     reservation.bento_id = bento_id
     reservation.reservation_date = reservation_date
     reservation.quantity = quantity
@@ -667,27 +678,27 @@ def get_statistics() -> Tuple[Response, int]:
     # 各勤務場所の予約数
     location_order_counts = db.session.query(Workplace.name, func.count(Reservation.id)).\
         join(User, Workplace.id == User.workplace_id).\
-        join(Reservation, User.id == Reservation.employee_id).\
+        join(Reservation, User.id == Reservation.user_id).\
         filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
         group_by(Workplace.name).all()
 
     # 各勤務場所の注文金額
     location_order_amounts = db.session.query(Workplace.name, func.sum(Bento.price * Reservation.quantity)).\
         join(User, Workplace.id == User.workplace_id).\
-        join(Reservation, User.id == Reservation.employee_id).\
+        join(Reservation, User.id == Reservation.user_id).\
         join(Bento, Reservation.bento_id == Bento.id).\
         filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
         group_by(Workplace.name).all()
 
     # 社員ごとの月次予約数
     employee_monthly_order_counts = db.session.query(User.id, User.name, func.count(Reservation.id)).\
-        join(Reservation, User.id == Reservation.employee_id).\
+        join(Reservation, User.id == Reservation.user_id).\
         filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
         group_by(User.id).all()
 
     # 社員ごとの月次注文金額
     employee_monthly_order_amounts = db.session.query(User.id, User.name, func.sum(Bento.price * Reservation.quantity)).\
-        join(Reservation, User.id == Reservation.employee_id).\
+        join(Reservation, User.id == Reservation.user_id).\
         join(Bento, Reservation.bento_id == Bento.id).\
         filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
         group_by(User.id).all()
