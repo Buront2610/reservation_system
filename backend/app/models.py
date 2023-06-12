@@ -2,7 +2,6 @@
 各種データテーブルの定義ファイル
 現状定義しているデータテーブルは以下になる
 ・ユーザ情報テーブル(User)
-・社員テーブル(Employee)
 ・勤務場所テーブル(Workplace)
 ・弁当テーブル(Bento)
 ・予約テーブル(Reservation)
@@ -12,10 +11,12 @@
 ユーザ数上昇やアクセス数によりパフォーマンスが劣化した場合、別途MySQLなどのRDBMSを検討すること
 """
 
+from enum import auto
 from app import db
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    employee_number = db.Column(db.string(10), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(100), nullable=False)
     name = db.Column(db.String(100), nullable=False)
@@ -27,6 +28,7 @@ class User(db.Model):
     def to_dict(self):
         return {        
             'id': self.id,
+            'employee_number': self.employee_number,
             'role': self.role,
             'name': self.name,
             'email_address': self.email_address,
@@ -36,8 +38,9 @@ class User(db.Model):
         }
 
 
+
 class Workplace(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100), nullable=False)
 
@@ -46,7 +49,7 @@ class Workplace(db.Model):
 
 
 class Bento(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Integer, nullable=False)
     choose_flag = db.Column(db.Boolean, nullable=False)
@@ -54,10 +57,9 @@ class Bento(db.Model):
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
-
 class Reservation(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.string(10), db.ForeignKey('user.employee_number'), nullable=False)
     bento_id = db.Column(db.Integer, db.ForeignKey('bento.id'), nullable=False)
     reservation_date = db.Column(db.Date, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
@@ -71,7 +73,7 @@ class Reservation(db.Model):
 
 
 class Exclude(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     exclude_date = db.Column(db.Date, nullable=True)
 
     def to_dict(self):
@@ -79,7 +81,7 @@ class Exclude(db.Model):
 
 
 class TimeFlag(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     time_flag = db.Column(db.Integer, nullable=False)
 
     def to_dict(self):

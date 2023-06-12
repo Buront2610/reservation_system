@@ -6,11 +6,13 @@ import { createTheme } from '@mui/material/styles';
 import { purple } from '@mui/material/colors';
 
 
-type CalendarCellProps = {
+interface CalendarCellProps {
   day: number;
   reservationStatus: string;
   date: string;
-};
+  onSelect: (date: string, reservationStatus: string) => void;
+}
+
 
 const theme = createTheme({
   palette: {
@@ -43,11 +45,12 @@ const getButtonStyle = (highlighted:boolean, reservationStatus:string, day:numbe
   return { color: "black"};
 };
 
-const CalendarCell: FC<CalendarCellProps> = ({ day, reservationStatus, date }) => {
+const CalendarCell: FC<CalendarCellProps> = ({ day, reservationStatus, date, onSelect }) => {
   const [highlighted, setHighlighted] = useState(false);
 
   const handleClick = () => {
     setHighlighted(!highlighted);
+    onSelect(date, reservationStatus);
   };
 
 

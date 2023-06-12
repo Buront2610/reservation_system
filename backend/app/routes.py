@@ -3,6 +3,7 @@
 トークン認証などによりセキュリティ対策を行っている
 各種CRUD操作を行うエンドポイントと、統計情報を取得するエンドポイントを用意 更新があれば随時追加
 """
+from importlib.abc import ResourceReader
 from venv import logger
 from flask import Flask, current_app, request, jsonify,Blueprint,Response
 from typing import Union, Tuple
@@ -43,7 +44,7 @@ class UserService:
         hashed_password = hash_password(data.get('password'))
         
         try:
-            user = User(id=data.get('id'), password=hashed_password, role=data.get('role'), 
+            user = User(employee_number=data.get('employee_number'), password=hashed_password, role=data.get('role'), 
                         name=data.get('name'), email_address=data.get('email_address'), 
                         telephone=data.get('telephone'), hide_flag=data.get('hide_flag'), 
                         workplace_id=data.get('workplace_id'))
@@ -74,6 +75,8 @@ class UserService:
             user.hide_flag = data['hide_flag']
         if 'workplace_id' in data:
             user.workplace_id = data['workplace_id']
+        if 'employee_number' in data:
+            user.employee_number = data['employee_number']
 
         db.session.commit()
 
@@ -92,7 +95,7 @@ class UserService:
     @staticmethod
     def _validate_user_data_for_creation(data):
         # Check if the required fields are present
-        required_fields = ['id', 'password', 'role', 'name', 'email_address']
+        required_fields = ['employee_number','password', 'role', 'name', 'email_address',]
         for field in required_fields:
             if field not in data:
                 raise ValueError(f"Missing required field: {field}")
@@ -187,7 +190,7 @@ class WorkplaceService:
     @staticmethod
     def _validate_workplace_data_for_creation(data):
         # Check if the required fields are present
-        required_fields = ['id', 'name', 'location']
+        required_fields = ['name', 'location']
         for field in required_fields:
             if field not in data:
                 raise ValueError(f"Missing required field: {field}")
@@ -230,12 +233,11 @@ class BentoService:
     
     @classmethod
     def create_bento(cls,data):
-        id = data.get('id')
         name = data.get('name')
         price = data.get('price')
         choose_flag = data.get('choose_flag')
         try:
-            bento = Bento(id=id,name=name, price=price, choose_flag=choose_flag)
+            bento = Bento(name=name, price=price, choose_flag=choose_flag)
             db.session.add(bento)
             db.session.commit()
             return bento
@@ -331,18 +333,16 @@ class ReservationService:
 
     @classmethod
     def create_reservation(cls, data):
-        id = data.get('id')
         user_id = data.get('user_id')
         bento_id = data.get('bento_id')
         reservation_date = data.get('reservation_date')   
         if isinstance(reservation_date, str):  # date is coming in ISO 8601 string format
-            reservation_date = date(reservation_date)  # convert to date object
+            reservation_date = datetime.date.fromisoformat(reservation_date)  # convert to date object
         quantity = data.get('quantity')
         remarks = data.get('remarks')
 
         try:
             reservation = Reservation(
-                id=id,
                 user_id=user_id,
                 bento_id=bento_id,
                 reservation_date=reservation_date,
@@ -368,6 +368,8 @@ class ReservationService:
         user_id = data.get('user_id')
         bento_id = data.get('bento_id')
         reservation_date = data.get('reservation_date')
+        if isinstance(reservation_date, str):  # date is coming in ISO 8601 string format
+            reservation_date = datetime.date.fromisoformat(reservation_date)  # convert to date object
         quantity = data.get('quantity')
         remarks = data.get('remarks')
 
@@ -465,7 +467,6 @@ class ReservationService:
 @bp.route('/login', methods=['POST'])
 def login() -> Tuple[Response, int]:
     data = request.get_json()
-    id = data.get('id')
     password = data.get('password')
 
     if not password or not id:
@@ -610,26 +611,24 @@ def get_reservations()-> Tuple[Response, int]:
     return jsonify([r.to_dict() for r in reservations]), 200
 
 
+@bp.route('/reservations/<int:id>', methods=['GET'])
+def get_reservation_by_id(id:int)-> Tuple[Response, int]:
+    reservation = ReservationService.get_reservation_by_id(id)
+    return jsonify(reservation.to_dict()), 200
+
 # IDで指定した予約情報を取得
-@bp.route('/reservations/<int:user_id>', methods=['GET'])
+@bp.route('/reservations/user/<int:user_id>', methods=['GET'])
 def get_reservation_user_id(user_id:int)-> Tuple[Response, int]:
-    reservation = ReservationService.get_reservations_by_user_id(user_id)
-    return jsonify(reservation.to_dict()),200
+    reservations = ReservationService.get_reservations_by_user_id(user_id)
+  
+    return jsonify(reservations),200
 
 # 新しい予約を追加
 @bp.route('/reservations', methods=['POST'])
 def add_reservation()-> Tuple[Response, int]:
     data = request.get_json()
-    user_id = data.get('user_id')
-    bento_id = data.get('bento_id')
-    reservation_date = data.get('reservation_date')
-    quantity = data.get('quantity')
-    remarks = data.get('remarks')
 
-    if not user_id or not bento_id or not reservation_date or not quantity :
-        return jsonify({'error': '未入力の必須情報があります。'}), 400
-
-    reservation = Reservation(user_id=user_id, bento_id=bento_id, reservation_date=reservation_date, quantity=quantity, remarks=remarks)
+    reservation = ReservationService.create_reservation(data)
     db.session.add(reservation)
     db.session.commit()
     return jsonify(reservation.to_dict()), 201
@@ -639,31 +638,22 @@ def add_reservation()-> Tuple[Response, int]:
 @bp.route('/reservations/<int:id>', methods=['PUT'])
 def update_reservation(id:int)-> Tuple[Response, int]:
     data = request.get_json()
-    user_id = data.get('user_id')
-    bento_id = data.get('bento_id')
-    reservation_date = data.get('reservation_date')
-    quantity = data.get('quantity')
-    remarks = data.get('remarks')
 
-    if not user_id or not bento_id or not reservation_date or not quantity :
-        return jsonify({'error': 'すべてのフィールドが必要です'}), 400
 
-    reservation = Reservation.query.get_or_404(id)
-    reservation.user_id = user_id
-    reservation.bento_id = bento_id
-    reservation.reservation_date = reservation_date
-    reservation.quantity = quantity
-    reservation.remarks = remarks
-    db.session.commit()
-    return jsonify(reservation.to_dict()), 200
+
+    reservation = ReservationService.update_reservation(id, data)
+    if reservation is None:
+        return jsonify({'error': '更新する予約情報が見つかりません'}), 404
+    else:
+        return jsonify(reservation.to_dict()), 200
 
 # 予約情報を削除
 @bp.route('/reservations/<int:id>', methods=['DELETE'])
 def delete_reservation(id:int) -> Tuple[Response, int]:
-    reservation = Reservation.query.get_or_404(id)
-    db.session.delete(reservation)
-    db.session.commit()
-    return jsonify({'message': '予約情報を削除しました'}), 200
+    if ReservationService.delete_reservation(id):
+        return jsonify({'message': '予約情報を削除しました'}), 200
+    else:
+        return jsonify({"error": "予約情報が見つかりません"}), 404
 
 
 # 統計情報の取得

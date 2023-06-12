@@ -36,7 +36,7 @@ class TestUserService:
     def setup_method(self, client, app):
         self.client = client
         self.user_data = {
-            "id": 1,
+            "employee_number": "0001",
             "password": "password",
             "role": "admin",
             "name": "User 1",
@@ -51,7 +51,7 @@ class TestUserService:
     def test_create_user(self, app):
         # Prepare
         new_user_data = self.user_data.copy()
-        new_user_data['id'] = 2
+        new_user_data["employee_number"] = "0002"
 
         # Act
         response = self.client.post('/api/users', json=new_user_data)
@@ -111,7 +111,6 @@ class TestWorkplaceService:
     def setup_method(self, client, app):
         self.client = client
         self.workplace_data = {
-            "id": 1,
             "name": "Workplace 1",
             "location": "Hiroshima",
         }
@@ -122,7 +121,6 @@ class TestWorkplaceService:
     def test_create_workplace(self, app):
         # Prepare
         new_workplace_data = self.workplace_data.copy()
-        new_workplace_data['id'] = 2
 
 
         # Act
@@ -185,7 +183,6 @@ class TestBentoService:
     def setup_method(self,client, app):
         self.client = client
         self.bento_data = {
-            "id": 1,
             "name": "Bento 1",
             "price": 1000,
             "choose_flag": False
@@ -196,7 +193,6 @@ class TestBentoService:
     def test_create_bento(self,app):
         # Prepare
         new_bento_data = self.bento_data.copy()
-        new_bento_data['id'] = 2
 
         # Act
         response = self.client.post('/api/bento', json=new_bento_data)
@@ -264,10 +260,9 @@ class TestReservationService:
     def setup_method(self, client, app):
         self.client = client
         self.reservation_data = {
-            "id": 1,
-            "user_id": 1,
+            "user_id": '0001',
             "bento_id": 1,
-            "reservation_date": date(2023,6,16) , # 直接dateオブジェクトを指定
+            "reservation_date": datetime.date(2023,6,16).isoformat() , # 直接dateオブジェクトを指定
             "quantity": 2,
             "remarks": "Test reservation"
         }
@@ -278,8 +273,7 @@ class TestReservationService:
     def test_create_reservation(self, app):
         # Prepare
         new_reservation_data = self.reservation_data.copy()
-        new_reservation_data['id'] = 2
-        new_reservation_data['user_id'] = 2
+        new_reservation_data['user_id'] = '0002'
 
         # Act
         response = self.client.post('/api/reservations', json=new_reservation_data)
@@ -287,7 +281,7 @@ class TestReservationService:
         # Assert
         assert response.status_code == 201
         with app.app_context():
-            reservation = ReservationService.get_reservation_by_id(2)
+            reservation = ReservationService.get_reservation_by_id('0002')
         assert reservation is not None
         assert reservation.id == 2
         logger.info(f"response: {response.get_json()}")
@@ -318,7 +312,7 @@ class TestReservationService:
         # Assert
         assert response.status_code == 200
         assert len(response.get_json()) == 1
-        assert response.get_json()[0]['id'] == 1
+        assert response.get_json()[0]['user_id'] == 1
 
     def test_update_reservation(self, app):
         # Prepare

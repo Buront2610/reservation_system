@@ -1,15 +1,18 @@
 // CalendarBody.tsx
 import React, { FC } from 'react';
-import { Employee } from './types';
+import { User } from './types';
 import CalendarRow from './calendarRow';
+import { on } from 'events';
 
 type CalendarBodyProps = {
   currentDate: Date;
-  employeeList: Employee[];
+  employeeList: User[];
   getReservationStatus: (date: string, employeeId: number) => string;
+  onSelect: (date: string, reservationStatus: string) => void;
 };
 
-const CalendarBody: FC<CalendarBodyProps> = ({ currentDate, employeeList, getReservationStatus }) => {
+
+const CalendarBody: FC<CalendarBodyProps> = ({ currentDate, employeeList, getReservationStatus , onSelect}) => {
   return (
     <>
       {employeeList.map((employee, index) => (
@@ -18,6 +21,7 @@ const CalendarBody: FC<CalendarBodyProps> = ({ currentDate, employeeList, getRes
           employee={employee}
           currentDate={currentDate}
           getReservationStatus={getReservationStatus}
+          onSelect={onSelect}
         />
       ))}
     </>

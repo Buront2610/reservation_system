@@ -1,17 +1,18 @@
 // CalendarRow.tsx
 import React, { FC } from 'react';
-import { Employee } from './types';
+import { User } from './types';
 import { TableRow, TableCell } from '@mui/material';
 import { getFirstDayOfMonth, getDaysInMonth, formatDate } from './functions';
 import CalendarCell from './calendarCell';
 
 type CalendarRowProps = {
-  employee: Employee;
+  employee: User;
   currentDate: Date;
   getReservationStatus: (date: string, employeeId: number) => string;
+  onSelect: (date: string, reservationStatus: string) => void;
 };
 
-const CalendarRow: FC<CalendarRowProps> = ({ employee, currentDate, getReservationStatus }) => {
+const CalendarRow: FC<CalendarRowProps> = ({ employee, currentDate, getReservationStatus,onSelect }) => {
   let rows = [];
   let cells = [];
   let dayOffset = getFirstDayOfMonth(currentDate);
@@ -33,7 +34,7 @@ const CalendarRow: FC<CalendarRowProps> = ({ employee, currentDate, getReservati
       const date = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
       const reservationStatus = getReservationStatus(date, employee.id);
       cells.push(
-        <CalendarCell key={`day-${employee.id}-${day}`} day={day} reservationStatus={reservationStatus} date={date} />
+        <CalendarCell key={`day-${employee.id}-${day}`} day={day} reservationStatus={reservationStatus} date={date} onSelect={onSelect} />
       );
     }
   }

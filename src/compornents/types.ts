@@ -4,6 +4,7 @@
 */
 export interface User {
     id: number;
+    employee_number: string;
     password: string;
     role: string;
     name: string;
@@ -27,7 +28,7 @@ export interface Bento{
 }
 export interface Reservation {
     id: number;
-    user_id: number;
+    user_id: string;
     bento_id: number;
     reservation_date: string;
     quantity: number;
