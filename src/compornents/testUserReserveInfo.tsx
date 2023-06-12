@@ -143,7 +143,7 @@ export default function TestReservationHistoryPage() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userRes = await getReservationByID(1);  // ユーザーIDを適切に変更
+        const userRes = await getReservationByID(dummyEmployees[0].employee_number);  // ユーザーIDを適切に変更
         setUserReservation(userRes);
       } catch (error) {
         console.log(error);

@@ -24,6 +24,7 @@ class User(db.Model):
     telephone = db.Column(db.String(100), nullable=True)
     hide_flag = db.Column(db.Boolean, nullable=False)
     workplace_id = db.Column(db.Integer, db.ForeignKey('workplace.id'), nullable=False)
+    reservations = db.relationship('Reservation', backref='user')  # これを追加
 
     def to_dict(self):
         return {        

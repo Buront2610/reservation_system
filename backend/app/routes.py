@@ -619,6 +619,7 @@ def get_reservation_by_id(id:int)-> Tuple[Response, int]:
 # IDで指定した予約情報を取得
 @bp.route('/reservations/user/<string:user_id>', methods=['GET'])
 def get_reservation_user_id(user_id:str)-> Tuple[Response, int]:
+    logger.info(f"Received user_id: {user_id}")
     reservations = ReservationService.get_reservations_by_user_id(user_id)
   
     return jsonify(reservations),200
@@ -629,8 +630,7 @@ def add_reservation()-> Tuple[Response, int]:
     data = request.get_json()
 
     reservation = ReservationService.create_reservation(data)
-    db.session.add(reservation)
-    db.session.commit()
+
     return jsonify(reservation.to_dict()), 201
     
 

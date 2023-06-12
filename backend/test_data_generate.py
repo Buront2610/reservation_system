@@ -24,7 +24,7 @@ with app.app_context():
     for i in range(10):  # Create 10 users
         random_password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))  # Generate a random password
         hashed_password = generate_password_hash(random_password)  # Hashing
-        employee_number = f'{i+1:0>10}'  # Generate a employee_number with leading zeros
+        employee_number = f'{i+1:04d}'  # Generate a 4 digit employee_number with leading zeros
         user = User(
             employee_number=employee_number,
             password=hashed_password, 

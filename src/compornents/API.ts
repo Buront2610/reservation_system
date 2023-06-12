@@ -113,7 +113,7 @@ export const deleteUser = async (userId: number): Promise<void> => {
     await axios.delete(`${API_BASE_URL}/users/${userId}`);
 }
 
-export async function getReservationByID(user_id: number): Promise<Reservation[]> {
+export async function getReservationByID(user_id: string): Promise<Reservation[]> {
     const response = await axios.get<Reservation[]>(`${API_BASE_URL}/reservations/user/${user_id}`);
     return response.data;
 }
