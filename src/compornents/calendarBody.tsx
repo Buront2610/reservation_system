@@ -3,11 +3,12 @@ import React, { FC } from 'react';
 import { User } from './types';
 import CalendarRow from './calendarRow';
 import { on } from 'events';
+import { StringMappingType } from 'typescript';
 
 type CalendarBodyProps = {
   currentDate: Date;
   employeeList: User[];
-  getReservationStatus: (date: string, employeeId: number) => string;
+  getReservationStatus: (date: string, employeeId: string) => string;
   onSelect: (date: string, reservationStatus: string) => void;
 };
 

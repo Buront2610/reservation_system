@@ -8,7 +8,7 @@ import CalendarCell from './calendarCell';
 type CalendarRowProps = {
   employee: User;
   currentDate: Date;
-  getReservationStatus: (date: string, employeeId: number) => string;
+  getReservationStatus: (date: string, employeeId: string) => string;
   onSelect: (date: string, reservationStatus: string) => void;
 };
 
@@ -32,7 +32,7 @@ const CalendarRow: FC<CalendarRowProps> = ({ employee, currentDate, getReservati
       cells.push(<TableCell key={`empty-${employee.id}-${day}`}></TableCell>);
     } else {
       const date = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
-      const reservationStatus = getReservationStatus(date, employee.id);
+      const reservationStatus = getReservationStatus(date, employee.employee_number);
       cells.push(
         <CalendarCell key={`day-${employee.id}-${day}`} day={day} reservationStatus={reservationStatus} date={date} onSelect={onSelect} />
       );

@@ -8,7 +8,7 @@ import { getReservationByID, getUserById, getAllUsers ,addReservation, deleteRes
 
 
 const dummyEmployees: User[] = [
-    { id: 1,employee_number:1, name: 'John Doe', workplace_id: 1, email_address: 'test@test.co.jp',  hide_flag: false, telephone: '8888',password:"test",role:"user"},
+    { id: 1, employee_number:'0001', name: 'John Doe', workplace_id: 1, email_address: 'test@test.co.jp',  hide_flag: false, telephone: '8888',password:"test",role:"user"},
 ];
 
 
@@ -31,12 +31,12 @@ const useCalendar = (initialReservations: Reservation[], initialEmployees: User[
 
 
 //指定された日付と従業員IDに予約が存在するかどうかを判定する
-const isReservationExists = (reservations: Reservation[], date: string, employeeId: number) => {
+const isReservationExists = (reservations: Reservation[], date: string, employeeId: string) => {
   return reservations.some(reservation => reservation.user_id === employeeId && reservation.reservation_date === date);
 };
 
 //指定された日付と従業員IDに予約状況を取得する
-const getReservationStatus = (date: string, employeeId: number) => {
+const getReservationStatus = (date: string, employeeId: string) => {
   return isReservationExists(initialReservations, date, employeeId) ? "予約済" : "";
 };
 
@@ -46,7 +46,7 @@ const Calendar: FC<{ userReservations: Reservation[] }> = ({userReservations}) =
   const { currentDate, initialEmployees, changeMonth, getReservationStatus } = useCalendar(userReservations, dummyEmployees);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedReservationId, setSelectedReservationId] = useState<number | null>(null);
 
   const handleAddReservation = async () => {
