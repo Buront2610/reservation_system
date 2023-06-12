@@ -16,7 +16,7 @@ from app import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    employee_number = db.Column(db.string(10), unique=True, nullable=False)
+    employee_number = db.Column(db.String(10), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(100), nullable=False)
     name = db.Column(db.String(100), nullable=False)
@@ -59,7 +59,7 @@ class Bento(db.Model):
 
 class Reservation(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.string(10), db.ForeignKey('user.employee_number'), nullable=False)
+    user_id = db.Column(db.String(10), db.ForeignKey('user.employee_number'), nullable=False)
     bento_id = db.Column(db.Integer, db.ForeignKey('bento.id'), nullable=False)
     reservation_date = db.Column(db.Date, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)

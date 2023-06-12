@@ -617,8 +617,8 @@ def get_reservation_by_id(id:int)-> Tuple[Response, int]:
     return jsonify(reservation.to_dict()), 200
 
 # IDで指定した予約情報を取得
-@bp.route('/reservations/user/<int:user_id>', methods=['GET'])
-def get_reservation_user_id(user_id:int)-> Tuple[Response, int]:
+@bp.route('/reservations/user/<string:user_id>', methods=['GET'])
+def get_reservation_user_id(user_id:str)-> Tuple[Response, int]:
     reservations = ReservationService.get_reservations_by_user_id(user_id)
   
     return jsonify(reservations),200

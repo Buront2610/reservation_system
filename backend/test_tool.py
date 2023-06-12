@@ -286,7 +286,7 @@ class TestReservationService:
         assert reservation.id == 2
         logger.info(f"response: {response.get_json()}")
         print(f"reponse:{response.get_json()}")
-        assert response.get_json()['id'] == 2
+        assert response.get_json()['user_id'] == '0002'
 
     def test_get_all_reservations(self, app):
         # Act
@@ -307,12 +307,12 @@ class TestReservationService:
 
     def test_get_reservations_by_user_id(self):
         # Act
-        response = self.client.get('/api/reservations/user/1')
+        response = self.client.get('/api/reservations/user/0001')
 
         # Assert
         assert response.status_code == 200
         assert len(response.get_json()) == 1
-        assert response.get_json()[0]['user_id'] == 1
+        assert response.get_json()[0]['user_id'] == '0001'
 
     def test_update_reservation(self, app):
         # Prepare

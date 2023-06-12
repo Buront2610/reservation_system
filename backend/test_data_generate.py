@@ -24,7 +24,9 @@ with app.app_context():
     for i in range(10):  # Create 10 users
         random_password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))  # Generate a random password
         hashed_password = generate_password_hash(random_password)  # Hashing
+        employee_number = f'{i+1:0>10}'  # Generate a employee_number with leading zeros
         user = User(
+            employee_number=employee_number,
             password=hashed_password, 
             role=random.choice(['admin', 'user']),  # Select a random role
             name=f'User{i}', 
@@ -46,7 +48,7 @@ with app.app_context():
 
     for _ in range(50):  # Create 50 reservations
         reservation = Reservation(
-            user_id=random.choice(users).id, 
+            user_id=random.choice(users).employee_number, 
             bento_id=random.choice(bentos).id, 
             reservation_date=date.today() + timedelta(days=random.randint(0, 10)), 
             quantity=random.randint(1, 5), 
