@@ -4,7 +4,7 @@ APIの定義に関してはbackend/app/routes.pyを参照すること
 types.tsに定義されている型を使用すること
 */
 import axios from 'axios';
-import { Workplace, Bento, Reservation, User, Login } from './types';
+import { Workplace, Bento, Reservation, User, Login, TimeFlag } from './types';
 import { UseAuth } from './authContext';
 import { th } from 'date-fns/locale';
 
@@ -152,15 +152,21 @@ export async function deleteExclude(id: number): Promise<void> {
     await axios.delete(`${API_BASE_URL}/excludes/${id}`);
 }
 
-//時間帯フラグの取得
-export async function getTimeFlag(): Promise<boolean> {
-    const response = await axios.get<boolean>(`${API_BASE_URL}/timeflag`);
+export async function getTimeFlag(): Promise<TimeFlag> {
+    const response = await axios.get<TimeFlag>(`${API_BASE_URL}/timeflag`);
     return response.data;
 }
 
-//時間帯フラグの更新
-export async function updateTimeFlag(newTimeFlag: Partial<boolean>): Promise<boolean> {
-    const response = await axios.post<boolean>(`${API_BASE_URL}/timeflag`, newTimeFlag);
+export async function getTimeFlagByID(id: number): Promise<TimeFlag> {
+    const response = await axios.get<TimeFlag>(`${API_BASE_URL}/timeflag/${id}`);
+    console.log(response.data);
+    return response.data;
+}
+export async function updateTimeFlag(timeFlag: TimeFlag): Promise<TimeFlag> {
+    console.log(timeFlag);
+    const response = await axios.put<TimeFlag>(`${API_BASE_URL}/timeflag/${timeFlag.id}`, {
+        time_flag: timeFlag.time_flag // ensure the data is sent as JSON
+    });
     return response.data;
 }
 

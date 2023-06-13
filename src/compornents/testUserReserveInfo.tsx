@@ -4,6 +4,7 @@ import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
 import  CalenderHeader  from './calendarHeader';
 import CalendarBody from './calendarBody';
 import { getReservationByID, getUserById, getAllUsers ,addReservation, deleteReservation } from './API';
+import { hi } from 'date-fns/locale';
 // Define dummy data
 
 
@@ -13,6 +14,28 @@ const dummyEmployees: User[] = [
 
 
 const DAYS_OF_WEEK = ["日", "月", "火", "水", "木", "金", "土"];
+
+
+function useFetchUserData(id: string) {
+  const [userReservation, setUserReservation] = useState<Reservation[] | null>(null);
+  
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userRes = await getReservationByID(id);
+        setUserReservation(userRes);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    
+    fetchUserData();
+  }, [id]);
+
+  return userReservation;
+}
+
+
 
 // カレンダーの初期状態を設定するためのフック
 // initialReservations: 予約情報の初期状態
@@ -47,48 +70,93 @@ const Calendar: FC<{ userReservations: Reservation[] }> = ({userReservations}) =
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [selectedReservationId, setSelectedReservationId] = useState<number | null>(null);
+  const [selectedReservationId, setSelectedReservationId] = useState<number[] | null>(null);
+  // Calendar.tsx
+  const [highlightedDates, setHighlightedDates] = useState<string[]>([]);
+
+  const handleHighlight = (date: string) => {
+    setHighlightedDates(prevDates =>
+      prevDates.includes(date) ? prevDates.filter(d => d !== date) : [...prevDates, date]
+    );
+  
+    // Check reservation for the date
+    const reservationStatus = getReservationStatus(date, dummyEmployees[0].employee_number);  //適切なemployeeIdに置き換えてください
+  
+    if (reservationStatus === '予約済') {
+      const reservation = userReservations.find(res => res.reservation_date === date);
+      if (reservation) {
+        setSelectedReservationId(prevIds => prevIds ? [...prevIds, reservation.id] : [reservation.id]);
+      }
+    } else {
+      setSelectedReservationId(prevIds => prevIds ? prevIds.filter(id => {
+        const reservation = userReservations.find(res => res.id === id);
+        return reservation && reservation.reservation_date !== date;
+      }) : null);
+    }
+  };
+  
+  
+  
 
   const handleAddReservation = async () => {
-    if (selectedDate && selectedUserId) {
-      if (new Date(selectedDate) < new Date()) {
-        alert('過去の日付に予約を追加することはできません');
-        return;
-      }
+    if (highlightedDates && dummyEmployees[0].employee_number) {
+      for (let date of highlightedDates) {
+        if (new Date(date) < new Date()) {
+          alert('過去の日付に予約を追加することはできません');
+          return;
+        }
+        
+        const reservationExists = getReservationStatus(date, dummyEmployees[0].employee_number);
   
-      const newReservation: Partial<Reservation> = {
-        user_id: selectedUserId,
-        reservation_date: selectedDate,
-        bento_id:1,
-        quantity:1,
-        remarks:"通常予約"
-
-      };
-  
-      try {
-        await addReservation(newReservation);
-        // データをリフレッシュするなどの処理が必要な場合はここに記述
-      } catch (error) {
-        console.error(error);
+        if (reservationExists === "") {
+          const newReservation: Partial<Reservation> = {
+            user_id: dummyEmployees[0].employee_number,
+            reservation_date: date,
+            bento_id:1,
+            quantity:1,
+            remarks:"通常予約"
+          };
+      
+          try {
+            await addReservation(newReservation);
+            // データをリフレッシュするなどの処理が必要な場合はここに記述
+          } catch (error) {
+            console.error(error);
+          }
+        } else {
+          console.log(`Date ${date} is already reserved.`);
+        }
       }
     }
   };
+  
   const handleDeleteReservation = async () => {
-    if (selectedReservationId) {
-      if (selectedDate && new Date(selectedDate) < new Date()) {
-        alert('過去の予約はキャンセルできません');
-        return;
-      }
+    confirm('予約をキャンセルしますか？');
+    if (selectedReservationId && highlightedDates) {
+      for (let date of highlightedDates) {
+        for (let id of selectedReservationId) {
+          if (new Date(date) < new Date()) {
+            alert('過去の予約はキャンセルできません');
+            return;
+          }
+          
+          const reservationExists = getReservationStatus(date, dummyEmployees[0].employee_number);
   
-      try {
-        await deleteReservation(selectedReservationId);
-        // データをリフレッシュするなどの処理が必要な場合はここに記述
-      } catch (error) {
-        console.error(error);
+          if (reservationExists === "予約済") {
+            try {
+              await deleteReservation(id);
+              // データをリフレッシュするなどの処理が必要な場合はここに記述
+            } catch (error) {
+              console.error(error);
+            }
+          } else {
+            console.log(`No reservation exists for date ${date}.`);
+          }
+        }
       }
     }
   };
-
+  
   const handleSelect = (date: string, reservationStatus: string) => {
     setSelectedDate(date);
     // 予約ステータスが"予約済"の場合は、予約IDをセットします。
@@ -96,12 +164,13 @@ const Calendar: FC<{ userReservations: Reservation[] }> = ({userReservations}) =
     if (reservationStatus === '予約済') {
       const reservation = userReservations.find(res => res.reservation_date === date);
       if (reservation) {
-        setSelectedReservationId(reservation.id);
       }
     } else {
       setSelectedReservationId(null);
     }
   };
+  
+
   
   return (
     <Box>
@@ -121,6 +190,7 @@ const Calendar: FC<{ userReservations: Reservation[] }> = ({userReservations}) =
               employeeList={initialEmployees}
               getReservationStatus={getReservationStatus}
               onSelect={handleSelect}
+              onHighlight={handleHighlight}
             />
           </TableBody>
         </Table>
@@ -137,22 +207,10 @@ const Calendar: FC<{ userReservations: Reservation[] }> = ({userReservations}) =
   );
 }
 
+
 export default function TestReservationHistoryPage() {
-  const [userReservation, setUserReservation] = useState<Reservation[] | null>(null);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userRes = await getReservationByID(dummyEmployees[0].employee_number);  // ユーザーIDを適切に変更
-        setUserReservation(userRes);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchUserData();
-  }, []);
-  console.log(userReservation);
+  const userReservation = useFetchUserData(dummyEmployees[0].employee_number);
 
   // userReservationがnullでない場合のみCalendarをレンダリング
   return userReservation ? <Calendar userReservations={userReservation} /> : <div>Loading...</div>;

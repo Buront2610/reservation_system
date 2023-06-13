@@ -10,10 +10,11 @@ type CalendarBodyProps = {
   employeeList: User[];
   getReservationStatus: (date: string, employeeId: string) => string;
   onSelect: (date: string, reservationStatus: string) => void;
+  onHighlight: (date: string) => void;
 };
 
 
-const CalendarBody: FC<CalendarBodyProps> = ({ currentDate, employeeList, getReservationStatus , onSelect}) => {
+const CalendarBody: FC<CalendarBodyProps> = ({ currentDate, employeeList, getReservationStatus , onSelect, onHighlight}) => {
   return (
     <>
       {employeeList.map((employee, index) => (
@@ -23,6 +24,7 @@ const CalendarBody: FC<CalendarBodyProps> = ({ currentDate, employeeList, getRes
           currentDate={currentDate}
           getReservationStatus={getReservationStatus}
           onSelect={onSelect}
+          onHighlight={onHighlight}
         />
       ))}
     </>

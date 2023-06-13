@@ -467,12 +467,13 @@ class ReservationService:
 @bp.route('/login', methods=['POST'])
 def login() -> Tuple[Response, int]:
     data = request.get_json()
+    id = data.get('id')
     password = data.get('password')
 
     if not password or not id:
         return jsonify({'error': 'IDとパスワードが必要です'}), 400
 
-    user = User.query.filter_by(id=id).first()
+    user = User.query.filter_by(employee_number=id).first()
 
     if not user:
         return jsonify({'error': 'ユーザーが見つかりません'}), 404
@@ -771,6 +772,7 @@ def create_timeflag() -> Tuple[Response, int]:
 @bp.route("/timeflag/<int:id>", methods=["GET"])
 def get_timeflag_by_id(id:int) -> Tuple[Response, int]:
     timeflag = TimeFlag.query.get_or_404(id)
+    current_app.logger.info('timeflag: %s', timeflag)
     return jsonify(timeflag.to_dict()),200
 
 @bp.route("/timeflag/<int:id>", methods=["DELETE"])
@@ -783,12 +785,21 @@ def delete_timeflag(id:int) -> Tuple[Response, int]:
 @bp.route("/timeflag/<int:id>", methods=["PUT"])
 def update_timeflag(id:int) -> Tuple[Response, int]:
     data = request.get_json()
-    timeflag = data.get('timeflag')
-    if not timeflag:
-        return jsonify({'error': '未入力の必須情報があります。'}), 400
-    timeflag = TimeFlag.query.get_or_404(id)
-    timeflag.timeflag = timeflag
-    db.session.commit()
-    return jsonify(timeflag.to_dict()), 201
+    time_flag = data.get('time_flag')
+    current_app.logger.info('data:',data)
+    if time_flag is None:
+        current_app.logger.info('data: %s', data)
+        current_app.logger.info('time_flag: %s', time_flag)
 
+        return jsonify({'error': '未入力の必須情報があります。'}), 400
+    try:
+        timeflag_obj = TimeFlag.query.get_or_404(id)
+        current_app.logger.info('timeflag_obj:',timeflag_obj)
+        timeflag_obj.time_flag = time_flag
+        db.session.commit()
+        return jsonify(timeflag_obj.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e) 
+        return jsonify({'error': 'エラーが発生しました。'}), 500
 

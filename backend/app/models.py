@@ -83,7 +83,7 @@ class Exclude(db.Model):
 
 class TimeFlag(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    time_flag = db.Column(db.Integer, nullable=False)
+    time_flag = db.Column(db.Boolean, nullable=False)
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

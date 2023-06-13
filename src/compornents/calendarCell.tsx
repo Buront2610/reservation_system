@@ -11,6 +11,7 @@ interface CalendarCellProps {
   reservationStatus: string;
   date: string;
   onSelect: (date: string, reservationStatus: string) => void;
+  onHighlight: (date: string) => void;
 }
 
 
@@ -45,12 +46,13 @@ const getButtonStyle = (highlighted:boolean, reservationStatus:string, day:numbe
   return { color: "black"};
 };
 
-const CalendarCell: FC<CalendarCellProps> = ({ day, reservationStatus, date, onSelect }) => {
+const CalendarCell: FC<CalendarCellProps> = ({ day, reservationStatus, date, onSelect, onHighlight }) => {
   const [highlighted, setHighlighted] = useState(false);
 
   const handleClick = () => {
     setHighlighted(!highlighted);
     onSelect(date, reservationStatus);
+    onHighlight(date);
   };
 
 
