@@ -8,6 +8,7 @@ from app.routes import UserService, WorkplaceService, BentoService, ReservationS
 from werkzeug.security import generate_password_hash
 from datetime import datetime, date, timedelta
 import datetime
+from flask import current_app
 
 
 
@@ -338,3 +339,57 @@ class TestReservationService:
         with app.app_context():
             reservation = ReservationService.get_reservation_by_id(1)
         assert reservation is None
+
+class TestStatisticsAPI:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, client, app):
+        self.client = client
+        with app.app_context():
+            # テストデータの作成
+            workplace1 = Workplace(name="Workplace 1", location="Location 1")
+            workplace2 = Workplace(name="Workplace 2", location="Location 2")
+            user1 = User(employee_number="0001", name="User 1", workplace_id=1, password="password1", role="role1", hide_flag=False)
+            user2 = User(employee_number="0002", name="User 2", workplace_id=2, password="password2", role="role2", hide_flag=False)
+            bento1 = Bento(name="Bento 1", price=100, choose_flag=True)
+            bento2 = Bento(name="Bento 2", price=200, choose_flag=True)
+            reservation1 = Reservation(user_id="0001", bento_id=1, reservation_date="2023-06-01", quantity=1)
+            reservation2 = Reservation(user_id="0001", bento_id=2, reservation_date="2023-06-01", quantity=2)
+            reservation3 = Reservation(user_id="0002", bento_id=1, reservation_date="2023-06-01", quantity=3)
+
+            db.create_all()
+            db.session.add_all([workplace1, workplace2, user1, user2, bento1, bento2, reservation1, reservation2, reservation3])
+            db.session.commit()
+
+    def test_get_statistics(self):
+        # Act
+        response = self.client.get('/statistics?month=6&year=2023')
+
+        # Assert
+        assert response.status_code == 200
+        data = response.get_json()
+
+        current_app.logger.info(f"response: {data}")    
+
+        assert "reservations" in data
+        assert "total" in data
+        assert "page" in data
+        assert "per_page" in data
+        assert "location_order_counts" in data
+        assert "location_order_amounts" in data
+        assert "employee_monthly_order_counts" in data
+        assert "employee_monthly_order_amounts" in data
+
+        assert len(data["reservations"]) == 3
+        assert data["total"] == 3
+        assert data["page"] == 1
+        assert data["per_page"] == 10
+
+        assert "Workplace 1" in data["location_order_counts"]
+        assert "Workplace 2" in data["location_order_counts"]
+        assert "Workplace 1" in data["location_order_amounts"]
+        assert "Workplace 2" not in data["location_order_amounts"]
+
+        assert "0001" in data["employee_monthly_order_counts"]
+        assert "0002" in data["employee_monthly_order_counts"]
+        assert "0001" in data["employee_monthly_order_amounts"]
+        assert "0002" not in data["employee_monthly_order_amounts"]

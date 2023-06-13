@@ -656,8 +656,7 @@ def delete_reservation(id:int) -> Tuple[Response, int]:
     else:
         return jsonify({"error": "予約情報が見つかりません"}), 404
 
-
-# 統計情報の取得
+#統計情報の取得
 @bp.route("/statistics", methods=["GET"])
 def get_statistics() -> Tuple[Response, int]:
     month = request.args.get("month", type=int)
@@ -669,30 +668,30 @@ def get_statistics() -> Tuple[Response, int]:
     # 各勤務場所の予約数
     location_order_counts = db.session.query(Workplace.name, func.count(Reservation.id)).\
         join(User, Workplace.id == User.workplace_id).\
-        join(Reservation, User.id == Reservation.user_id).\
+        join(Reservation, User.employee_number == Reservation.user_id).\
         filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
         group_by(Workplace.name).all()
 
     # 各勤務場所の注文金額
     location_order_amounts = db.session.query(Workplace.name, func.sum(Bento.price * Reservation.quantity)).\
         join(User, Workplace.id == User.workplace_id).\
-        join(Reservation, User.id == Reservation.user_id).\
+        join(Reservation, User.employee_number == Reservation.user_id).\
         join(Bento, Reservation.bento_id == Bento.id).\
         filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
         group_by(Workplace.name).all()
 
     # 社員ごとの月次予約数
-    employee_monthly_order_counts = db.session.query(User.id, User.name, func.count(Reservation.id)).\
-        join(Reservation, User.id == Reservation.user_id).\
+    employee_monthly_order_counts = db.session.query(User.employee_number, User.name, func.count(Reservation.id)).\
+        join(Reservation, User.employee_number == Reservation.user_id).\
         filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
-        group_by(User.id).all()
+        group_by(User.employee_number).all()
 
     # 社員ごとの月次注文金額
-    employee_monthly_order_amounts = db.session.query(User.id, User.name, func.sum(Bento.price * Reservation.quantity)).\
-        join(Reservation, User.id == Reservation.user_id).\
+    employee_monthly_order_amounts = db.session.query(User.employee_number, User.name, func.sum(Bento.price * Reservation.quantity)).\
+        join(Reservation, User.employee_number == Reservation.user_id).\
         join(Bento, Reservation.bento_id == Bento.id).\
         filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
-        group_by(User.id).all()
+        group_by(User.employee_number).all()
     
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
@@ -707,8 +706,8 @@ def get_statistics() -> Tuple[Response, int]:
         "per_page": reservations.per_page,
         "location_order_counts": {loc: count for loc, count in location_order_counts},
         "location_order_amounts": {loc: amount for loc, amount in location_order_amounts},
-        "employee_monthly_order_counts": {emp_id: {"name": name, "count": count} for emp_id, name, count in employee_monthly_order_counts},
-        "employee_monthly_order_amounts": {emp_id: {"name": name, "amount": amount} for emp_id, name, amount in employee_monthly_order_amounts}
+        "employee_monthly_order_counts": {emp_num: {"name": name, "count": count} for emp_num, name, count in employee_monthly_order_counts},
+        "employee_monthly_order_amounts": {emp_num: {"name": name, "amount": amount} for emp_num, name, amount in employee_monthly_order_amounts}
     }
 
     return jsonify(result), 200
