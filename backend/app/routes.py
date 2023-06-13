@@ -655,16 +655,9 @@ def delete_reservation(id:int) -> Tuple[Response, int]:
         return jsonify({'message': '予約情報を削除しました'}), 200
     else:
         return jsonify({"error": "予約情報が見つかりません"}), 404
-
-#統計情報の取得
-@bp.route("/statistics", methods=["GET"])
-def get_statistics() -> Tuple[Response, int]:
-    month = request.args.get("month", type=int)
-    year = request.args.get("year", type=int)
-
-    if month is None or year is None:
-        return jsonify({"error": "Both month and year must be specified"}), 400
-
+# 統計情報の取得
+@bp.route("/statistics/<int:year>/<int:month>", methods=["GET"])
+def get_statistics(year: int, month: int) -> Tuple[Response, int]:
     # 各勤務場所の予約数
     location_order_counts = db.session.query(Workplace.name, func.count(Reservation.id)).\
         join(User, Workplace.id == User.workplace_id).\
@@ -692,7 +685,7 @@ def get_statistics() -> Tuple[Response, int]:
         join(Bento, Reservation.bento_id == Bento.id).\
         filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
         group_by(User.employee_number).all()
-    
+
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
 
@@ -711,6 +704,7 @@ def get_statistics() -> Tuple[Response, int]:
     }
 
     return jsonify(result), 200
+
 
 ##除外日に対するCRUDエンドポイント
 @bp.route("/exclude", methods=["GET"])
