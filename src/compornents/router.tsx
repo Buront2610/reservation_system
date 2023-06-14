@@ -20,6 +20,7 @@ import TestUserSideMenu from './testSideMenu';
 import TestAdminManage from './testAdminManage';
 import TestAdminOrderSummaryPage from './testAdminReserveStatus';
 import AdminTimeLock from './adminTimeLock';
+import AdminMangement from './adminManage';
 
 interface setStateProps{
     setStateProp: object;
@@ -51,6 +52,7 @@ function routerCompornent() {
                     <Route path="/test7" element={<TestAdminManage />} />
                     <Route path='/test8' element={<TestAdminOrderSummaryPage />}/>
                     <Route path='/lock' element={<AdminTimeLock />} />
+                    <Route path='/manage' element={<AdminMangement />} />
                 </Route>
                 {user && (
                     <>

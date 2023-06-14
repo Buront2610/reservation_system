@@ -50,3 +50,14 @@ export interface TimeFlag {
     id: number;
     time_flag: boolean;
 }
+
+export interface Statistics {
+    reservations: Reservation[];
+    total: number;
+    page: number;
+    per_page: number;
+    location_order_counts: Record<string, number>;
+    location_order_amounts: Record<string, number>;
+    employee_monthly_order_counts: Record<string, { name: string, count: number }>;
+    employee_monthly_order_amounts: Record<string, { name: string, amount: number }>;
+}

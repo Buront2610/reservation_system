@@ -1,9 +1,9 @@
-import { useState,useEffect, FC } from 'react';
-import { Reservation, User} from './types';
+import { useState,useEffect, FC, useMemo } from 'react';
+import { Reservation, User, TimeFlag} from './types';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,Button } from '@mui/material';
 import  CalenderHeader  from './calendarHeader';
 import CalendarBody from './calendarBody';
-import { getReservationByID, getUserById, getAllUsers ,addReservation, deleteReservation } from './API';
+import { getReservationByID, getUserById, getAllUsers ,addReservation, deleteReservation, getStatistics , getTimeFlagByID} from './API';
 import { hi } from 'date-fns/locale';
 // Define dummy data
 
@@ -59,15 +59,21 @@ const isReservationExists = (reservations: Reservation[], date: string, employee
 };
 
 //指定された日付と従業員IDに予約状況を取得する
-const getReservationStatus = (date: string, employeeId: string) => {
-  return isReservationExists(initialReservations, date, employeeId) ? "予約済" : "";
-};
+// getReservationStatus関数をメモ化します
+const getReservationStatus = useMemo(() => {
+  return (date: string, employeeId: string) => {
+    return isReservationExists(initialReservations, date, employeeId) ? "予約済" : "";
+  };
+}, [initialReservations]);
+
 
   return { currentDate, initialEmployees, changeMonth, getReservationStatus };
 }
-const Calendar: FC<{ userReservations: Reservation[] }> = ({userReservations}) => {
-  const { currentDate, initialEmployees, changeMonth, getReservationStatus } = useCalendar(userReservations, dummyEmployees);
 
+
+const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => void }> = ({userReservations, reloadReservations}) => {
+  const { currentDate, initialEmployees, changeMonth, getReservationStatus } = useCalendar(userReservations, dummyEmployees);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedReservationId, setSelectedReservationId] = useState<number[] | null>(null);
@@ -94,18 +100,40 @@ const Calendar: FC<{ userReservations: Reservation[] }> = ({userReservations}) =
       }) : null);
     }
   };
+  const handleUnHighlightAll = () => {
+    setHighlightedDates([]); // unhighlight all
+  };
   
   
   
-
+  
   const handleAddReservation = async () => {
+    setIsProcessing(true);
+    const successfulDates: string[] = [];
+
     if (highlightedDates && dummyEmployees[0].employee_number) {
       for (let date of highlightedDates) {
-        if (new Date(date) < new Date()) {
+        let now = new Date();
+        let selectedDate = new Date(date);
+        
+        // Create new date objects without time information
+          let nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+          let selectedDateOnly = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+  
+        if (selectedDateOnly < nowDateOnly) {
+          console.log(selectedDateOnly);
+          console.log(nowDateOnly);
           alert('過去の日付に予約を追加することはできません');
           return;
         }
-        
+  
+        // Check if TimeFlag is true, then abort the process
+        const timeFlag: TimeFlag = await getTimeFlagByID(1);
+        if (selectedDateOnly.getTime() === nowDateOnly.getTime() && timeFlag.time_flag) {
+          alert('本日分のお弁当の予約時間を過ぎました');
+          return;
+        }
+  
         const reservationExists = getReservationStatus(date, dummyEmployees[0].employee_number);
   
         if (reservationExists === "") {
@@ -119,7 +147,9 @@ const Calendar: FC<{ userReservations: Reservation[] }> = ({userReservations}) =
       
           try {
             await addReservation(newReservation);
-            // データをリフレッシュするなどの処理が必要な場合はここに記述
+            // Refresh data after reservation
+            successfulDates.push(date);
+  
           } catch (error) {
             console.error(error);
           }
@@ -127,34 +157,67 @@ const Calendar: FC<{ userReservations: Reservation[] }> = ({userReservations}) =
           console.log(`Date ${date} is already reserved.`);
         }
       }
+      if (successfulDates.length > 0) {
+        alert(`${successfulDates.join(', ')}の予約が成功しました`);
+        await reloadReservations();
+        setHighlightedDates([]); // ハイライト解除
+
+      }
     }
+    setIsProcessing(false);
   };
   
   const handleDeleteReservation = async () => {
     confirm('予約をキャンセルしますか？');
+    setIsProcessing(true); //処理中のフラグを立てる
+    const successfulDates: string[] = [];
     if (selectedReservationId && highlightedDates) {
       for (let date of highlightedDates) {
-        for (let id of selectedReservationId) {
-          if (new Date(date) < new Date()) {
-            alert('過去の予約はキャンセルできません');
-            return;
-          }
-          
-          const reservationExists = getReservationStatus(date, dummyEmployees[0].employee_number);
-  
-          if (reservationExists === "予約済") {
+        let now = new Date();
+        let selectedDate = new Date(date);
+        
+        // Create new date objects without time information
+        let nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+        let selectedDateOnly = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+
+        if (selectedDateOnly < nowDateOnly) {
+          console.log(selectedDateOnly);
+          console.log(nowDateOnly);
+          alert('過去の予約はキャンセルできません');
+          return;
+        }
+        const timeFlag: TimeFlag = await getTimeFlagByID(1);
+        if (selectedDateOnly.getTime() === nowDateOnly.getTime() && timeFlag.time_flag) {
+          alert('本日の予約時間を過ぎました');
+          return;
+        }
+        
+        const reservationExists = getReservationStatus(date, dummyEmployees[0].employee_number);
+
+        if (reservationExists === "予約済") {
+          const reservationId = selectedReservationId.find(id => {
+            const reservation = userReservations.find(res => res.id === id);
+            return reservation && reservation.reservation_date === date;
+          });
+          if (reservationId) {
             try {
-              await deleteReservation(id);
-              // データをリフレッシュするなどの処理が必要な場合はここに記述
+              await deleteReservation(reservationId);
+              successfulDates.push(date);
             } catch (error) {
               console.error(error);
             }
-          } else {
-            console.log(`No reservation exists for date ${date}.`);
           }
+        } else {
+          console.log(`No reservation exists for date ${date}.`);
         }
       }
+      if (successfulDates.length > 0) {
+        alert(`${successfulDates.join(', ')}の予約をキャンセルしました`);
+        await reloadReservations();
+        setHighlightedDates([]); // ハイライト解除
+      }
     }
+    setIsProcessing(false); //処理中のフラグを下げる
   };
   
   const handleSelect = (date: string, reservationStatus: string) => {
@@ -191,15 +254,16 @@ const Calendar: FC<{ userReservations: Reservation[] }> = ({userReservations}) =
               getReservationStatus={getReservationStatus}
               onSelect={handleSelect}
               onHighlight={handleHighlight}
+              highlightedDates={highlightedDates}
+              unHighlightAll={handleUnHighlightAll}
             />
           </TableBody>
         </Table>
       </TableContainer>
-      <Box display="flex" justifyContent="center" marginTop={2}>
-        <Button variant="contained" color="primary" onClick={handleAddReservation}>
+      <Box display="flex" justifyContent="center" marginTop={2}><Button variant="contained" color="primary" onClick={handleAddReservation} disabled={isProcessing}>
           予約
         </Button>
-        <Button variant="contained" color="secondary" onClick={handleDeleteReservation}>
+        <Button variant="contained" color="secondary" onClick={handleDeleteReservation} disabled={isProcessing}>
           予約キャンセル
         </Button>
       </Box>
@@ -207,11 +271,25 @@ const Calendar: FC<{ userReservations: Reservation[] }> = ({userReservations}) =
   );
 }
 
+export default function TestReservationHistoryPage() {    
+  const [userReservation, setUserReservation] = useState<Reservation[] | null>(null);
+  
+  const fetchUserData = async () => {
+    try {
+      const userRes = await getReservationByID(dummyEmployees[0].employee_number);
+      setUserReservation(userRes);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-export default function TestReservationHistoryPage() {
+  const reloadReservations = async () => {
+    await fetchUserData();
+  }
 
-  const userReservation = useFetchUserData(dummyEmployees[0].employee_number);
+  useEffect(() => {
+    reloadReservations();
+  }, []);
 
-  // userReservationがnullでない場合のみCalendarをレンダリング
-  return userReservation ? <Calendar userReservations={userReservation} /> : <div>Loading...</div>;
+  return userReservation ? <Calendar userReservations={userReservation} reloadReservations={reloadReservations} /> : <div>Loading...</div>;
 }

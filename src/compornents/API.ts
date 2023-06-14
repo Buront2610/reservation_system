@@ -4,7 +4,7 @@ APIの定義に関してはbackend/app/routes.pyを参照すること
 types.tsに定義されている型を使用すること
 */
 import axios from 'axios';
-import { Workplace, Bento, Reservation, User, Login, TimeFlag } from './types';
+import { Workplace, Bento, Reservation, User, Login, TimeFlag,Statistics } from './types';
 import { UseAuth } from './authContext';
 import { th } from 'date-fns/locale';
 
@@ -170,3 +170,7 @@ export async function updateTimeFlag(timeFlag: TimeFlag): Promise<TimeFlag> {
     return response.data;
 }
 
+export async function getStatistics(year: number, month: number, page: number = 1, perPage: number = 10): Promise<Statistics> {
+    const response = await axios.get<Statistics>(`${API_BASE_URL}/statistics/${year}/${month}?page=${page}&per_page=${perPage}`);
+    return response.data;
+}

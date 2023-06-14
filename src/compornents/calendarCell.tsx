@@ -12,6 +12,8 @@ interface CalendarCellProps {
   date: string;
   onSelect: (date: string, reservationStatus: string) => void;
   onHighlight: (date: string) => void;
+  highlightedDates: string[];
+  unHighlightAll: () => void;
 }
 
 
@@ -46,19 +48,25 @@ const getButtonStyle = (highlighted:boolean, reservationStatus:string, day:numbe
   return { color: "black"};
 };
 
-const CalendarCell: FC<CalendarCellProps> = ({ day, reservationStatus, date, onSelect, onHighlight }) => {
+const CalendarCell: FC<CalendarCellProps> = ({ day, reservationStatus, date, onSelect, onHighlight,highlightedDates, unHighlightAll }) => {
   const [highlighted, setHighlighted] = useState(false);
+  const isHighlighted = highlightedDates.includes(date)
 
   const handleClick = () => {
     setHighlighted(!highlighted);
     onSelect(date, reservationStatus);
-    onHighlight(date);
+    if (!highlighted) {
+      onHighlight(date);
+    } else {
+      unHighlightAll();
+    }
   };
+  
 
 
 
   return (
-    <TableCell style={getButtonStyle(highlighted, reservationStatus, day, date)}>
+    <TableCell style={getButtonStyle(isHighlighted, reservationStatus, day, date)}>
       <Tooltip title={`Date: ${date}`}>
         <Button color="secondary" onClick={handleClick}>
           <span>{day}</span>

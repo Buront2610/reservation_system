@@ -1,55 +1,59 @@
-import React, { useState } from 'react';
-import { Workplace, Bento, User, Employee } from './types';
+import React, { useState, useEffect } from 'react';
+import { Workplace, Bento, Reservation, User, Login } from './types';
+import { 
+    getWorkplaces, getBento, getAllUsers, addReservation, 
+    updateReservation, deleteReservation
+} from './API';
+import { UseAuth } from './authContext';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import { Box, Grid } from '@mui/material';
-import { DataGrid,GridToolbar,jaJP } from '@mui/x-data-grid';
+import { Box , Grid} from '@mui/material';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
-// Demo Data
-const demoEmployees: Employee[] = [
-    { id: 1, name: 'John Doe', workplace_id: 1 },
-    // other employees...
-];
-const demoUsers: User[] = [
-    { id: 1, password: 'password1', role: 'admin' },
-    // other users...
-];
-const demoWorkplaces: Workplace[] = [
-    { id: 1, name: 'Head Office', location: 'Tokyo' },
-    // other workplaces...
-];
-const demoBentos: Bento[] = [
-    { id: 1, name: 'Salmon Bento', price: 500 },
-    // other bentos...
+const columns: GridColDef[] = [
+  { field: 'id', headerName: '社員番号', width: 150 },
+  { field: 'name', headerName: '社員名', width: 150 },
+  { field: 'password', headerName: 'Password', width: 150 },
 ];
 
-export default function TestAdminManage() {
-    const [employees, setEmployees] = useState<Employee[]>(demoEmployees);
-    const [users, setUsers] = useState<User[]>(demoUsers);
-    const [workplaces, setWorkplaces] = useState<Workplace[]>(demoWorkplaces);
-    const [bentos, setBentos] = useState<Bento[]>(demoBentos);
+export default function AdminManage() {
+    const [workplaces, setWorkplaces] = useState<Workplace[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
+    const [reservations, setReservations] = useState<Reservation[]>([]);
+    const { auth } = UseAuth();
+    const [newEntry, setNewEntry] = useState<User>({ id: undefined, name: '', password: '' });
 
-    // For handling form input
-    const [newEntry, setNewEntry] = useState<Partial<Employee & User>>({});
+    useEffect(() => {
+        loadInitialData();
+    }, []);
 
-    const handleAddEmployeeUser = (newEntry: Partial<Employee & User>) => {
-        const newEmployee: Partial<Employee> = { id: newEntry.id, name: newEntry.name, workplace_id: newEntry.workplace_id };
-        const newUser: Partial<User> = { id: newEntry.id, password: newEntry.password, role: newEntry.role };
-
-        setEmployees(prevEmployees => [...prevEmployees, newEmployee as Employee]);
-        setUsers(prevUsers => [...prevUsers, newUser as User]);
+    async function loadInitialData() {
+        const [workplaces, users, reservations] = await Promise.all([
+            getWorkplaces(),
+            getAllUsers(),
+            getReservations()
+        ]);
+        setWorkplaces(workplaces);
+        setUsers(users);
+        setReservations(reservations);
     }
 
-    const handleDeleteEmployeeUser = (id: number) => {
-        setEmployees(prevEmployees => prevEmployees.filter(employee => employee.id !== id));
-        setUsers(prevUsers => prevUsers.filter(user => user.id !== id));
-    }
-
-    // Handle form submission
-    const handleAddEmployeeUserSubmit = (event: React.FormEvent) => {
+    async function handleAddEmployeeUserSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        handleAddEmployeeUser(newEntry);
-        setNewEntry({});
+        await addEmployeeUser(newEntry);
+        setNewEntry({ id: undefined, name: '', password: '' });
+        await loadInitialData();
+    }
+
+    async function addEmployeeUser(user: User) {
+        await fetch('/api/addEmployeeUser', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${auth?.token}`
+            },
+            body: JSON.stringify(user)
+        });
     }
 
     return (
@@ -68,38 +72,16 @@ export default function TestAdminManage() {
                     <Box mb={2}>
                         <TextField fullWidth label="Password" value={newEntry.password || ''} onChange={e => setNewEntry({ ...newEntry, password: e.target.value })} />
                     </Box>
-                    <Box mb={2}>
-                        <TextField fullWidth label="Role" value={newEntry.role || ''} onChange={e => setNewEntry({ ...newEntry, role: e.target.value })} />
-                    </Box>
-                    <Box mb={2}>
-                        <Button type="submit" variant="contained" color="primary">Submit</Button>
-                    </Box>
+                    <Button variant="contained" color="primary" type="submit">追加</Button>
                 </form>
             </Grid>
-
             <Grid item xs={12} md={6}>
-                {/* Employees/Users DataGrid */}
-                <DataGrid
-                    rows={employees.map(e => ({ ...e, role: users.find(u => u.id === e.id)?.role, password: users.find(u => u.id === e.id)?.password }))}
-                    columns={[
-                        { field: 'id', headerName: '社員番号', width: 90 },
-                        { field: 'name', headerName: '社員名', width: 150 },
-                        { field: 'role', headerName: 'Role', width: 130 },
-                        { field: 'password', headerName: 'Password', width: 160 },
-                        {
-                            field: 'action',
-                            headerName: 'Action',
-                            width: 150,
-                            renderCell: (params) => (
-                                <Button onClick={() => handleDeleteEmployeeUser(params.row.id)}>削除</Button>
-                            ),
-                        },
-                        ]}
-                        slots={{
-                          toolbar: GridToolbar,
-                        }}
-                        localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}  
-                    />
+                <h1>ユーザ一覧</h1>
+
+                {/* User List */}
+                <div style={{ height: 400, width: '100%' }}>
+                    <DataGrid rows={users} columns={columns} pageSize={5} />
+                </div>
             </Grid>
         </Grid>
     );

@@ -11,9 +11,11 @@ type CalendarRowProps = {
   getReservationStatus: (date: string, employeeId: string) => string;
   onSelect: (date: string, reservationStatus: string) => void;
   onHighlight: (date: string) => void;
+  highlightedDates: string[];
+  unHighlightAll: () => void;
 };
 
-const CalendarRow: FC<CalendarRowProps> = ({ employee, currentDate, getReservationStatus,onSelect, onHighlight }) => {
+const CalendarRow: FC<CalendarRowProps> = ({ employee, currentDate, getReservationStatus,onSelect, onHighlight, unHighlightAll ,highlightedDates}) => {
   let rows = [];
   let cells = [];
   let dayOffset = getFirstDayOfMonth(currentDate);
@@ -35,7 +37,7 @@ const CalendarRow: FC<CalendarRowProps> = ({ employee, currentDate, getReservati
       const date = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
       const reservationStatus = getReservationStatus(date, employee.employee_number);
       cells.push(
-        <CalendarCell key={`day-${employee.id}-${day}`} day={day} reservationStatus={reservationStatus} date={date} onSelect={onSelect} onHighlight={onHighlight} />
+        <CalendarCell key={`day-${employee.id}-${day}`} day={day} reservationStatus={reservationStatus} date={date} onSelect={onSelect} onHighlight={onHighlight} highlightedDates={highlightedDates} unHighlightAll={unHighlightAll} />
       );
     }
   }

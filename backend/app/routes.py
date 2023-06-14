@@ -655,43 +655,47 @@ def delete_reservation(id:int) -> Tuple[Response, int]:
         return jsonify({'message': '予約情報を削除しました'}), 200
     else:
         return jsonify({"error": "予約情報が見つかりません"}), 404
+
+
 # 統計情報の取得
+def filter_by_month_and_year(query, month, year):
+    return query.filter(extract("month", Reservation.reservation_date) == month,
+                        extract("year", Reservation.reservation_date) == year)
+
 @bp.route("/statistics/<int:year>/<int:month>", methods=["GET"])
 def get_statistics(year: int, month: int) -> Tuple[Response, int]:
     # 各勤務場所の予約数
     location_order_counts = db.session.query(Workplace.name, func.count(Reservation.id)).\
         join(User, Workplace.id == User.workplace_id).\
-        join(Reservation, User.employee_number == Reservation.user_id).\
-        filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
+        join(Reservation, User.employee_number == Reservation.user_id)
+    location_order_counts = filter_by_month_and_year(location_order_counts, month, year).\
         group_by(Workplace.name).all()
 
     # 各勤務場所の注文金額
     location_order_amounts = db.session.query(Workplace.name, func.sum(Bento.price * Reservation.quantity)).\
         join(User, Workplace.id == User.workplace_id).\
         join(Reservation, User.employee_number == Reservation.user_id).\
-        join(Bento, Reservation.bento_id == Bento.id).\
-        filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
+        join(Bento, Reservation.bento_id == Bento.id)
+    location_order_amounts = filter_by_month_and_year(location_order_amounts, month, year).\
         group_by(Workplace.name).all()
 
     # 社員ごとの月次予約数
     employee_monthly_order_counts = db.session.query(User.employee_number, User.name, func.count(Reservation.id)).\
-        join(Reservation, User.employee_number == Reservation.user_id).\
-        filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
+        join(Reservation, User.employee_number == Reservation.user_id)
+    employee_monthly_order_counts = filter_by_month_and_year(employee_monthly_order_counts, month, year).\
         group_by(User.employee_number).all()
 
     # 社員ごとの月次注文金額
     employee_monthly_order_amounts = db.session.query(User.employee_number, User.name, func.sum(Bento.price * Reservation.quantity)).\
         join(Reservation, User.employee_number == Reservation.user_id).\
-        join(Bento, Reservation.bento_id == Bento.id).\
-        filter(extract("month", Reservation.reservation_date) == month, extract("year", Reservation.reservation_date) == year).\
+        join(Bento, Reservation.bento_id == Bento.id)
+    employee_monthly_order_amounts = filter_by_month_and_year(employee_monthly_order_amounts, month, year).\
         group_by(User.employee_number).all()
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
+    reservations = Reservation.query.paginate(page=page, per_page=per_page, error_out=False)
 
-    reservations = Reservation.query.paginate(page, per_page, error_out=False)
-
-    # 結果を辞書に格納
     result = {
         "reservations": [reservation.to_dict() for reservation in reservations.items],
         "total": reservations.total,
@@ -703,7 +707,10 @@ def get_statistics(year: int, month: int) -> Tuple[Response, int]:
         "employee_monthly_order_amounts": {emp_num: {"name": name, "amount": amount} for emp_num, name, amount in employee_monthly_order_amounts}
     }
 
+    current_app.logger.info(result)
+
     return jsonify(result), 200
+
 
 
 ##除外日に対するCRUDエンドポイント
