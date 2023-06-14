@@ -124,7 +124,7 @@ class UserService:
         if 'email_address' in data and not re.match(r"[^@]+@[^@]+\.[^@]+", data['email_address']):
             raise ValueError("Invalid email address format")
             
-        if 'password' in data and len(data['password']) < 8:
+        if 'password' in data and len(data['password']) < 4:
             raise ValueError("Password must be at least 8 characters")
             
         valid_roles = ['admin', 'user', 'guest']

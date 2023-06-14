@@ -1,88 +1,121 @@
-import React, { useState, useEffect } from 'react';
-import { Workplace, Bento, Reservation, User, Login } from './types';
-import { 
-    getWorkplaces, getBento, getAllUsers, addReservation, 
-    updateReservation, deleteReservation
-} from './API';
-import { UseAuth } from './authContext';
+import React, { useState , useEffect} from 'react';
+import { User } from './types';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import { Box , Grid} from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { Box, Grid, Tab, Tabs } from '@mui/material';
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import { getAllUsers, createUser, updateUser, deleteUser } from './API';
 
-const columns: GridColDef[] = [
-  { field: 'id', headerName: '社員番号', width: 150 },
-  { field: 'name', headerName: '社員名', width: 150 },
-  { field: 'password', headerName: 'Password', width: 150 },
-];
-
-export default function AdminManage() {
-    const [workplaces, setWorkplaces] = useState<Workplace[]>([]);
+export default function TestAdminManage() {
+   
     const [users, setUsers] = useState<User[]>([]);
-    const [reservations, setReservations] = useState<Reservation[]>([]);
-    const { auth } = UseAuth();
-    const [newEntry, setNewEntry] = useState<User>({ id: undefined, name: '', password: '' });
+    const [newEntry, setNewEntry] = useState<Partial<User>>({});
+    const [selectedTab, setSelectedTab] = React.useState(0);
 
     useEffect(() => {
         loadInitialData();
     }, []);
 
     async function loadInitialData() {
-        const [workplaces, users, reservations] = await Promise.all([
-            getWorkplaces(),
-            getAllUsers(),
-            getReservations()
-        ]);
-        setWorkplaces(workplaces);
+        const users = await getAllUsers();
         setUsers(users);
-        setReservations(reservations);
     }
 
-    async function handleAddEmployeeUserSubmit(event: React.FormEvent<HTMLFormElement>) {
+    const handleAddUser = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        await addEmployeeUser(newEntry);
-        setNewEntry({ id: undefined, name: '', password: '' });
-        await loadInitialData();
+        const createdUser = await createUser(newEntry);
+        setUsers([...users, createdUser]);
+        setNewEntry({});
     }
 
-    async function addEmployeeUser(user: User) {
-        await fetch('/api/addEmployeeUser', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${auth?.token}`
-            },
-            body: JSON.stringify(user)
-        });
+    const handleUpdateUser = async (id: number, updatedData: Partial<User>) => {
+        const updatedUser = await updateUser(id, updatedData);
+        setUsers(users.map(user => user.id === id ? updatedUser : user));
     }
+
+    const handleDeleteUser = async (id: number) => {
+        await deleteUser(id);
+        setUsers(users.filter(user => user.id !== id));
+    }
+
+    const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+        setSelectedTab(newValue);
+    };
 
     return (
         <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-                <h1>ユーザ登録ページ</h1>
-
-                {/* Add Employee/User Form */}
-                <form onSubmit={handleAddEmployeeUserSubmit}>
-                    <Box mb={2}>
-                        <TextField fullWidth label="社員番号" value={newEntry.id || ''} onChange={e => setNewEntry({ ...newEntry, id: parseInt(e.target.value) })} />
-                    </Box>
-                    <Box mb={2}>
-                        <TextField fullWidth label="社員名" value={newEntry.name || ''} onChange={e => setNewEntry({ ...newEntry, name: e.target.value })} />
-                    </Box>
-                    <Box mb={2}>
-                        <TextField fullWidth label="Password" value={newEntry.password || ''} onChange={e => setNewEntry({ ...newEntry, password: e.target.value })} />
-                    </Box>
-                    <Button variant="contained" color="primary" type="submit">追加</Button>
-                </form>
+            <Grid item xs={12}>
+                <Tabs value={selectedTab} onChange={handleChange}>
+                    <Tab label="ユーザ登録" />
+                    <Tab label="ユーザ一覧" />
+                </Tabs>
             </Grid>
-            <Grid item xs={12} md={6}>
-                <h1>ユーザ一覧</h1>
-
-                {/* User List */}
-                <div style={{ height: 400, width: '100%' }}>
-                    <DataGrid rows={users} columns={columns} pageSize={5} />
-                </div>
-            </Grid>
+            {selectedTab === 0 && (
+                <Grid item xs={12}>
+                    <h1>ユーザ登録ページ</h1>
+                    <form onSubmit={handleAddUser}>
+                        <Box mb={2}>
+                            <TextField fullWidth label="社員番号" value={newEntry.employee_number || ''} onChange={e => setNewEntry({ ...newEntry, employee_number: e.target.value })} />
+                        </Box>
+                        <Box mb={2}>
+                            <TextField fullWidth label="パスワード" value={newEntry.password || ''} onChange={e => setNewEntry({ ...newEntry, password: e.target.value })} />
+                        </Box>
+                        <Box mb={2}>
+                            <TextField fullWidth label="名前" value={newEntry.name || ''} onChange={e => setNewEntry({ ...newEntry, name: e.target.value })} />
+                        </Box>
+                        <Box mb={2}>
+                            <TextField fullWidth label="メールアドレス" value={newEntry.email_address || ''} onChange={e => setNewEntry({ ...newEntry, email_address: e.target.value })} />
+                        </Box>
+                        <Box mb={2}>
+                            <TextField fullWidth label="電話番号" value={newEntry.telephone || ''} onChange={e => setNewEntry({ ...newEntry, telephone: e.target.value })} />
+                        </Box>
+                        <Box mb={2}>
+                            <TextField fullWidth label="職場ID" value={newEntry.workplace_id || ''} onChange={e => setNewEntry({ ...newEntry, workplace_id: parseInt(e.target.value) })} />
+                        </Box>
+                        <Box mb={2}>
+                            <TextField fullWidth label="役割" value={newEntry.role || ''} onChange={e => setNewEntry({ ...newEntry, role: e.target.value })} />
+                        </Box>
+                        <Box mb={2}>
+                            <Button type="submit" variant="contained" color="primary">登録</Button>
+                        </Box>
+                    </form>
+                </Grid>
+            )}
+            {selectedTab === 1 && (
+                <Grid item xs={12}>
+                    <h1>ユーザ一覧ページ</h1>
+                    <DataGrid
+                        rows={users}
+                        columns={[
+                            { field: 'employee_number', headerName: '社員番号', width: 120, editable: true },
+                            { field: 'name', headerName: '名前', width: 150, editable: true },
+                            { field: 'email_address', headerName: 'メールアドレス', width: 200, editable: true },
+                            { field: 'telephone', headerName: '電話番号', width: 150, editable: true },
+                            { field: 'role', headerName: '役割', width: 100, editable: true },
+                            { field: 'workplace_id', headerName: '職場ID', width: 100, editable: true },
+                            {
+                                field: 'action',
+                                headerName: '操作',
+                                width: 150,
+                                renderCell: (params) => (
+                                    <Button onClick={() => handleDeleteUser(params.row.id)}>削除</Button>
+                                ),
+                            },
+                        ]}
+                        // onCellEditCommit={(params, event) => {
+                        //     handleUpdateUser(params.id as number, {[params.field]: params.value});
+                        // }}
+                        // components={{
+                        //     Toolbar: GridToolbarContainer,
+                        // }}
+                        // componentsProps={{
+                        //     toolbar: {
+                        //         children: [<GridToolbarExport />],
+                        //     },
+                        // }}
+                    />
+                </Grid>
+            )}
         </Grid>
     );
 }

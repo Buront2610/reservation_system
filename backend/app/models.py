@@ -22,7 +22,6 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email_address = db.Column(db.String(100), nullable=True)
     telephone = db.Column(db.String(100), nullable=True)
-    hide_flag = db.Column(db.Boolean, nullable=False)
     workplace_id = db.Column(db.Integer, db.ForeignKey('workplace.id'), nullable=False)
     reservations = db.relationship('Reservation', backref='user')  # これを追加
 
@@ -34,7 +33,6 @@ class User(db.Model):
             'name': self.name,
             'email_address': self.email_address,
             'telephone': self.telephone,
-            'hide_flag': self.hide_flag,
             'workplace_id': self.workplace_id,
         }
 

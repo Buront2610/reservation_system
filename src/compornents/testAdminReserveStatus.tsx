@@ -1,31 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { DataGrid ,GridValueGetterParams,jaJP, GridToolbar} from '@mui/x-data-grid';
-import { Employee, Reservation,Bento } from './types';
+import { User, Workplace, Statistics, Reservation } from './types';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-
-// Demo Data
-const demoEmployees: Employee[] = [
-    { id: 1, name: "testA", workplace_id: 1 },
-    { id: 3018, name: "Test Doe", workplace_id: 2}
-    // ...other employees
-  ];
-  
-  const bentos: Bento[] = [
-    { id: 1, name: "Chicken Bento", price: 500 },
-    // ...other bentos
-  ];
-  
-  const demoReservations: Reservation[] = [
-    { id: 1, employee_id: 1, reservation_date: "2023-01-10", bento_id: 1, quantity: 1 },
-    { id: 2, employee_id: 1, reservation_date: "2023-01-15", bento_id: 1, quantity: 1 },
-    { id: 3, employee_id: 1, reservation_date: "2023-02-05", bento_id: 1, quantity: 1 },
-    { id: 4, employee_id: 3018, reservation_date: "2023-05-15", bento_id: 1, quantity: 1 },
-    // ...other reservations
-  ];
-  
+import { getStatistics, getAllUsers, getWorkplace } from './API';  // Add API import here
 
 interface MonthlySummary {
     month: number;
@@ -39,51 +19,48 @@ interface EmployeeSummary {
     monthlySummary: MonthlySummary[];
 }
 
-
-// 現在の年を取得
 const currentYear = new Date().getFullYear();
-
-// 選択可能な年の範囲を設定 (ここでは現在の年から10年前までとする)
 const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
-
 export default function TestAdminOrderSummaryPage() {
-    const [employees, setEmployees] = useState<Employee[]>(demoEmployees);
-    const [reservations, setReservations] = useState<Reservation[]>(demoReservations);
+    const [users, setUsers] = useState<User[]>([]);
     const [employeeSummaries, setEmployeeSummaries] = useState<EmployeeSummary[]>([]);
-        // 選択された年を管理するためのstate
     const [selectedYear, setSelectedYear] = useState(currentYear);
+    const [isLoading, setIsLoading] = useState(false);
 
-    // 選択された年に応じてデータを更新
-   
-    // 選択された年に応じてデータを更新
-    const rows = employeeSummaries;
-
-    // 年を選択するためのドロップダウンメニューのハンドラ
     const handleChange = (event: SelectChangeEvent<number>) => {
-        setSelectedYear(event.target.value as number); // target.value is unknown, cast it to number
-      };
-      
+        setSelectedYear(event.target.value as number);
+    };
 
-      useEffect(() => {
-        // Compute summaries on component mount and whenever employees or reservations change
-        const summaries = employees.map(employee => {
-            const employeeReservations = reservations.filter(r => r.employee_id === employee.id && new Date(r.reservation_date).getFullYear() === selectedYear);
-            const monthlySummary: MonthlySummary[] = Array(12).fill(null).map((_, month) => {
-                const monthlyReservations = employeeReservations.filter(r => new Date(r.reservation_date).getMonth() === month);
-                return {
-                    month: month + 1, // Months are 0-indexed in JS Date
-                    orderCount: monthlyReservations.length,
-                    totalAmount: monthlyReservations.reduce((total, r) => total + r.quantity * (bentos.find(b => b.id === r.bento_id)?.price || 0), 0)
-                };
-            });
-    
-            return { id: employee.id, name: employee.name, monthlySummary };
-        });
-    
-        setEmployeeSummaries(summaries);
-    }, [employees, reservations, selectedYear]);
-    
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsLoading(true);
+            try {
+                const users = await getAllUsers();
+                setUsers(users);
+                const summaries = await Promise.all(users.map(async user => {
+                    const monthlySummary: MonthlySummary[] = [];
+                    for (let month = 0; month < 12; month++) {
+                        const stats = await getStatistics(selectedYear, month + 1);
+                        const userStats = stats.employee_monthly_order_counts[user.employee_number];
+                        const orderCount = userStats ? userStats.count : 0;
+                        const totalAmount = userStats ? stats.employee_monthly_order_amounts[user.employee_number].amount : 0;
+                        monthlySummary.push({ month: month + 1, orderCount, totalAmount });
+                        console.log(stats)
+                    }
+                    return { id: user.id, name: user.name, monthlySummary };
+                }));
+                setEmployeeSummaries(summaries);
+            } catch (error) {
+                console.error("Error loading data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [selectedYear]);
+
     const columns = [
         { field: 'id', headerName: '社員ID', width: 70 },
         { field: 'name', headerName: '社員名', width: 130 },
@@ -115,13 +92,14 @@ export default function TestAdminOrderSummaryPage() {
             </Select>
           </FormControl>
           <div style={{ height: 400, width: '100%' }}>
-            <DataGrid rows={rows} columns={columns}
-            slots={{
-              toolbar: GridToolbar,
-            }}
-            localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}  />
+            {isLoading
+              ? <div>Loading...</div>
+              : <DataGrid rows={employeeSummaries} columns={columns}
+                          slots={{
+                            toolbar: GridToolbar,
+                          }}
+                          localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}  />}
           </div>
         </div>
-      );
+    );
 }
-
