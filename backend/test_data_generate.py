@@ -32,7 +32,6 @@ with app.app_context():
             name=f'User{i}', 
             email_address=f'user{i}@example.com', 
             telephone=''.join(random.choices(string.digits, k=10)),  # Generate a random 10-digit phone number
-            hide_flag=False, 
             workplace_id=1
         )
         db.session.add(user)
