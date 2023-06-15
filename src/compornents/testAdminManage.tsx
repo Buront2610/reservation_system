@@ -85,6 +85,7 @@ export default function TestAdminManage() {
                 <Grid item xs={12}>
                     <h1>ユーザ一覧ページ</h1>
                     <DataGrid
+                        editMode='row'
                         rows={users}
                         columns={[
                             { field: 'employee_number', headerName: '社員番号', width: 120, editable: true },
@@ -101,6 +102,15 @@ export default function TestAdminManage() {
                                     <Button onClick={() => handleDeleteUser(params.row.id)}>削除</Button>
                                 ),
                             },
+   
+                            {
+                            field: 'update',
+                            headerName: '更新',
+                            width: 150,
+                            renderCell: (params) => (
+                                <Button onClick={() => handleUpdateUser(params.row.id, params.row)}>更新</Button>
+                            ),
+                            }
                         ]}
                         // onCellEditCommit={(params, event) => {
                         //     handleUpdateUser(params.id as number, {[params.field]: params.value});

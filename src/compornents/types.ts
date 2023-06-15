@@ -36,7 +36,7 @@ export interface Reservation {
 }
 
 export interface Login {
-    id: number;
+    id: string;
     password: string;
     role: string;
 }

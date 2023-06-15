@@ -12,14 +12,14 @@ const API_BASE_URL = 'http://localhost:5000/api';
 
 
 
-export async function login(id: number, password: string): Promise<Login | null> {
+export async function login(id: string, password: string): Promise<Login | null> {
     const users = await getAllUsers();
-    const foundUser = users.find(user => user.id === id && user.password === password);
+    const foundUser = users.find(user => user.employee_number === id && user.password === password);
     if (!foundUser) {
         return null;
     }
     return {
-        id: foundUser.id,
+        id: foundUser.employee_number,
         password: foundUser.password,
         role: foundUser.role,
     };
