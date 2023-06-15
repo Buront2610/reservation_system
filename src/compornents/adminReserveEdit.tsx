@@ -15,6 +15,8 @@ export default function AdminReservationManage() {
     const [selectedTab, setSelectedTab] = React.useState(0);
     const [users, setUsers] = useState<User[]>([]);
     const [bento, setBento] = useState<Partial<Bento>>({});
+    const [newReservation, setNewReservation] = useState<Partial<Reservation>>({});
+
 
     useEffect(() => {
         loadInitialData();
@@ -52,6 +54,28 @@ export default function AdminReservationManage() {
         setSelectedTab(newValue);
     };
 
+// Function to handle auto-filling reservation form
+// Function to handle auto-filling reservation form
+const handleAutoFillReservation = () => {
+    // Find the first guest user ID
+    const guestUser = users.find(user => user.role === 'guest');
+
+    if (!guestUser) {
+        console.log('No guest user found');
+        return;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    console.log(guestUser);
+
+    // Set the newEntry state
+    setNewEntry({
+        user_id: guestUser.employee_number.toString(), // Assuming guestUser.id is a number
+        reservation_date: today,
+    });
+}
+
+    
     return (
         <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -63,6 +87,7 @@ export default function AdminReservationManage() {
             {selectedTab === 0 && (
                 <Grid item xs={12}>
                     <h1>予約登録ページ</h1>
+                    <div><Button variant="contained" onClick={handleAutoFillReservation}>Auto-fill Reservation</Button></div>
                     <form onSubmit={handleAddReservation}>
                         <Box mb={2}>
                             <TextField fullWidth label="ユーザーID" value={newEntry.user_id || ''} onChange={e => setNewEntry({ ...newEntry, user_id: e.target.value })} />
