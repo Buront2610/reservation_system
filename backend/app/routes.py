@@ -46,7 +46,7 @@ class UserService:
         try:
             user = User(employee_number=data.get('employee_number'), password=hashed_password, role=data.get('role'), 
                         name=data.get('name'), email_address=data.get('email_address'), 
-                        telephone=data.get('telephone'), hide_flag=data.get('hide_flag'), 
+                        telephone=data.get('telephone'), 
                         workplace_id=data.get('workplace_id'))
             db.session.add(user)
             db.session.commit()
@@ -71,8 +71,6 @@ class UserService:
             user.email_address = data['email_address']
         if 'telephone' in data:
             user.telephone = data['telephone']
-        if 'hide_flag' in data:
-            user.hide_flag = data['hide_flag']
         if 'workplace_id' in data:
             user.workplace_id = data['workplace_id']
         if 'employee_number' in data:
@@ -107,7 +105,7 @@ class UserService:
 
         # Check if the password meets minimum security requirements
         password = data.get('password')
-        if len(password) < 8:
+        if len(password) < 4:
             raise ValueError("Password must be at least 8 characters")
 
         # Check if role is a valid role
@@ -229,6 +227,11 @@ class BentoService:
     @classmethod
     def get_bento_by_id(cls,bento_id):
         bento = db.session.get(Bento, bento_id)
+        return bento
+
+    @classmethod
+    def get_bento_by_choose(cls):
+        bento = Bento.query.filter_by(choose_flag=True).first()
         return bento
     
     @classmethod
@@ -576,6 +579,11 @@ def get_bento() -> Tuple[Response, int]:
 @bp.route("/bento/<int:bento_id>", methods=["GET"])
 def get_bento_by_id(bento_id:int) -> Tuple[Response, int]:
     bento = BentoService.get_bento_by_id(bento_id)
+    return jsonify(bento.to_dict()), 200
+
+@bp.route("/bento/choose", methods=["GET"])
+def get_bento_by_choose_flag() -> Tuple[Response, int]:
+    bento = BentoService.get_bento_by_choose()
     return jsonify(bento.to_dict()), 200
 
 @bp.route("/bento", methods=["POST"])

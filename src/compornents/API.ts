@@ -61,6 +61,11 @@ export async function getBento(): Promise<Bento[]> {
     return response.data;
 }
 
+export async function getBentoByChooseFlag(): Promise<Bento> {
+    const response = await axios.get<Bento>(`${API_BASE_URL}/bento/choose`);
+    return response.data;
+}
+
 export async function addBento(newBento: Partial<Bento>): Promise<Bento> {
     const response = await axios.post<Bento>(`${API_BASE_URL}/bento`, newBento);
     return response.data;

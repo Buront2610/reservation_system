@@ -4,8 +4,9 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { Box, Grid, Tab, Tabs } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
-import { getReservations, addReservation, updateReservation, deleteReservation, getBento } from './API';
+import { getReservations, addReservation, updateReservation, deleteReservation, getBento, getBentoByChooseFlag } from './API';
 import { getAllUsers } from './API'; // User情報を取得するAPI
+import { get } from 'http';
 
 export default function AdminReservationManage() {
 
@@ -13,7 +14,7 @@ export default function AdminReservationManage() {
     const [newEntry, setNewEntry] = useState<Partial<Reservation>>({});
     const [selectedTab, setSelectedTab] = React.useState(0);
     const [users, setUsers] = useState<User[]>([]);
-    const [bento, setBento] = useState<Bento[]>([]);
+    const [bento, setBento] = useState<Partial<Bento>>({});
 
     useEffect(() => {
         loadInitialData();
@@ -24,19 +25,17 @@ export default function AdminReservationManage() {
         setReservations(reservations);
         const users = await getAllUsers();
         setUsers(users);
-        const bento = await getBento();
+        const bento = await getBentoByChooseFlag();
         setBento(bento);
     }
 
     const handleAddReservation = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const chosenBento = bento.find(b => b.choose_flag);
-        if(chosenBento) {
-            newEntry.bento_id = chosenBento.id;
-            const createdReservation = await addReservation(newEntry);
-            setReservations([...reservations, createdReservation]);
-            setNewEntry({});
-        }
+        newEntry.bento_id = bento.id;
+        const createdReservation = await addReservation(newEntry);
+        setReservations([...reservations, createdReservation]);
+        setNewEntry({});
+        
     }
 
     const handleUpdateReservation = async (id: number, updatedData: Partial<Reservation>) => {
@@ -67,9 +66,6 @@ export default function AdminReservationManage() {
                     <form onSubmit={handleAddReservation}>
                         <Box mb={2}>
                             <TextField fullWidth label="ユーザーID" value={newEntry.user_id || ''} onChange={e => setNewEntry({ ...newEntry, user_id: e.target.value })} />
-                        </Box>
-                        <Box mb={2}>
-                            <TextField fullWidth label="弁当ID" value={newEntry.bento_id || ''} onChange={e => setNewEntry({ ...newEntry, bento_id: parseInt(e.target.value) })} />
                         </Box>
                         <Box mb={2}>
                             <TextField fullWidth label="予約日" value={newEntry.reservation_date || ''} onChange={e => setNewEntry({ ...newEntry, reservation_date: e.target.value })} />
