@@ -169,6 +169,7 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
   
   const handleDeleteReservation = async () => {
     confirm('予約をキャンセルしますか？');
+    
     setIsProcessing(true); //処理中のフラグを立てる
     const successfulDates: string[] = [];
     if (selectedReservationId && highlightedDates) {
@@ -189,6 +190,7 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
         const timeFlag: TimeFlag = await getTimeFlagByID(1);
         if (selectedDateOnly.getTime() === nowDateOnly.getTime() && timeFlag.time_flag) {
           alert('本日の予約時間を過ぎました');
+          setIsProcessing(false); //処理中のフラグを下げる
           return;
         }
         

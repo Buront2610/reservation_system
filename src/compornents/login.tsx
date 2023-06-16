@@ -26,7 +26,7 @@ const hashPassword = (password: string): string => {
 }
 
 const Login: React.FC<LoginProps> = (): ReactElement => {
-  const [username, setUsername] = useState<number | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -71,7 +71,7 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
                     label="userName"
                     placeholder="userName"
                     margin="normal"
-                    onChange={(e) => setUsername(parseInt(e.target.value))}
+                    onChange={(e) => setUsername(e.target.value)}
                 />
                 <TextField
                     fullWidth

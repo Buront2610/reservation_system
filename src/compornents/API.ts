@@ -8,7 +8,7 @@ import { Workplace, Bento, Reservation, User, Login, TimeFlag,Statistics } from 
 import { UseAuth } from './authContext';
 import { th } from 'date-fns/locale';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://192.168.20.10:5000/api';
 
 
 

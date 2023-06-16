@@ -12,7 +12,7 @@ import { Login } from "./types";
 //Login処理用のContext
 interface AuthContextProps {
   user: Login | null;  // Change User to Login
-  loginUser: (id: number, password: string) => Promise<void>;
+  loginUser: (id: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<Login | null>(null); // Change User to Login
 
   //
-  const loginUser = async (id: number, password: string): Promise<void> => {
+  const loginUser = async (id: string, password: string): Promise<void> => {
     //ユーザ情報のチェック
     const foundUser = await login(id, password);
   

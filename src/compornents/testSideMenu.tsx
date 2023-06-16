@@ -24,12 +24,12 @@ import HomeIcon from '@mui/icons-material/Home';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import HistoryIcon from '@mui/icons-material/History';
 import CalculateIcon from '@mui/icons-material/Calculate';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { Link as RouterLink, useLocation, Outlet  } from 'react-router-dom';
 
-import userReserve from './userReserve';
-import dashBoard from    './adminReserveList';
 import Login from './login';
 import { textAlign } from '@mui/system';
 import { ManageAccounts } from '@mui/icons-material';
@@ -140,47 +140,38 @@ import LockIcon from '@mui/icons-material/Lock';
           path: "/login"
         },
         {
-          text: "予約",
+          text: "予約ページ",
           icon: <AddBusinessIcon />,
-          path: "/test"
+          path: "/reservation"
         },
         {
-          text: "予約情報",
-          icon: <HistoryIcon />,
-          path: "/test2"
+          text: "予約登録",
+          icon: <AddShoppingCartIcon/>,
+          path: "/adminReservationEdit"
         },
         {
-          text: "テスト予約",
-          icon: <AddBusinessIcon />,
-          path: "/test3"
+          text: "ユーザ登録・編集",
+          icon: <PersonAddIcon />,
+          path: "/adminUserEdit"
         },
         {
-          text: "テスト予約履歴",
-          icon: <HistoryIcon />,
-          path: "/test4"
-        },
-        {
-          text: "テスト管理者予約",
+          text: "弁当・勤務場所情報",
           icon: <ManageAccountsIcon />,
-          path: "/test5"
+          path: "/adminBentoAndWorkPlaceEdit"
         },
         {
-          text: "テスト管理者予約統計",
+          text: "勤務場所別予約統計",
           icon: <AnalyticsIcon />,
-          path: "/test6"
+          path: "/orderWorkPlaceSummary"
         },
         {
-            text: "テストユーザ追加",
-            icon: <ManageAccountsIcon />,
-            path: "/test7"
-        },
-        {
-            text:"テスト予約集計",
+            text: "ユーザ別予約統計",
             icon: <CalculateIcon />,
-            path: "/test8"
+            path: "/orderUserSummary"
         },
+
         {
-            text:"テスト予約ロック",
+            text:"予約ロック",
             icon: <LockIcon />,
             path: "/lock"
         }

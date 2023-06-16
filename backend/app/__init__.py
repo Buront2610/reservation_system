@@ -35,7 +35,7 @@ def create_app(config_class=Config):
     app.config['MAIL_PASSWORD'] = 'your_password'
 
 
-    CORS(app, origins=['http://localhost:9999'])  #      
+    CORS(app, origins=['http://localhost:9999', 'http://192.168.20.10:9999'])  #      
     db.init_app(app)
     migrate.init_app(app, db)
 

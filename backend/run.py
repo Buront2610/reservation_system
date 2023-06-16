@@ -2,7 +2,7 @@
 Flaskアプリケーションのエントリーポイント
 """
 from app import create_app
-from backend.app.functions import schedule_secret_key_regeneration, set_secret_key_env
+from app.functions import schedule_secret_key_regeneration, set_secret_key_env
 import os
 
 app = create_app()
@@ -17,5 +17,6 @@ if __name__ == "__main__":
           app.secret_key = os.environ.get('SECRET_KEY')
 
      # シークレットキーの定期再生成をスケジューリング
-     schedule_secret_key_regeneration()
-     app.run(debug=os.environ.get("FLASK_DEBUG", False))
+     # schedule_secret_key_regeneration()
+     app.run(host="192.168.20.10", debug=False)
+

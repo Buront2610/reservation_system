@@ -87,7 +87,7 @@ const handleAutoFillReservation = () => {
             {selectedTab === 0 && (
                 <Grid item xs={12}>
                     <h1>予約登録ページ</h1>
-                    <div><Button variant="contained" onClick={handleAutoFillReservation}>Auto-fill Reservation</Button></div>
+                    
                     <form onSubmit={handleAddReservation}>
                         <Box mb={2}>
                             <TextField fullWidth label="ユーザーID" value={newEntry.user_id || ''} onChange={e => setNewEntry({ ...newEntry, user_id: e.target.value })} />
@@ -105,6 +105,7 @@ const handleAutoFillReservation = () => {
                             <Button type="submit" variant="contained" color="primary">登録</Button>
                         </Box>
                     </form>
+                    <div><Button variant="contained" onClick={handleAutoFillReservation}>来客用予約</Button></div>
                 </Grid>
             )}
             {selectedTab === 1 && (

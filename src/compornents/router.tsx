@@ -3,13 +3,6 @@ import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-rou
 import { Box } from '@mui/material';
 import Login  from './login'
 import { UseAuth } from './authContext';
-import  AdminSideMenu from './adminSideMenu';
-import  UserSideMenu from './userSideMenu';
-import ReservationPage from './userReserve';
-import ReservationInfoPage from './userReserveInfo';
-import EmployeeReservationListPage from './adminReserveList';
-import ReservationStatsPage from './adminReserveStats';
-import EmployeeManagePage from './adminManage';
 import { styled } from '@mui/material/styles';
 import { Button } from '@mui/material';
 import TestReservationPage from './testUserReserve';
@@ -20,7 +13,6 @@ import TestUserSideMenu from './testSideMenu';
 import TestAdminManage from './testAdminManage';
 import TestAdminOrderSummaryPage from './testAdminReserveStatus';
 import AdminTimeLock from './adminTimeLock';
-import AdminMangement from './adminManage';
 import AdminReserveEdit from './adminReserveEdit';
 import AdminBentoAndWorkplaceManagePage from './adminBentoAndWorkplaceEdit';
 
@@ -36,29 +28,25 @@ function routerCompornent() {
     const { user } = UseAuth();
   
     let SideMenu = Placeholder;
-    if (user) {
-        SideMenu = user.role === 'admin' ? AdminSideMenu : UserSideMenu;
-    }
+    // if (user) {
+    //     SideMenu = user.role === 'admin' ? AdminSideMenu : UserSideMenu;
+    // }
   
     return (
         <BrowserRouter>
             <Routes>
                 <Route element={<TestUserSideMenu />}>
                     <Route path="/login" element={<Login />} />
-                    <Route path="/test" element={<ReservationPage />} />
-                    <Route path="/test2" element={<ReservationInfoPage />} />
-                    <Route path="/test3" element={<TestReservationPage />} />
-                    <Route path="/test4" element={<TestReservationHistoryPage />} />
-                    <Route path="/test5" element={<TestAdminReservationPage />} />
-                    <Route path="/test6" element={<TestAdminReservationStatsPage />} />
-                    <Route path="/test7" element={<TestAdminManage />} />
-                    <Route path='/test8' element={<TestAdminOrderSummaryPage />}/>
-                    <Route path='/ReservationEdit' element={<AdminReserveEdit />} />
-                    <Route path='/BentoAndWorkplaceEdit' element={<AdminBentoAndWorkplaceManagePage />} />
+                    <Route path="/reservation" element={<TestReservationHistoryPage />} />
+                    <Route path="/orderWorkPlaceSummary" element={<TestAdminReservationStatsPage />} />
+                    <Route path="/adminUserEdit" element={<TestAdminManage />} />
+                    <Route path='/orderUserSummary' element={<TestAdminOrderSummaryPage />}/>
+                    <Route path='/adminReservationEdit' element={<AdminReserveEdit />} />
+                    <Route path='/adminBentoAndWorkplaceEdit' element={<AdminBentoAndWorkplaceManagePage />} />
                     <Route path='/lock' element={<AdminTimeLock />} />
-                    <Route path='/manage' element={<AdminMangement />} />
+            
                 </Route>
-                {user && (
+                {/* {user && (
                     <>
                     <Route path="/user/*" element={<SideMenu />}>
                         <Route path="/reservation" element={<ReservationPage />} />
@@ -72,7 +60,7 @@ function routerCompornent() {
                         </Route>
                     )}
                     </>
-            )}
+            )} */}
             </Routes>
         </BrowserRouter>
     );
