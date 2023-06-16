@@ -168,8 +168,8 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
   };
   
   const handleDeleteReservation = async () => {
-    confirm('予約をキャンセルしますか？');
-    
+    window.confirm('予約をキャンセルしますか？');
+
     setIsProcessing(true); //処理中のフラグを立てる
     const successfulDates: string[] = [];
     if (selectedReservationId && highlightedDates) {
