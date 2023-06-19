@@ -4,7 +4,7 @@ APIの定義に関してはbackend/app/routes.pyを参照すること
 types.tsに定義されている型を使用すること
 */
 import axios from 'axios';
-import { Workplace, Bento, Reservation, User, Login, TimeFlag,Statistics } from './types';
+import { Workplace, Bento, Reservation, User, Login, TimeFlag,Statistics, Exclude } from './types';
 import { UseAuth } from './authContext';
 import { th } from 'date-fns/locale';
 
@@ -143,13 +143,13 @@ export async function deleteReservation(id: number): Promise<void> {
     await axios.delete(`${API_BASE_URL}/reservations/${id}`);
 }
 
-export async function getExcludes(): Promise<string[]> {
-    const response = await axios.get<string[]>(`${API_BASE_URL}/excludes`);
+export async function getExcludes(): Promise<Exclude[]> {
+    const response = await axios.get<Exclude[]>(`${API_BASE_URL}/excludes`);
     return response.data;
 }
 
-export async function addExclude(newExclude: Partial<string>): Promise<string> {
-    const response = await axios.post<string>(`${API_BASE_URL}/excludes`, newExclude);
+export async function addExclude(newExclude: Partial<Exclude>): Promise<Exclude> {
+    const response = await axios.post<Exclude>(`${API_BASE_URL}/excludes`, newExclude);
     return response.data;
 }
 

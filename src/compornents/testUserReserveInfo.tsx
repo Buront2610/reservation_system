@@ -123,6 +123,8 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
         if (selectedDateOnly < nowDateOnly) {
           console.log(selectedDateOnly);
           console.log(nowDateOnly);
+          setIsProcessing(false); //処理中のフラグを下げる
+
           alert('過去の日付に予約を追加することはできません');
           return;
         }
@@ -130,6 +132,7 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
         // Check if TimeFlag is true, then abort the process
         const timeFlag: TimeFlag = await getTimeFlagByID(1);
         if (selectedDateOnly.getTime() === nowDateOnly.getTime() && timeFlag.time_flag) {
+          setIsProcessing(false); //処理中のフラグを下げる
           alert('本日分のお弁当の予約時間を過ぎました');
           return;
         }
@@ -184,13 +187,15 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
         if (selectedDateOnly < nowDateOnly) {
           console.log(selectedDateOnly);
           console.log(nowDateOnly);
+          setIsProcessing(false); //処理中のフラグを下げる
           alert('過去の予約はキャンセルできません');
           return;
         }
         const timeFlag: TimeFlag = await getTimeFlagByID(1);
         if (selectedDateOnly.getTime() === nowDateOnly.getTime() && timeFlag.time_flag) {
-          alert('本日の予約時間を過ぎました');
           setIsProcessing(false); //処理中のフラグを下げる
+          alert('本日の予約時間を過ぎました');
+        
           return;
         }
         
