@@ -68,8 +68,8 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
                     fullWidth
                     id="username"
                     type="number"
-                    label="userName"
-                    placeholder="userName"
+                    label="社員番号"
+                    placeholder="社員番号"
                     margin="normal"
                     onChange={(e) => setUsername(e.target.value)}
                 />

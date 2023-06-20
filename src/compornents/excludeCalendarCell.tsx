@@ -30,40 +30,38 @@ palette: {
 });
 
 const getButtonStyle = (highlighted:boolean, day:number, date:string) => {
-const currentDate = new Date();
-const buttonDate = new Date(date);
-if (highlighted){
-    return { backgroundColor: "yellow" };
-}
-if (buttonDate < new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())) {
-    return { backgroundColor: "black", color: "white" };
-}
-return { color: "black"};
+    const currentDate = new Date();
+    const buttonDate = new Date(date);
+    if (highlighted){
+        return { backgroundColor: "yellow" };
+    }
+    if (buttonDate < new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())) {
+        return { backgroundColor: "black", color: "white" };
+    }
+    return { color: "black"};
 };
 
 const ExcludedCell: FC<Exclude> = ({ id, date, day, onSelect, onHighlight,highlightedDates, unHighlightAll }) => {
-const [highlighted, setHighlighted] = useState(false);
-const isHighlighted = highlightedDates.includes(date)
+    const isHighlighted = highlightedDates.includes(date)
 
-const handleClick = () => {
-    setHighlighted(!highlighted);
-    onSelect(date);
-    if (!highlighted) {
-    onHighlight(date);
-    } else {
-    unHighlightAll();
-    }
-};
+    const handleClick = () => {
+        onSelect(date, reservationStatus);
+        if (!isHighlighted) {
+          onHighlight(date);
+        } else {
+          onHighlight(date); // ハイライトを個別に解除するように修正
+        }
+      };
 
-return (
-    <TableCell style={getButtonStyle(isHighlighted, day, date)}>
-    <Tooltip title={`Date: ${date}`}>
-        <Button color="secondary" onClick={handleClick}>
-        <span>{day}</span>
-        </Button>
-    </Tooltip>
-    </TableCell>
-);
+    return (
+        <TableCell style={getButtonStyle(isHighlighted, day, date)}>
+        <Tooltip title={`Date: ${date}`}>
+            <Button color="secondary" onClick={handleClick}>
+            <span>{day}</span>
+            </Button>
+        </Tooltip>
+        </TableCell>
+    );
 };
 
 export default ExcludedCell;

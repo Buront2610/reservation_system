@@ -59,7 +59,7 @@ const useCalendar = (initialExcludes: Exclude[]) => {
   };
 
   // 指定された日付が除外日であるかを判定する
-  const isExcludeExists = (excludes: Exclude[], date: string) => {
+  const isExcludeExists = (excludes: Exclude[], date: string,) => {
     return excludes.some(exclude => exclude.date === date);
   };
 
@@ -76,7 +76,7 @@ const useCalendar = (initialExcludes: Exclude[]) => {
 
 
 const Calendar: FC<{ excludedDates: Exclude[];  reloadExcludes: () => void }> = ({excludedDates, reloadExcludes}) => {
-  const { currentDate, initialExcludes, changeMonth, getExcludeStatus } = useCalendar(excludesDates);
+  const { currentDate, initialExcludes, changeMonth, getExcludeStatus } = useCalendar(excludedDates);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedExcludeIds, setSelectedExcludeIds] = useState<number[] | null>(null);
@@ -183,7 +183,7 @@ const Calendar: FC<{ excludedDates: Exclude[];  reloadExcludes: () => void }> = 
             <CalendarBody 
               currentDate={currentDate}
               employeeList={dummyEmployees}
-              getExcludeStatus={getExcludeStatus}
+              getAttributeStatus={getExcludeStatus}
               onSelect={handleSelect}
               onHighlight={handleHighlight}
               highlightedDates={highlightedDates}
