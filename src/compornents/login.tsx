@@ -45,7 +45,7 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
       const hashedPassword = hashPassword(password);
       try {
         await auth.loginUser(username, hashedPassword);
-        navigate("/home");
+        navigate("/reservation");
       } catch (error: any) {
         setError(error);
       }
