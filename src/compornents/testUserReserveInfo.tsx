@@ -250,7 +250,7 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
           <TableHead>
             <TableRow>
               {DAYS_OF_WEEK.map((day, index) => (
-                <TableCell key={index}>{day}</TableCell>
+                <TableCell key={index} style={{fontSize: 32}}>{day}</TableCell>
               ))}
             </TableRow>
           </TableHead>
@@ -267,10 +267,11 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
           </TableBody>
         </Table>
       </TableContainer>
-      <Box display="flex" justifyContent="center" marginTop={2}><Button variant="contained" color="primary" onClick={handleAddReservation} disabled={isProcessing}>
+      <Box display="flex" justifyContent="center" marginTop={2}>
+        <Button variant="contained" color="primary" onClick={handleAddReservation} disabled={isProcessing} size='large'>
           予約
         </Button>
-        <Button variant="contained" color="secondary" onClick={handleDeleteReservation} disabled={isProcessing}>
+        <Button variant="contained" color="secondary" onClick={handleDeleteReservation} disabled={isProcessing} size='large'>
           予約キャンセル
         </Button>
       </Box>
@@ -284,6 +285,7 @@ export default function TestReservationHistoryPage() {
   const fetchUserData = async () => {
     try {
       const userRes = await getReservationByID(dummyEmployees[0].employee_number);
+      console.log(userRes);
       setUserReservation(userRes);
     } catch (error) {
       console.error(error);

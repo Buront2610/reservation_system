@@ -1,5 +1,5 @@
 // CalendarCell.tsx
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useEffect} from 'react';
 import { TableCell, Tooltip, Button } from '@mui/material';
 import { HdrAuto } from '@mui/icons-material';
 import { createTheme } from '@mui/material/styles';
@@ -49,26 +49,25 @@ const getButtonStyle = (highlighted:boolean, reservationStatus:string, day:numbe
 };
 
 const CalendarCell: FC<CalendarCellProps> = ({ day, reservationStatus, date, onSelect, onHighlight,highlightedDates, unHighlightAll }) => {
-  const [highlighted, setHighlighted] = useState(false);
   const isHighlighted = highlightedDates.includes(date)
 
   const handleClick = () => {
-    setHighlighted(!highlighted);
     onSelect(date, reservationStatus);
-    if (!highlighted) {
+    if (!isHighlighted) {
       onHighlight(date);
     } else {
-      unHighlightAll();
+      onHighlight(date); // ハイライトを個別に解除するように修正
     }
   };
   
 
 
 
+
   return (
     <TableCell style={getButtonStyle(isHighlighted, reservationStatus, day, date)}>
       <Tooltip title={`Date: ${date}`}>
-        <Button color="secondary" onClick={handleClick}>
+        <Button color="secondary" onClick={handleClick} style={{fontSize: 16}}>
           <span>{day}</span>
           <span>{reservationStatus}</span>
         </Button>

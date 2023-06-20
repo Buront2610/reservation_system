@@ -182,8 +182,8 @@ const Calendar: FC<{ excludedDates: Exclude[];  reloadExcludes: () => void }> = 
           <TableBody>
             <CalendarBody 
               currentDate={currentDate}
-              ExcludeedList={initialExcludes}
-              getReservationStatus={getExcludeStatus}
+              employeeList={dummyEmployees}
+              getExcludeStatus={getExcludeStatus}
               onSelect={handleSelect}
               onHighlight={handleHighlight}
               highlightedDates={highlightedDates}

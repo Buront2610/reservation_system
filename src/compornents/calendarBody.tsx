@@ -1,6 +1,6 @@
 // CalendarBody.tsx
 import React, { FC } from 'react';
-import { User } from './types';
+import { User ,Exclude } from './types';
 import CalendarRow from './calendarRow';
 import { on } from 'events';
 import { StringMappingType } from 'typescript';
