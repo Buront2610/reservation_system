@@ -4,6 +4,8 @@ import { TableCell, Tooltip, Button } from '@mui/material';
 import { HdrAuto } from '@mui/icons-material';
 import { createTheme } from '@mui/material/styles';
 import { purple } from '@mui/material/colors';
+import { getExcludes } from './API';
+import { Exclude } from './types';
 
 
 interface CalendarCellProps {
@@ -30,21 +32,15 @@ const theme = createTheme({
   },
 });
 
-const isDisabled = (date: string) => {
-  const currentDate = new Date();
-  const buttonDate = new Date(date);
-  return buttonDate < new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
-};
-
 
 const getButtonStyle = (highlighted:boolean, reservationStatus:string, day:number, date:string) => {
   const currentDate = new Date();
   const buttonDate = new Date(date);
   if (highlighted && reservationStatus==="予約済") {
-    return { backgroundColor: "red" };
+    return { backgroundColor: "#FFCC33" };
   }
   if(highlighted){
-    return { backgroundColor: "yellow" };
+    return { backgroundColor: "#CCFFFF" };
   }
   if (reservationStatus==="予約済") {
     return { backgroundColor: "#99FF99" };
@@ -57,6 +53,15 @@ const getButtonStyle = (highlighted:boolean, reservationStatus:string, day:numbe
 
 const CalendarCell: FC<CalendarCellProps> = ({ day, reservationStatus, date, onSelect, onHighlight,highlightedDates, unHighlightAll }) => {
   const isHighlighted = highlightedDates.includes(date)
+  const [excludedDates, setExcludedDates] = useState<string[]>([]); // 除外日付を格納する状態を作成
+
+  useEffect(() => {
+    // APIから除外日を取得
+    getExcludes().then((excludes: Exclude[]) => {
+      setExcludedDates(excludes.map(exclude => exclude.exclude_date)); // 除外日を状態にセット
+    });
+  }, []);
+
 
   const handleClick = () => {
     onSelect(date, reservationStatus);
@@ -67,6 +72,13 @@ const CalendarCell: FC<CalendarCellProps> = ({ day, reservationStatus, date, onS
     }
   };
   
+  
+  const isDisabled = (date: string) => {
+    const currentDate = new Date();
+    const buttonDate = new Date(date);
+    return buttonDate < new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()) || excludedDates.includes(date); // 除外日かどうかもチェック
+  };
+
   
   const buttonDisabled = isDisabled(date);
 
