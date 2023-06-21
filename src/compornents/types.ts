@@ -43,7 +43,7 @@ export interface Login {
 
 export interface Exclude {
     id: number;
-    date: string;
+    exclude_date: string;
 }
 
 export interface TimeFlag {

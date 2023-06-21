@@ -4,7 +4,7 @@ import { useState,useEffect, FC, useMemo } from 'react';
 import { Reservation, User, TimeFlag} from './types';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,Button } from '@mui/material';
 import  CalenderHeader  from './calendarHeader';
-import CalendarBody from './calendarBody';
+import AdminCalendarBody from './adminCalendarBody';
 import { getReservationByID, getUserById, getAllUsers ,addReservation, deleteReservation, getStatistics , getTimeFlagByID} from './API';
 import { hi } from 'date-fns/locale';
 import { getExcludes, addExclude, deleteExclude } from './API';
@@ -60,7 +60,7 @@ const useCalendar = (initialExcludes: Exclude[]) => {
 
   // 指定された日付が除外日であるかを判定する
   const isExcludeExists = (excludes: Exclude[], date: string,) => {
-    return excludes.some(exclude => exclude.date === date);
+    return excludes.some(exclude => exclude.exclude_date === date);
   };
 
   // 指定された日付の除外状況を取得する
@@ -92,14 +92,14 @@ const Calendar: FC<{ excludedDates: Exclude[];  reloadExcludes: () => void }> = 
     const excludeStatus = getExcludeStatus(date);
 
     if (excludeStatus === "除外済") {
-      const exclude = initialExcludes.find(ex => ex.date === date);
+      const exclude = initialExcludes.find(ex => ex.exclude_date === date);
       if (exclude) {
         setSelectedExcludeIds(prevIds => prevIds ? [...prevIds, exclude.id] : [exclude.id]);
       }
     } else {
       setSelectedExcludeIds(prevIds => prevIds ? prevIds.filter(id => {
         const exclude = initialExcludes.find(ex => ex.id === id);
-        return exclude && exclude.date !== date;
+        return exclude && exclude.exclude_date !== date;
       }) : []);
     }
   };
@@ -113,13 +113,14 @@ const Calendar: FC<{ excludedDates: Exclude[];  reloadExcludes: () => void }> = 
   
   const handleAddExclude = async () => {
     setIsProcessing(true);
-  
+    const successfulDates: string[] = [];
+
     if (!isProcessing) {
       try {
         for (let date of highlightedDates) {
-          const newExclude = { date };
+          const newExclude:Partial<Exclude> = {exclude_date:date};
           await addExclude(newExclude);
-          alert(`Date ${date} successfully excluded.`);
+          successfulDates.push(date);
         }
         // Refresh excludes data
         await reloadExcludes();
@@ -128,28 +129,41 @@ const Calendar: FC<{ excludedDates: Exclude[];  reloadExcludes: () => void }> = 
         console.error(error);
       }
     }
-  
+    alert(`Date ${successfulDates} successfully excluded.`);
+
     setIsProcessing(false);
   };
   
   const handleDeleteExclude = async () => {
     setIsProcessing(true);
-  
+    const successfulDates: string[] = [];
+
     if (!isProcessing && selectedExcludeIds && highlightedDates) {
-      try {
+      
         for (let date of highlightedDates) {
-          await deleteExclude(id);
-          alert(`Date ${date} successfully removed from exclude list.`);
-        }
+          const excludeExists = getExcludeStatus(date)
+          if(excludeExists === "除外済"){
+            const excludeId = selectedExcludeIds.find(id => {
+              const exclude = excludedDates.find(ex => ex.exclude_date === date);
+              return exclude && exclude.id === id;
+            });
+          
+            if(excludeId){
+              try{
+                await deleteExclude(excludeId);
+                successfulDates.push(date);
+              }catch(error){
+                console.error(error);
+              }
+        }}
         // Refresh excludes data
         await reloadExcludes();
         setHighlightedDates([]); // Clear highlighted dates after deleting
-      } catch (error) {
-        console.error(error);
-      }
     }
-  
+  }
     setIsProcessing(false);
+    alert(`Date ${successfulDates} successfully removed from exclude list.`);
+
   };
   
   const handleSelect = (date: string, excludedStatus: string) => {
@@ -157,7 +171,7 @@ const Calendar: FC<{ excludedDates: Exclude[];  reloadExcludes: () => void }> = 
     // 予約ステータスが"予約済"の場合は、予約IDをセットします。
     // これは予約IDをどのように取得するかに依存します。ここではサンプルとして予約ステータスを使います。
     if (excludedStatus === '除外済') {
-      const exclude = excludedDates.find(res => res.date === date);
+      const exclude = excludedDates.find(res => res.exclude_date === date);
       if (exclude) {
       }
     } else {
@@ -180,10 +194,10 @@ const Calendar: FC<{ excludedDates: Exclude[];  reloadExcludes: () => void }> = 
             </TableRow>
           </TableHead>
           <TableBody>
-            <CalendarBody 
+            <AdminCalendarBody 
               currentDate={currentDate}
               employeeList={dummyEmployees}
-              getAttributeStatus={getExcludeStatus}
+              getExcludeStatus={getExcludeStatus}
               onSelect={handleSelect}
               onHighlight={handleHighlight}
               highlightedDates={highlightedDates}
@@ -193,10 +207,10 @@ const Calendar: FC<{ excludedDates: Exclude[];  reloadExcludes: () => void }> = 
         </Table>
       </TableContainer>
       <Box display="flex" justifyContent="center" marginTop={2}><Button variant="contained" color="primary" onClick={handleAddExclude} disabled={isProcessing}>
-          予約
+          除外
         </Button>
         <Button variant="contained" color="secondary" onClick={handleDeleteExclude} disabled={isProcessing}>
-          予約キャンセル
+          除外キャンセル
         </Button>
       </Box>
     </Box>
@@ -224,4 +238,3 @@ export default function AdminExcludeDaysEditPage() {
   
     return excludedDates ? <Calendar excludedDates={excludedDates} reloadExcludes={reloadExcludes} /> : <div>Loading...</div>;
   }
-  

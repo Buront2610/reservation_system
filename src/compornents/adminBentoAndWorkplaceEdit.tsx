@@ -85,9 +85,7 @@ export default function AdminBentoAndWorkplaceManagePage() {
     
         if (row && row.id) {
             setSelectedRow({...row, choose_flag: updatedFlag});
-            console.log(updatedFlag)
-            console.log(row.id)
-            console.log(row.choose_flag)
+
             
             updateBento(row.id, row.choose_flag);
             // Update the bento array with the new flag value

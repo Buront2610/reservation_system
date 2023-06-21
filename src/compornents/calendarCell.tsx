@@ -30,6 +30,13 @@ const theme = createTheme({
   },
 });
 
+const isDisabled = (date: string) => {
+  const currentDate = new Date();
+  const buttonDate = new Date(date);
+  return buttonDate < new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+};
+
+
 const getButtonStyle = (highlighted:boolean, reservationStatus:string, day:number, date:string) => {
   const currentDate = new Date();
   const buttonDate = new Date(date);
@@ -40,10 +47,10 @@ const getButtonStyle = (highlighted:boolean, reservationStatus:string, day:numbe
     return { backgroundColor: "yellow" };
   }
   if (reservationStatus==="予約済") {
-    return { backgroundColor: "blue" };
+    return { backgroundColor: "#99FF99" };
   }
   if (buttonDate < new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())) {
-    return { backgroundColor: "black", color: "white" };
+    // return { backgroundColor: "black", color: "white" };
   }
   return { color: "black"};
 };
@@ -60,14 +67,13 @@ const CalendarCell: FC<CalendarCellProps> = ({ day, reservationStatus, date, onS
     }
   };
   
-
-
-
+  
+  const buttonDisabled = isDisabled(date);
 
   return (
     <TableCell style={getButtonStyle(isHighlighted, reservationStatus, day, date)}>
       <Tooltip title={`Date: ${date}`}>
-        <Button color="secondary" onClick={handleClick} style={{fontSize: 16}}>
+        <Button color="secondary" onClick={handleClick} style={{fontSize: 16}} disabled={buttonDisabled}>
           <span>{day}</span>
           <span>{reservationStatus}</span>
         </Button>

@@ -69,15 +69,14 @@ class Reservation(db.Model):
         dict_repr['reservation_date'] = dict_repr['reservation_date'].isoformat() if dict_repr['reservation_date'] else None
         return dict_repr
 
-
-
 class Exclude(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     exclude_date = db.Column(db.Date, nullable=True)
 
     def to_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
+        dict_repr = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        dict_repr['exclude_date'] = dict_repr['exclude_date'].isoformat() if dict_repr['exclude_date'] else None    
+        return dict_repr
 
 class TimeFlag(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

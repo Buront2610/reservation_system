@@ -144,17 +144,17 @@ export async function deleteReservation(id: number): Promise<void> {
 }
 
 export async function getExcludes(): Promise<Exclude[]> {
-    const response = await axios.get<Exclude[]>(`${API_BASE_URL}/excludes`);
+    const response = await axios.get<Exclude[]>(`${API_BASE_URL}/exclude`);
     return response.data;
 }
 
 export async function addExclude(newExclude: Partial<Exclude>): Promise<Exclude> {
-    const response = await axios.post<Exclude>(`${API_BASE_URL}/excludes`, newExclude);
+    const response = await axios.post<Exclude>(`${API_BASE_URL}/exclude`, newExclude);
     return response.data;
 }
 
 export async function deleteExclude(id: number): Promise<void> {
-    await axios.delete(`${API_BASE_URL}/excludes/${id}`);
+    await axios.delete(`${API_BASE_URL}/exclude/${id}`);
 }
 
 export async function getTimeFlag(): Promise<TimeFlag> {

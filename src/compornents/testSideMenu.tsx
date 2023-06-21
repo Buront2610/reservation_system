@@ -28,6 +28,7 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import HistoryIcon from '@mui/icons-material/History';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 import { Link as RouterLink, useLocation, Outlet  } from 'react-router-dom';
 
 import Login from './login';
@@ -168,6 +169,12 @@ import LockIcon from '@mui/icons-material/Lock';
             text: "ユーザ別予約統計",
             icon: <CalculateIcon />,
             path: "/orderUserSummary"
+        },
+
+        {
+            text:"除外日設定",
+            icon:<EventBusyIcon />,
+            path:"adminCalendarEdit"
         },
 
         {

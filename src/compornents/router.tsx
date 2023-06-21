@@ -15,6 +15,7 @@ import TestAdminOrderSummaryPage from './testAdminReserveStatus';
 import AdminTimeLock from './adminTimeLock';
 import AdminReserveEdit from './adminReserveEdit';
 import AdminBentoAndWorkplaceManagePage from './adminBentoAndWorkplaceEdit';
+import AdminExcludeDaysEditPage from './adminCalenderEdit';
 
 interface setStateProps{
     setStateProp: object;
@@ -44,7 +45,7 @@ function routerCompornent() {
                     <Route path='/adminReservationEdit' element={<AdminReserveEdit />} />
                     <Route path='/adminBentoAndWorkplaceEdit' element={<AdminBentoAndWorkplaceManagePage />} />
                     <Route path='/lock' element={<AdminTimeLock />} />
-            
+                    <Route path='/adminCalendarEdit' element={<AdminExcludeDaysEditPage />} />
                 </Route>
                 {/* {user && (
                     <>

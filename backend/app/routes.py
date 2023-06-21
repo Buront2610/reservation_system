@@ -733,6 +733,8 @@ def create_exclude() -> Tuple[Response, int]:
     exclude_date = data.get('exclude_date')
     if not exclude_date:
         return jsonify({'error': '未入力の必須情報があります。'}), 400
+    if isinstance(exclude_date, str):  # date is coming in ISO 8601 string format
+        exclude_date = datetime.date.fromisoformat(exclude_date)  # convert to date object
     exclude = Exclude(exclude_date=exclude_date)
     db.session.add(exclude)
     db.session.commit()

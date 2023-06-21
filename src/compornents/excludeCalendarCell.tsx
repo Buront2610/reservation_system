@@ -6,10 +6,10 @@ import { purple } from '@mui/material/colors';
 
 
 interface Exclude {
-    id: number;
     date: string;
+    excludedStatus: string;
     day: number;
-    onSelect: (date: string) => void;
+    onSelect: (date: string, excludedStatus: string) => void;
     onHighlight: (date: string) => void;
     highlightedDates: string[];
     unHighlightAll: () => void;
@@ -35,17 +35,15 @@ const getButtonStyle = (highlighted:boolean, day:number, date:string) => {
     if (highlighted){
         return { backgroundColor: "yellow" };
     }
-    if (buttonDate < new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())) {
-        return { backgroundColor: "black", color: "white" };
-    }
+
     return { color: "black"};
 };
 
-const ExcludedCell: FC<Exclude> = ({ id, date, day, onSelect, onHighlight,highlightedDates, unHighlightAll }) => {
+const ExcludedCell: FC<Exclude> = ({ excludedStatus, date, day, onSelect, onHighlight,highlightedDates, unHighlightAll }) => {
     const isHighlighted = highlightedDates.includes(date)
 
     const handleClick = () => {
-        onSelect(date, reservationStatus);
+        onSelect(date, excludedStatus);
         if (!isHighlighted) {
           onHighlight(date);
         } else {
@@ -58,6 +56,7 @@ const ExcludedCell: FC<Exclude> = ({ id, date, day, onSelect, onHighlight,highli
         <Tooltip title={`Date: ${date}`}>
             <Button color="secondary" onClick={handleClick}>
             <span>{day}</span>
+            <span>{excludedStatus}</span>
             </Button>
         </Tooltip>
         </TableCell>
