@@ -477,6 +477,7 @@ def login() -> Tuple[Response, int]:
         return jsonify({'error': 'IDとパスワードが必要です'}), 400
 
     user = User.query.filter_by(employee_number=id).first()
+    logger.info(f"user: {user}")
 
     if not user:
         return jsonify({'error': 'ユーザーが見つかりません'}), 404
@@ -485,7 +486,7 @@ def login() -> Tuple[Response, int]:
     if check_password(password, user.password):
         # 認証に成功した場合、トークンを生成して返す
         token = generate_token(user)
-        return jsonify({'token': token, 'role': user.role}), 200
+        return jsonify({'id': user.id, 'token': token, 'role': user.role}), 200
     else:
         return jsonify({'error': 'パスワードが間違っています'}), 401
     

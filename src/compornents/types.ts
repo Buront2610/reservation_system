@@ -36,10 +36,12 @@ export interface Reservation {
 }
 
 export interface Login {
-    id: string;
-    password: string;
+    id: string
+    token: string;
     role: string;
 }
+
+
 
 export interface Exclude {
     id: number;

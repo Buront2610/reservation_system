@@ -7,10 +7,13 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 from flask_cors import CORS
+# Import flask_jwt_extended library
+from flask_jwt_extended import JWTManager
 
 
 db = SQLAlchemy()
 migrate = Migrate()
+jwt = JWTManager()  # Add this line
 
 def setup_logger(app: Flask):
     # Loggerの設定
@@ -33,11 +36,15 @@ def create_app(config_class=Config):
     app.config['MAIL_PORT'] = 465
     app.config['MAIL_USERNAME'] = 'your_email_address'
     app.config['MAIL_PASSWORD'] = 'your_password'
+    app.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY')  # Add this line
+
 
 
     CORS(app, origins=['http://localhost:9999', 'http://192.168.20.10:9999'])  #      
     db.init_app(app)
     migrate.init_app(app, db)
+    jwt.init_app(app)  # Add this line
+
 
     setup_logger(app)
 

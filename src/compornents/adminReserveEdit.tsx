@@ -7,6 +7,17 @@ import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-g
 import { getReservations, addReservation, updateReservation, deleteReservation, getBento, getBentoByChooseFlag } from './API';
 import { getAllUsers } from './API'; // User情報を取得するAPI
 import { get } from 'http';
+import { DateField } from '@mui/x-date-pickers/DateField';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { DatePicker } from '@mui/x-date-pickers';
+
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import { jaJP } from '@mui/x-data-grid';
+import ja from 'date-fns/locale/ja';
+import 'dayjs/locale/ja';
+
 
 export default function AdminReservationManage() {
 
@@ -34,6 +45,8 @@ export default function AdminReservationManage() {
     const handleAddReservation = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         newEntry.bento_id = bento.id;
+        console.log('newEntry:',newEntry);
+        console.log('bento:',bento);
         const createdReservation = await addReservation(newEntry);
         setReservations([...reservations, createdReservation]);
         setNewEntry({});
@@ -92,8 +105,33 @@ const handleAutoFillReservation = () => {
                         <Box mb={2}>
                             <TextField fullWidth label="ユーザーID" value={newEntry.user_id || ''} onChange={e => setNewEntry({ ...newEntry, user_id: e.target.value })} />
                         </Box>
+                        
+                            
                         <Box mb={2}>
-                            <TextField fullWidth label="予約日" value={newEntry.reservation_date || ''} onChange={e => setNewEntry({ ...newEntry, reservation_date: e.target.value })} />
+                            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'ja'}>
+                            <DatePicker
+                                label="予約日"
+                                value={dayjs(newEntry.reservation_date)}
+                                onChange={(newValue) => {
+                                    // newValueがundefinedまたはnullでないことを確認します
+                                    if (newValue) {
+                                        const year = newValue.year();
+                                        const month = (newValue.month() + 1).toString().padStart(2, '0'); // Months are 0-indexed in dayjs
+                                        const day = newValue.date().toString().padStart(2, '0');
+                                        const formattedDate = `${year}-${month}-${day}`;
+                                        console.log(formattedDate);
+                                        setNewEntry({ ...newEntry, reservation_date: formattedDate });
+                                    }
+                                }}
+                                
+                                slotProps={{
+                                    textField: {
+                                        helperText: '日付を選択してください',
+                                    },
+                                }}
+                                format='YYYY-MM-DD'
+                            />
+                            </LocalizationProvider>
                         </Box>
                         <Box mb={2}>
                             <TextField fullWidth label="数量" value={newEntry.quantity || ''} onChange={e => setNewEntry({ ...newEntry, quantity: parseInt(e.target.value) })} />
@@ -128,17 +166,7 @@ const handleAutoFillReservation = () => {
                                 ),
                             },
                         ]}
-                        // onCellEditCommit={(params, event) => {
-                        //     handleUpdateReservation(params.id as number, {[params.field]: params.value});
-                        // }}
-                        // components={{
-                        //     Toolbar: GridToolbarContainer,
-                        // }}
-                        // componentsProps={{
-                        //     toolbar: {
-                        //         children: [<GridToolbarExport />],
-                        //     },
-                        // }}
+
                     />
                 </Grid>
             )}

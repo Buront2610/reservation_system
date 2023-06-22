@@ -44,10 +44,11 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
     if(username !== null && auth !== null && password !== "") {
       const hashedPassword = hashPassword(password);
       try {
-        await auth.loginUser(username, hashedPassword);
-        navigate("/reservation");
+        await auth.loginUser(username, password);
+        navigate("/userReservation");
       } catch (error: any) {
         setError(error);
+        console.log(error);
       }
     } else {
       setError("IDとパスワードを入力してください。");
@@ -82,7 +83,6 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
                     margin="normal"
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                {error && <div style={{ color: 'red' }}>{error}</div>}
                 </div>
             </CardContent>
             <CardActions>

@@ -52,7 +52,7 @@ def generate_token(user: User) -> str:
         'exp': datetime.utcnow() + timedelta(hours=24)
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-    return token.decode('utf-8')
+    return token
 
 
 # 指定された年の土日祝日を取得する関数

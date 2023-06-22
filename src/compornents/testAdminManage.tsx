@@ -88,6 +88,7 @@ export default function TestAdminManage() {
                         editMode='row'
                         rows={users}
                         columns={[
+                            { field: 'id', headerName: 'ID', width: 70 },
                             { field: 'employee_number', headerName: '社員番号', width: 120, editable: true },
                             { field: 'name', headerName: '名前', width: 150, editable: true },
                             { field: 'email_address', headerName: 'メールアドレス', width: 200, editable: true },

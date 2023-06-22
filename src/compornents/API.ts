@@ -13,16 +13,17 @@ const API_BASE_URL = 'http://192.168.20.10:5000/api';
 
 
 export async function login(id: string, password: string): Promise<Login | null> {
-    const users = await getAllUsers();
-    const foundUser = users.find(user => user.employee_number === id && user.password === password);
-    if (!foundUser) {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/login`, { id, password });
+        return {
+            id: response.data.id,
+            token: response.data.token,
+            role: response.data.role,
+        };
+    } catch (error) {
+        console.error(error);
         return null;
     }
-    return {
-        id: foundUser.employee_number,
-        password: foundUser.password,
-        role: foundUser.role,
-    };
 }
 
 export async function getWorkplaces(): Promise<Workplace[]> {

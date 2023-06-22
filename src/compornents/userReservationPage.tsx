@@ -6,6 +6,7 @@ import CalendarBody from './calendarBody';
 import { getReservationByID, getUserById, getAllUsers ,addReservation, deleteReservation, getStatistics , getTimeFlagByID} from './API';
 import { hi } from 'date-fns/locale';
 import { UseAuth } from './authContext';
+
 // Define dummy data
 
 
@@ -72,8 +73,8 @@ const getReservationStatus = useMemo(() => {
 }
 
 
-const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => void }> = ({userReservations, reloadReservations}) => {
-  const { currentDate, initialEmployees, changeMonth, getReservationStatus } = useCalendar(userReservations, dummyEmployees);
+const Calendar: FC<{ userReservations: Reservation[]; Employees:User[]; reloadReservations: () => void }> = ({userReservations, reloadReservations, Employees}) => {
+  const { currentDate, initialEmployees, changeMonth, getReservationStatus } = useCalendar(userReservations, Employees);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -87,7 +88,7 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
     );
   
     // Check reservation for the date
-    const reservationStatus = getReservationStatus(date, dummyEmployees[0].employee_number);  //適切なemployeeIdに置き換えてください
+    const reservationStatus = getReservationStatus(date, Employees[0].employee_number);  //適切なemployeeIdに置き換えてください
   
     if (reservationStatus === '予約済') {
       const reservation = userReservations.find(res => res.reservation_date === date);
@@ -112,7 +113,7 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
     setIsProcessing(true);
     const successfulDates: string[] = [];
 
-    if (highlightedDates && dummyEmployees[0].employee_number) {
+    if (highlightedDates && Employees[0].employee_number) {
       for (let date of highlightedDates) {
         let now = new Date();
         let selectedDate = new Date(date);
@@ -138,11 +139,11 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
           return;
         }
   
-        const reservationExists = getReservationStatus(date, dummyEmployees[0].employee_number);
+        const reservationExists = getReservationStatus(date, Employees[0].employee_number);
   
         if (reservationExists === "") {
           const newReservation: Partial<Reservation> = {
-            user_id: dummyEmployees[0].employee_number,
+            user_id: Employees[0].employee_number,
             reservation_date: date,
             bento_id:1,
             quantity:1,
@@ -200,7 +201,7 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
           return;
         }
         
-        const reservationExists = getReservationStatus(date, dummyEmployees[0].employee_number);
+        const reservationExists = getReservationStatus(date, Employees[0].employee_number);
 
         if (reservationExists === "予約済") {
           const reservationId = selectedReservationId.find(id => {
@@ -257,13 +258,13 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
           </TableHead>
           <TableBody>
             <CalendarBody 
-              currentDate={currentDate}
-              employeeList={initialEmployees}
-              getReservationStatus={getReservationStatus}
-              onSelect={handleSelect}
-              onHighlight={handleHighlight}
-              highlightedDates={highlightedDates}
-              unHighlightAll={handleUnHighlightAll}
+                currentDate={currentDate}
+                employeeList={initialEmployees}
+                getReservationStatus={getReservationStatus}
+                onSelect={handleSelect}
+                onHighlight={handleHighlight}
+                highlightedDates={highlightedDates}
+                unHighlightAll={handleUnHighlightAll}
             />
           </TableBody>
         </Table>
@@ -280,26 +281,44 @@ const Calendar: FC<{ userReservations: Reservation[]; reloadReservations: () => 
   );
 }
 
-export default function TestReservationHistoryPage() {    
-  const [userReservation, setUserReservation] = useState<Reservation[] | null>(null);
-  
-  const fetchUserData = async () => {
-    try {
-      const userRes = await getReservationByID(dummyEmployees[0].employee_number);
-      console.log(userRes);
-      setUserReservation(userRes);
-    } catch (error) {
-      console.error(error);
+export default function ReservationPage() {    
+    const [userReservation, setUserReservation] = useState<Reservation[] | null>(null);
+    const [Employees, setEmployees] = useState<User[]>([]);
+
+    const { user } = UseAuth();
+
+
+    const fetchUserData = async () => {
+        if (user) {
+        try {
+            const userDetail = await getUserById(parseInt(user.id)); // Get detailed user info
+            setEmployees([userDetail]); // Set detailed user info as dummyEmployees
+    
+            const userRes = await getReservationByID(userDetail.employee_number);
+            setUserReservation(userRes);
+        } catch (error) {
+            console.error(error);
+        }
+        }
+    };
+    
+    const reloadReservations = async () => {
+        await fetchUserData();
     }
-  };
-
-  const reloadReservations = async () => {
-    await fetchUserData();
-  }
-
-  useEffect(() => {
-    reloadReservations();
-  }, []);
-  console.log(UseAuth())
-  return userReservation ? <Calendar userReservations={userReservation} reloadReservations={reloadReservations} /> : <div>Loading...</div>;
+    console.log(user);  // Check what `user` object looks like
+    // console.log(user.id);
+    
+    useEffect(() => {
+        reloadReservations();
+    }, []);
+    console.log(UseAuth())
+    return userReservation ? (
+        <Calendar 
+            userReservations={userReservation} 
+            Employees={Employees}
+            reloadReservations={reloadReservations} 
+        /> 
+    ) : (
+        <div>Loading...</div>
+    );
 }
