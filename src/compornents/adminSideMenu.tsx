@@ -139,6 +139,11 @@ import LockIcon from '@mui/icons-material/Lock';
 
       const itemsList = [
         {
+            text:"ログイン",
+            icon:<LoginIcon/>,
+            path:"/login"
+        },
+        {
           text: "予約登録",
           icon: <AddShoppingCartIcon/>,
           path: "/adminReservationEdit"

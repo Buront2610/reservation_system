@@ -47,7 +47,7 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
         console.log(auth)        
 
         if(auth.user?.role === 'admin') {
-          navigate("/adminReservationList");
+          navigate("/adminReservationEdit");
         } else if(auth.user?.role === 'user') {
           navigate("/userReservation");
         } else {
@@ -77,7 +77,7 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
                 <TextField
                     fullWidth
                     id="username"
-                    type="number"
+                    type="string"
                     label="社員番号"
                     placeholder="社員番号"
                     margin="normal"

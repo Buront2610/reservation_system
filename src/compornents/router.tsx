@@ -16,6 +16,7 @@ import UserSideMenu from './userSideMenu';
 import AdminSideMenu from './adminSideMenu';
 import Login from './login';
 import { AuthProvider } from './authContext';
+import AdminReservationManage from './adminReserveEdit';
 
 function RouterComponent() {
   const { user } = UseAuth();
@@ -28,19 +29,19 @@ function RouterComponent() {
                 {user ? (
                 user.role === 'admin' ? (
                     <Route path="/" element={<AdminSideMenu />}>
-                    <Route path="/adminReservationList" element={<TestAdminReservationPage />} />
-                    <Route path="/adminReservationStats" element={<TestAdminReservationStatsPage />} />
-                    <Route path="/adminUserEdit" element={<TestAdminManage />} />
-                    <Route path="/orderUserSummary" element={<TestAdminOrderSummaryPage />} />
-                    <Route path="/adminReservationEdit" element={<AdminReserveEdit />} />
-                    <Route path="/adminBentoAndWorkplaceEdit" element={<AdminBentoAndWorkplaceManagePage />} />
-                    <Route path="/lock" element={<AdminTimeLock />} />
-                    <Route path="/adminCalendarEdit" element={<AdminExcludeDaysEditPage />} />
+                        <Route path="/adminReservationList" element={<TestAdminReservationPage />} />
+                        <Route path="/adminReservationStats" element={<TestAdminReservationStatsPage />} />
+                        <Route path="/adminUserEdit" element={<TestAdminManage />} />
+                        <Route path="/orderUserSummary" element={<TestAdminOrderSummaryPage />} />
+                        <Route path="/adminReservationEdit" element={<AdminReservationManage />} />
+                        <Route path="/adminBentoAndWorkplaceEdit" element={<AdminBentoAndWorkplaceManagePage />} />
+                        <Route path="/lock" element={<AdminTimeLock />} />
+                        <Route path="/adminCalendarEdit" element={<AdminExcludeDaysEditPage />} />
                     </Route>
                 ) : (
-                    <Route path="/" element={<UserSideMenu />}>
-                    <Route path="/userReservation" element={<ReservationPage />} />
-                    <Route path="/userReserveHistory" element={<TestReservationHistoryPage />} />
+                        <Route path="/" element={<UserSideMenu />}>
+                        <Route path="/userReservation" element={<ReservationPage />} />
+                        <Route path="/userReserveHistory" element={<TestReservationHistoryPage />} />
                     </Route>
                 )
                 ) : (
