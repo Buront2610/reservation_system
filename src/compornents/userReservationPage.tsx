@@ -6,6 +6,7 @@ import CalendarBody from './calendarBody';
 import { getReservationByID, getUserById, getAllUsers ,addReservation, deleteReservation, getStatistics , getTimeFlagByID} from './API';
 import { hi } from 'date-fns/locale';
 import { UseAuth } from './authContext';
+import { useNavigate } from 'react-router-dom';
 
 // Define dummy data
 
@@ -284,9 +285,14 @@ const Calendar: FC<{ userReservations: Reservation[]; Employees:User[]; reloadRe
 export default function ReservationPage() {    
     const [userReservation, setUserReservation] = useState<Reservation[] | null>(null);
     const [Employees, setEmployees] = useState<User[]>([]);
-
+    const navigate = useNavigate();
     const { user } = UseAuth();
 
+    useEffect(() => {
+      if(!user) {
+        navigate('/login');
+      }
+    }, [user, navigate]);
 
     const fetchUserData = async () => {
         if (user) {

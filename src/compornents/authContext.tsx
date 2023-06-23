@@ -24,8 +24,21 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<Login | null>(() => {
     const userFromLocalStorage = localStorage.getItem('user');
-    if (userFromLocalStorage) {
-      return JSON.parse(userFromLocalStorage);
+    const loginTimeStamp = localStorage.getItem('loginTimeStamp');
+
+    if (userFromLocalStorage && loginTimeStamp) {
+      const currentTimeStamp = new Date().getTime();
+      const timeDifference = currentTimeStamp - Number(loginTimeStamp);
+
+      // 24 hours in milliseconds is 24 * 60 * 60 * 1000
+      if (timeDifference < 0.1 * 60 * 60 * 1000) {
+        return JSON.parse(userFromLocalStorage);
+      } else {
+        // If more than 24 hours has passed, remove user and timestamp from local storage
+        localStorage.removeItem('user');
+        localStorage.removeItem('loginTimeStamp');
+        return null;
+      }
     } else {
       return null;
     }
@@ -37,6 +50,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (foundUser) {
       setUser(foundUser);
       localStorage.setItem('user', JSON.stringify(foundUser));
+      localStorage.setItem('loginTimeStamp', JSON.stringify(new Date().getTime()));
     } else {
       throw new Error('IDまたはパスワードが違います。');
     }
@@ -45,6 +59,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('loginTimeStamp');
   };
 
   return (
