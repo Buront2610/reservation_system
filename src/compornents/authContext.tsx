@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { login } from "./API";
 import { Login } from "./types";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextProps {
   user: Login | null; 
@@ -22,6 +23,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  // const navigate = useNavigate();
   const [user, setUser] = useState<Login | null>(() => {
     const userFromLocalStorage = localStorage.getItem('user');
     const loginTimeStamp = localStorage.getItem('loginTimeStamp');
@@ -31,7 +33,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const timeDifference = currentTimeStamp - Number(loginTimeStamp);
 
       // 24 hours in milliseconds is 24 * 60 * 60 * 1000
-      if (timeDifference < 0.1 * 60 * 60 * 1000) {
+      if (timeDifference < 1 * 60 * 60 * 1000) {
         return JSON.parse(userFromLocalStorage);
       } else {
         // If more than 24 hours has passed, remove user and timestamp from local storage
@@ -60,6 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('loginTimeStamp');
+    // navigate("login");
   };
 
   return (

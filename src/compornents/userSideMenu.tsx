@@ -20,6 +20,8 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import LoginIcon from '@mui/icons-material/Login';
+import { UseAuth } from './authContext';
+import LogoutIcon from '@mui/icons-material/Logout';
 import HomeIcon from '@mui/icons-material/Home';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
@@ -119,12 +121,14 @@ import LockIcon from '@mui/icons-material/Lock';
     );
 
 
-    export default function TestUserSideMenu() {
+    export default function UserSideMenu() {
 
       const location = useLocation();
       const Path = location.pathname;
       const theme = useTheme();
       const [open, setOpen] = React.useState(false);
+      const { logout } = UseAuth();
+
 
       const handleDrawerOpen = () => {
         setOpen(true);
@@ -143,44 +147,13 @@ import LockIcon from '@mui/icons-material/Lock';
         {
           text: "予約ページ",
           icon: <AddBusinessIcon />,
-          path: "/reservation"
+          path: "/userReservation"
         },
         {
-          text: "予約登録",
-          icon: <AddShoppingCartIcon/>,
-          path: "/adminReservationEdit"
-        },
-        {
-          text: "ユーザ登録・編集",
-          icon: <PersonAddIcon />,
-          path: "/adminUserEdit"
-        },
-        {
-          text: "弁当・勤務場所情報",
-          icon: <ManageAccountsIcon />,
-          path: "/adminBentoAndWorkPlaceEdit"
-        },
-        {
-          text: "勤務場所別予約統計",
-          icon: <AnalyticsIcon />,
-          path: "/orderWorkPlaceSummary"
-        },
-        {
-            text: "ユーザ別予約統計",
-            icon: <CalculateIcon />,
-            path: "/orderUserSummary"
-        },
+          text:"ログアウト",
+          icon: <LogoutIcon />,
+          onClick : logout
 
-        {
-            text:"除外日設定",
-            icon:<EventBusyIcon />,
-            path:"adminCalendarEdit"
-        },
-
-        {
-            text:"予約ロック",
-            icon: <LockIcon />,
-            path: "/lock"
         }
       ];
 
@@ -216,14 +189,15 @@ import LockIcon from '@mui/icons-material/Lock';
             <Divider />
 
             <List component="div">
-                {itemsList.map(({ text, icon: Icon, path }) => (
-                    <ListItem
-                    key={text}
-                    disablePadding
-                    component={RouterLink}
-                    to={path}
-                    sx={{ display: 'block' }}
-                    >
+        {itemsList.map(({ text, icon: Icon, onClick ,path}) => (
+                     <ListItem
+                     key={text}
+                     disablePadding
+                     component={onClick ? 'div' : RouterLink}  // Use 'div' for logout item
+                     to={onClick ? undefined : path}  // Set path to undefined for logout item
+                     sx={{ display: 'block' }}
+                     onClick={onClick}  // Add onClick event handler
+                   >
                     <ListItemButton
                         sx={{
                         minHeight: 48,

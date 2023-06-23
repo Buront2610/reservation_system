@@ -42,18 +42,27 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
 
   const onClickLogin = async () => {
     if(username !== null && auth !== null && password !== "") {
-      const hashedPassword = hashPassword(password);
       try {
         await auth.loginUser(username, password);
-        navigate("/userReservation");
+        console.log(auth)        
+
+        if(auth.user?.role === 'admin') {
+          navigate("/adminReservationList");
+        } else if(auth.user?.role === 'user') {
+          navigate("/userReservation");
+        } else {
+          throw new Error("Invalid role");
+        }
+        
       } catch (error: any) {
-        setError(error);
+        setError(error.message);
         console.log(error);
       }
     } else {
       setError("IDとパスワードを入力してください。");
     }
   };
+  
   return (
     <Box
         display="flex"

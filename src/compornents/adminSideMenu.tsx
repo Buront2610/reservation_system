@@ -30,6 +30,8 @@ import CalculateIcon from '@mui/icons-material/Calculate';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import { Link as RouterLink, useLocation, Outlet  } from 'react-router-dom';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { UseAuth } from './authContext';
 
 import Login from './login';
 import { textAlign } from '@mui/system';
@@ -119,12 +121,13 @@ import LockIcon from '@mui/icons-material/Lock';
     );
 
 
-    export default function TestUserSideMenu() {
+    export default function AdminSideMenu() {
 
       const location = useLocation();
       const Path = location.pathname;
       const theme = useTheme();
       const [open, setOpen] = React.useState(false);
+      const { logout } = UseAuth();
 
       const handleDrawerOpen = () => {
         setOpen(true);
@@ -135,16 +138,6 @@ import LockIcon from '@mui/icons-material/Lock';
       };
 
       const itemsList = [
-        {
-          text: "ログイン",
-          icon: <LoginIcon />,
-          path: "/login"
-        },
-        {
-          text: "予約ページ",
-          icon: <AddBusinessIcon />,
-          path: "/reservation"
-        },
         {
           text: "予約登録",
           icon: <AddShoppingCartIcon/>,
@@ -181,7 +174,12 @@ import LockIcon from '@mui/icons-material/Lock';
             text:"予約ロック",
             icon: <LockIcon />,
             path: "/lock"
-        }
+        },
+        {
+            text:"ログアウト",
+            icon: <LogoutIcon />,
+            onClick: logout
+        },
       ];
 
       return (
@@ -216,14 +214,15 @@ import LockIcon from '@mui/icons-material/Lock';
             <Divider />
 
             <List component="div">
-                {itemsList.map(({ text, icon: Icon, path }) => (
-                    <ListItem
-                    key={text}
-                    disablePadding
-                    component={RouterLink}
-                    to={path}
-                    sx={{ display: 'block' }}
-                    >
+                {itemsList.map(({ text, icon: Icon, onClick ,path}) => (
+                     <ListItem
+                     key={text}
+                     disablePadding
+                     component={onClick ? 'div' : RouterLink}  // Use 'div' for logout item
+                     to={onClick ? undefined : path}  // Set path to undefined for logout item
+                     sx={{ display: 'block' }}
+                     onClick={onClick}  // Add onClick event handler
+                   >
                     <ListItemButton
                         sx={{
                         minHeight: 48,
