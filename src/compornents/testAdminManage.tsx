@@ -22,9 +22,6 @@ import {
 } from 'react-papaparse';
 // CSVReaderをインポート
 
-
-
-
 const GREY = '#CCC';
 const GREY_LIGHT = 'rgba(255, 255, 255, 0.4)';
 const DEFAULT_REMOVE_HOVER_COLOR = '#A01919';
@@ -111,7 +108,6 @@ const styles = {
     } as CSSProperties,
 };
 
-
 export default function TestAdminManage() {
     const theme = useTheme();
     const [users, setUsers] = useState<User[]>([]);
@@ -126,16 +122,22 @@ export default function TestAdminManage() {
     const [removeHoverColor, setRemoveHoverColor] = useState(
         DEFAULT_REMOVE_HOVER_COLOR
     );
-
-    const handleCSVImport = async (results: ParseResult<Partial<User>>[]) => {
+    const handleCSVImport = async (results: {data: string[][], errors: any[], meta: any[]}) => {
         setImporting(true);
-        const dataList = results.map(result => result.data); // ParseResultからdataを取得
-        // データを一つずつ作成します
-        for (let data of dataList) {
-            let user = data[0]; // data is an array, access the first element
-            // userオブジェクトが適切な形式であることを確認します
+        console.log('result:',results)
+    
+        for (let data of results.data) {
+            let user = {
+                employee_number: data[0],
+                password: data[1],
+                name: data[2],
+                email_address: data[3],
+                telephone: data[4],
+                role: data[5],
+                workplace_id: Number(data[6]) // convert string to number
+            };
+    
             if (user.employee_number && user.password && user.name && user.email_address && user.telephone && user.role && user.workplace_id) {
-                // ユーザがすでに存在するか確認します
                 const existingUser = users.find(u => u.employee_number === user.employee_number);
                 if (!existingUser) {
                     await createUser(user);
@@ -144,19 +146,12 @@ export default function TestAdminManage() {
                 }
             }
         }
-        // ユーザリストを更新します
+    
         const updatedUsers = await getAllUsers();
         setUsers(updatedUsers);
         setImporting(false);
     };
-
     
-
-
-    console.log('workplacesList:',workplaces);
-    (workplaces.map((workplace) => (
-        console.log('workplace:',workplace)
-    )));
     const handleChangeRole = (event: SelectChangeEvent) => {
         setRoles(event.target.value);
         setNewEntry ({...newEntry, role: event.target.value});
@@ -166,15 +161,11 @@ export default function TestAdminManage() {
         setWorkplace(newValue);  // This is a number now.
         setNewEntry({...newEntry, workplace_id: newValue});  // This value is also a number.
     };
-    
-
-
     const rolesList =[
         'user',
         'admin',
         'guest',
     ]
-
     useEffect(() => {
         loadInitialData();
     }, []);
@@ -184,16 +175,6 @@ export default function TestAdminManage() {
         const workplaces = await getWorkplaces();
         setWorkplaces(workplaces);
         setUsers(users);
-    }
-
-    //multiple select styles
-    function getStyles(name: string, personName: readonly string[], theme: Theme) {
-        return {
-            fontWeight:
-                personName.indexOf(name) === -1
-                ? theme.typography.fontWeightRegular
-                : theme.typography.fontWeightMedium,
-        };
     }
 
     const handleAddUser = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -292,78 +273,80 @@ export default function TestAdminManage() {
                             <Button type="submit" variant="contained" color="primary">登録</Button>
                         </Box>
                     </form>
+                    <CSVReader
+                        onUploadAccepted={(results: any) => {
+                            console.log('---------------------------');
+                            console.log(results);
+                            console.log('---------------------------');
+                            setZoneHover(false);
+                            handleCSVImport(results);
+                        }}
+                        onDragOver={(event: DragEvent) => {
+                            event.preventDefault();
+                            setZoneHover(true);
+                        }}
+                        onDragLeave={(event: DragEvent) => {
+                            event.preventDefault();
+                            setZoneHover(false);
+                        }}
+                        >
+                        {({
+                            getRootProps,
+                            acceptedFile,
+                            ProgressBar,
+                            getRemoveFileProps,
+                            Remove,
+                        }: any) => (
+                            <>
+                            <div
+                                {...getRootProps()}
+                                style={Object.assign(
+                                {},
+                                styles.zone,
+                                zoneHover && styles.zoneHover
+                                )}
+                            >
+                                {acceptedFile ? (
+                                <>
+                                    <div style={styles.file}>
+                                    <div style={styles.info}>
+                                        <span style={styles.size}>
+                                        {formatFileSize(acceptedFile.size)}
+                                        </span>
+                                        <span style={styles.name}>{acceptedFile.name}</span>
+                                    </div>
+                                    <div style={styles.progressBar}>
+                                        <ProgressBar />
+                                    </div>
+                                    <div
+                                        {...getRemoveFileProps()}
+                                        style={styles.remove}
+                                        onMouseOver={(event: Event) => {
+                                        event.preventDefault();
+                                        setRemoveHoverColor(REMOVE_HOVER_COLOR_LIGHT);
+                                        }}
+                                        onMouseOut={(event: Event) => {
+                                        event.preventDefault();
+                                        setRemoveHoverColor(DEFAULT_REMOVE_HOVER_COLOR);
+                                        }}
+                                    >
+                                        <Remove color={removeHoverColor} />
+                                    </div>
+                                    </div>
+                                </>
+                                ) : (
+                                'Drop CSV file here or click to upload'
+                                )}
+                            </div>
+                            </>
+                        )}
+                    </CSVReader>
                 </Grid>
             )}
             {selectedTab === 1 && (
                 <Grid item xs={12}>
                     <h1>ユーザ一覧ページ</h1>    
-                    <CSVReader
-                    onUploadAccepted={(results: any) => {
-                        console.log('---------------------------');
-                        console.log(results);
-                        console.log('---------------------------');
-                        setZoneHover(false);
-                    }}
-                    onDragOver={(event: DragEvent) => {
-                        event.preventDefault();
-                        setZoneHover(true);
-                    }}
-                    onDragLeave={(event: DragEvent) => {
-                        event.preventDefault();
-                        setZoneHover(false);
-                    }}
-                    >
-                    {({
-                        getRootProps,
-                        acceptedFile,
-                        ProgressBar,
-                        getRemoveFileProps,
-                        Remove,
-                    }: any) => (
-                        <>
-                        <div
-                            {...getRootProps()}
-                            style={Object.assign(
-                            {},
-                            styles.zone,
-                            zoneHover && styles.zoneHover
-                            )}
-                        >
-                            {acceptedFile ? (
-                            <>
-                                <div style={styles.file}>
-                                <div style={styles.info}>
-                                    <span style={styles.size}>
-                                    {formatFileSize(acceptedFile.size)}
-                                    </span>
-                                    <span style={styles.name}>{acceptedFile.name}</span>
-                                </div>
-                                <div style={styles.progressBar}>
-                                    <ProgressBar />
-                                </div>
-                                <div
-                                    {...getRemoveFileProps()}
-                                    style={styles.remove}
-                                    onMouseOver={(event: Event) => {
-                                    event.preventDefault();
-                                    setRemoveHoverColor(REMOVE_HOVER_COLOR_LIGHT);
-                                    }}
-                                    onMouseOut={(event: Event) => {
-                                    event.preventDefault();
-                                    setRemoveHoverColor(DEFAULT_REMOVE_HOVER_COLOR);
-                                    }}
-                                >
-                                    <Remove color={removeHoverColor} />
-                                </div>
-                                </div>
-                            </>
-                            ) : (
-                            'Drop CSV file here or click to upload'
-                            )}
-                        </div>
-                        </>
-                    )}
-                    </CSVReader>
+
 
                     <DataGrid
                         editMode='row'
@@ -394,17 +377,7 @@ export default function TestAdminManage() {
                             ),
                             }
                         ]}
-                        // onCellEditCommit={(params, event) => {
-                        //     handleUpdateUser(params.id as number, {[params.field]: params.value});
-                        // }}
-                        // components={{
-                        //     Toolbar: GridToolbarContainer,
-                        // }}
-                        // componentsProps={{
-                        //     toolbar: {
-                        //         children: [<GridToolbarExport />],
-                        //     },
-                        // }}
+
                     />
                 </Grid>
                 
