@@ -133,9 +133,10 @@ export default function TestAdminManage() {
                 name: data[2],
                 email_address: data[3],
                 telephone: data[4],
-                role: data[5],
-                workplace_id: Number(data[6]) // convert string to number
+                workplace_id: Number(data[5]), // convert string to number
+                role: data[6],
             };
+            console.log('user:',user)
     
             if (user.employee_number && user.password && user.name && user.email_address && user.telephone && user.role && user.workplace_id) {
                 const existingUser = users.find(u => u.employee_number === user.employee_number);
@@ -144,6 +145,9 @@ export default function TestAdminManage() {
                 } else {
                     await updateUser(existingUser.id, user);
                 }
+            }
+            else{
+                console.log('error')
             }
         }
     
