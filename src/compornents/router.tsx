@@ -9,6 +9,7 @@ import TestAdminManage from './testAdminManage';
 import TestAdminOrderSummaryPage from './testAdminReserveStatus';
 import AdminTimeLock from './adminTimeLock';
 import AdminReserveEdit from './adminReserveEdit';
+import AdminReserveWorkplacePage from './testAdminReserveStats';
 import AdminBentoAndWorkplaceManagePage from './adminBentoAndWorkplaceEdit';
 import AdminExcludeDaysEditPage from './adminCalenderEdit';
 import ReservationPage from './userReservationPage';
@@ -33,6 +34,7 @@ function RouterComponent() {
                         <Route path="/adminReservationStats" element={<TestAdminReservationStatsPage />} />
                         <Route path="/adminUserEdit" element={<TestAdminManage />} />
                         <Route path="/orderUserSummary" element={<TestAdminOrderSummaryPage />} />
+                        <Route path="/orderWorkplaceSummary" element={<AdminReserveWorkplacePage/>} />
                         <Route path="/adminReservationEdit" element={<AdminReservationManage />} />
                         <Route path="/adminBentoAndWorkplaceEdit" element={<AdminBentoAndWorkplaceManagePage />} />
                         <Route path="/lock" element={<AdminTimeLock />} />

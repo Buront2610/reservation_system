@@ -55,10 +55,14 @@ export default function AdminReserveWorkplacePage() {
             (reservation) =>
                 new Date(reservation.reservation_date).toDateString() === today.toDateString()
         );
-        const monthReservations = workplaceReservations.filter(
-            (reservation) =>
-                new Date(reservation.reservation_date).getMonth() === currentMonth.getMonth()
-        );
+        const monthReservations = workplaceReservations.filter((reservation) => {
+            const reservationDate = new Date(reservation.reservation_date);
+            return (
+                reservationDate.getFullYear() === currentMonth.getFullYear() &&
+                reservationDate.getMonth() === currentMonth.getMonth()
+            );
+        });
+        
 
         const todayTotalOrder = todayReservations.reduce((prev, curr) => prev + curr.quantity, 0);
         const monthTotalOrder = monthReservations.reduce((prev, curr) => prev + curr.quantity, 0);
