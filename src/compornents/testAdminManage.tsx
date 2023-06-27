@@ -20,6 +20,9 @@ import {
     lightenDarkenColor,
     formatFileSize,
 } from 'react-papaparse';
+
+import { useNavigate, useLocation } from 'react-router-dom';
+import { UseAuth } from './authContext';
 // CSVReaderをインポート
 
 const GREY = '#CCC';
@@ -122,6 +125,15 @@ export default function TestAdminManage() {
     const [removeHoverColor, setRemoveHoverColor] = useState(
         DEFAULT_REMOVE_HOVER_COLOR
     );
+
+    const navigate = useNavigate();
+    const { user } = UseAuth();
+
+    useEffect(() => {
+      if(!user) {
+        navigate('/login');
+      }
+    }, [user, navigate]);
     const handleCSVImport = async (results: {data: string[][], errors: any[], meta: any[]}) => {
         setImporting(true);
         console.log('result:',results)
@@ -138,7 +150,7 @@ export default function TestAdminManage() {
             };
             console.log('user:',user)
     
-            if (user.employee_number && user.password && user.name && user.email_address && user.telephone && user.role && user.workplace_id) {
+            if (user.employee_number && user.password && user.name &&  user.role && user.workplace_id) {
                 const existingUser = users.find(u => u.employee_number === user.employee_number);
                 if (!existingUser) {
                     await createUser(user);
@@ -207,6 +219,7 @@ export default function TestAdminManage() {
             <Grid item xs={12}>
                 <Tabs value={selectedTab} onChange={handleChange}>
                     <Tab label="ユーザ登録" />
+                    <Tab label="CSV登録" />
                     <Tab label="ユーザ一覧" />
                 </Tabs>
             </Grid>
@@ -277,6 +290,12 @@ export default function TestAdminManage() {
                             <Button type="submit" variant="contained" color="primary">登録</Button>
                         </Box>
                     </form>
+                    
+                </Grid>
+            )}
+            {selectedTab === 1 && (
+                <Grid item xs={12}>
+                    <h1>CSVユーザ登録</h1>   
                     <CSVReader
                         onUploadAccepted={(results: any) => {
                             console.log('---------------------------');
@@ -345,9 +364,9 @@ export default function TestAdminManage() {
                             </>
                         )}
                     </CSVReader>
-                </Grid>
+                </Grid> 
             )}
-            {selectedTab === 1 && (
+            {selectedTab === 2 && (
                 <Grid item xs={12}>
                     <h1>ユーザ一覧ページ</h1>    
 

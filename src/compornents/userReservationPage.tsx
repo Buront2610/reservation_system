@@ -1,12 +1,12 @@
 import { useState,useEffect, FC, useMemo } from 'react';
 import { Reservation, User, TimeFlag} from './types';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,Button } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,Button, Typography } from '@mui/material';
 import  CalenderHeader  from './calendarHeader';
 import CalendarBody from './calendarBody';
 import { getReservationByID, getUserById, getAllUsers ,addReservation, deleteReservation, getStatistics , getTimeFlagByID} from './API';
 import { hi } from 'date-fns/locale';
 import { UseAuth } from './authContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 // Define dummy data
 
@@ -73,6 +73,7 @@ const getReservationStatus = useMemo(() => {
   return { currentDate, initialEmployees, changeMonth, getReservationStatus };
 }
 
+//ユーザ名を表示するヘッダ
 
 const Calendar: FC<{ userReservations: Reservation[]; Employees:User[]; reloadReservations: () => void }> = ({userReservations, reloadReservations, Employees}) => {
   const { currentDate, initialEmployees, changeMonth, getReservationStatus } = useCalendar(userReservations, Employees);
@@ -318,12 +319,22 @@ export default function ReservationPage() {
         reloadReservations();
     }, []);
     console.log(UseAuth())
+
+    const PageHeader: FC<{username: string}> = ({username}) => (
+      <Box marginBottom={2}>
+        <Typography variant="h5" component="h2">{username}</Typography>
+      </Box>
+    );
+
     return userReservation ? (
+      <>
+        <PageHeader username={Employees[0].name}/>
         <Calendar 
             userReservations={userReservation} 
             Employees={Employees}
             reloadReservations={reloadReservations} 
         /> 
+      </>
     ) : (
         <div>Loading...</div>
     );
