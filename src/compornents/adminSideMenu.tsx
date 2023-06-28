@@ -37,6 +37,7 @@ import Login from './login';
 import { textAlign } from '@mui/system';
 import { ManageAccounts } from '@mui/icons-material';
 import LockIcon from '@mui/icons-material/Lock';
+import { useUserAuthenticationLogoutNavigate } from './useUserAuthLogoutNavigate';
 
 
     interface setStateProps {
@@ -128,6 +129,7 @@ import LockIcon from '@mui/icons-material/Lock';
       const theme = useTheme();
       const [open, setOpen] = React.useState(false);
       const { logout } = UseAuth();
+      useUserAuthenticationLogoutNavigate();
 
       const handleDrawerOpen = () => {
         setOpen(true);
@@ -220,14 +222,14 @@ import LockIcon from '@mui/icons-material/Lock';
 
             <List component="div">
                 {itemsList.map(({ text, icon: Icon, onClick ,path}) => (
-                     <ListItem
-                     key={text}
-                     disablePadding
-                     component={onClick ? 'div' : RouterLink}  // Use 'div' for logout item
-                     to={onClick ? undefined : path}  // Set path to undefined for logout item
-                     sx={{ display: 'block' }}
-                     onClick={onClick}  // Add onClick event handler
-                   >
+                      <ListItem
+                      key={text}
+                      disablePadding
+                      component={onClick ? 'div' : RouterLink}  // Use 'div' for logout item
+                      to={onClick ? undefined : path}  // Set path to undefined for logout item
+                      sx={{ display: 'block' }}
+                      onClick={onClick}  // Add onClick event handler
+                    >
                     <ListItemButton
                         sx={{
                         minHeight: 48,

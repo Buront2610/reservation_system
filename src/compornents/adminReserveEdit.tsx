@@ -17,9 +17,12 @@ import dayjs, { Dayjs } from 'dayjs';
 import { jaJP } from '@mui/x-data-grid';
 import ja from 'date-fns/locale/ja';
 import 'dayjs/locale/ja';
+import { useUserAuthenticationLogoutNavigate } from './useUserAuthLogoutNavigate';
 
 
 export default function AdminReservationManage() {
+    useUserAuthenticationLogoutNavigate();
+
 
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [newEntry, setNewEntry] = useState<Partial<Reservation>>({});
@@ -87,7 +90,6 @@ const handleAutoFillReservation = () => {
         reservation_date: today,
     });
 }
-
     
     return (
         <Grid container spacing={2}>

@@ -26,7 +26,7 @@ const hashPassword = (password: string): string => {
 }
 
 const Login: React.FC<LoginProps> = (): ReactElement => {
-  const [username, setUsername] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>("");  // Here, initial value changed to empty string
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -81,7 +81,10 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
                     label="社員番号"
                     placeholder="社員番号"
                     margin="normal"
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={(e) => {
+                      const newVal = e.target.value;
+                      setUsername(newVal);
+                    }} 
                 />
                 <TextField
                     fullWidth
@@ -90,8 +93,10 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
                     label="Password"
                     placeholder="Password"
                     margin="normal"
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+                    onChange={(e) => {
+                      const newVal = e.target.value;
+                      setPassword(newVal);
+                    }}                />
                 </div>
             </CardContent>
             <CardActions>
@@ -101,7 +106,7 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
                     color="secondary"
                     onClick={onClickLogin}
                 >
-                Login
+                ログイン
                 </Button>
             </CardActions>
         </Card>

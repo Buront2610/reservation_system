@@ -4,6 +4,7 @@ import { Box, Button, Card, Snackbar, Alert } from '@mui/material';
 import ClockDisplay from './clockDisplay';
 import { getTimeFlagByID, updateTimeFlag } from './API';
 import { TimeFlag } from './types';
+import { useUserAuthenticationLogoutNavigate } from './useUserAuthLogoutNavigate';
 
 const RootDiv = styled('div')({
   display: 'flex',
@@ -29,13 +30,13 @@ const AdminTimeLock: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
 
+  useUserAuthenticationLogoutNavigate();
+
   useEffect(() => {
     const fetchTimeFlag = async () => {
       try {
         const initialFlag = await getTimeFlagByID(1);
-        console.log(initialFlag);
         setTimeFlag(initialFlag);
-        console.log(initialFlag);
       } catch (error) {
         setError('時間帯フラグの取得に失敗しました。');
         setOpen(true);
@@ -49,7 +50,6 @@ const AdminTimeLock: React.FC = () => {
     if (timeFlag) {
       try {
         const newFlag: TimeFlag = { id: timeFlag.id, time_flag: !timeFlag.time_flag };
-        console.log(newFlag);
         const updatedFlag = await updateTimeFlag(newFlag);
         setTimeFlag(updatedFlag); // Change this line
       } catch (error) {

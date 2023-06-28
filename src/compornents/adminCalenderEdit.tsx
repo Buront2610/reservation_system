@@ -9,6 +9,7 @@ import { getReservationByID, getUserById, getAllUsers ,addReservation, deleteRes
 import { hi } from 'date-fns/locale';
 import { getExcludes, addExclude, deleteExclude } from './API';
 import { Exclude } from './types';
+import { useUserAuthenticationLogoutNavigate } from './useUserAuthLogoutNavigate';
 // Define dummy data
 
 
@@ -218,7 +219,8 @@ const Calendar: FC<{ excludedDates: Exclude[];  reloadExcludes: () => void }> = 
 }
 export default function AdminExcludeDaysEditPage() {
     const [excludedDates, setExcludedDates] = useState<Exclude[] | null>(null);
-  
+    useUserAuthenticationLogoutNavigate();
+    
     const fetchExcludeData = async () => {
       try {
         const excludes = await getExcludes();

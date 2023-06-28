@@ -23,6 +23,7 @@ import {
 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { UseAuth } from './authContext';
+import { useUserAuthenticationLogoutNavigate } from './useUserAuthLogoutNavigate';
 // CSVReaderをインポート
 
 const GREY = '#CCC';
@@ -126,14 +127,7 @@ export default function TestAdminManage() {
         DEFAULT_REMOVE_HOVER_COLOR
     );
 
-    const navigate = useNavigate();
-    const { user } = UseAuth();
-
-    useEffect(() => {
-      if(!user) {
-        navigate('/login');
-      }
-    }, [user, navigate]);
+    useUserAuthenticationLogoutNavigate();
     const handleCSVImport = async (results: {data: string[][], errors: any[], meta: any[]}) => {
         setImporting(true);
         console.log('result:',results)

@@ -7,6 +7,7 @@ import { getReservationByID, getUserById, getAllUsers ,addReservation, deleteRes
 import { hi } from 'date-fns/locale';
 import { UseAuth } from './authContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useUserAuthenticationLogoutNavigate } from './useUserAuthLogoutNavigate';
 
 // Define dummy data
 
@@ -286,14 +287,10 @@ const Calendar: FC<{ userReservations: Reservation[]; Employees:User[]; reloadRe
 export default function ReservationPage() {    
     const [userReservation, setUserReservation] = useState<Reservation[] | null>(null);
     const [Employees, setEmployees] = useState<User[]>([]);
-    const navigate = useNavigate();
+ 
     const { user } = UseAuth();
 
-    useEffect(() => {
-      if(!user) {
-        navigate('/login');
-      }
-    }, [user, navigate]);
+    useUserAuthenticationLogoutNavigate();
 
     const fetchUserData = async () => {
         if (user) {

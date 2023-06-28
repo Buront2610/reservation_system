@@ -6,7 +6,7 @@ import { Box, Grid, Tab, Tabs, Select,SelectChangeEvent, MenuItem} from '@mui/ma
 import { DataGrid, GridEditCellProps } from '@mui/x-data-grid';
 import { getBento, addBento, updateBento, deleteBento, getWorkplaces, addWorkplace, updateWorkplace, deleteWorkplace } from './API';
 import Checkbox from '@mui/material/Checkbox';
-
+import { useUserAuthenticationLogoutNavigate } from './useUserAuthLogoutNavigate';
 
 export default function AdminBentoAndWorkplaceManagePage() {
     const [bento, setBento] = useState<Bento[]>([]);
@@ -19,6 +19,8 @@ export default function AdminBentoAndWorkplaceManagePage() {
     const [selectedRow, setSelectedRow] = useState<Partial<Bento> | undefined>();
 
     const [selectedValue, setSelectedValue] = useState('false');
+
+    useUserAuthenticationLogoutNavigate();
 
 
 
