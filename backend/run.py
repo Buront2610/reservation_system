@@ -4,6 +4,7 @@ Flaskアプリケーションのエントリーポイント
 from app import create_app
 from app.functions import schedule_secret_key_regeneration, set_secret_key_env
 import os
+from waitress import serve
 
 app = create_app()
 
@@ -18,5 +19,6 @@ if __name__ == "__main__":
 
      # シークレットキーの定期再生成をスケジューリング
      # schedule_secret_key_regeneration()
-     app.run(host="192.168.20.10", debug=False)
+     serve(app, host="0.0.0.0", port=5000)
+     # app.run(host="192.168.20.10", debug=False)
 
