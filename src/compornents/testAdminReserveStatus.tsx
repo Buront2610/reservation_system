@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DataGrid ,GridValueGetterParams,jaJP, GridToolbar} from '@mui/x-data-grid';
+import { DataGrid ,GridValueGetterParams,jaJP, GridToolbar, GridToolbarExport} from '@mui/x-data-grid';
 import { User, Workplace, Statistics, Reservation } from './types';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -31,6 +31,18 @@ export default function TestAdminOrderSummaryPage() {
     const handleChange = (event: SelectChangeEvent<number>) => {
         setSelectedYear(event.target.value as number);
     };
+    const gridToolbarExport=()=>{
+        return(
+        <GridToolbarExport
+            csvOptions={{
+              fileName: 'customerDataBase',
+              utf8WithBom: true,
+            }}
+          />
+        )
+    }
+
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -96,7 +108,7 @@ export default function TestAdminOrderSummaryPage() {
               ? <div>Loading...</div>
               : <DataGrid rows={employeeSummaries} columns={columns}
                           slots={{
-                            toolbar: GridToolbar,
+                            toolbar: gridToolbarExport,
                           }}
                           localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}  />}
           </div>

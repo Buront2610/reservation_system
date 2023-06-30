@@ -41,11 +41,11 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
   };
 
   const onClickLogin = async () => {
-    if(username !== null && auth !== null && password !== "") {
+    if(username !== null && username !== "" && auth !== null && password !== "") {
       try {
         await auth.loginUser(username, password);
         console.log(auth)        
-
+  
         if(auth.user?.role === 'admin') {
           navigate("/adminReservationEdit");
         } else if(auth.user?.role === 'user') {
@@ -60,8 +60,10 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
       }
     } else {
       setError("IDとパスワードを入力してください。");
+      alert("IDとパスワードを入力してください。");
     }
   };
+  
   
   return (
     <Box

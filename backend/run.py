@@ -19,6 +19,6 @@ if __name__ == "__main__":
 
      # シークレットキーの定期再生成をスケジューリング
      # schedule_secret_key_regeneration()
-     serve(app, host="0.0.0.0", port=5000)
-     # app.run(host="192.168.20.10", debug=False)
+     # serve(app, host="0.0.0.0", port=5000)
+     app.run(host="192.168.20.10", debug=False, port=5000)
 
