@@ -39,21 +39,21 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
     width: "400px",
     variant: "outlined",
   };
-
   const onClickLogin = async () => {
     if(username !== null && username !== "" && auth !== null && password !== "") {
       try {
-        await auth.loginUser(username, password);
-        console.log(auth)        
-  
-        if(auth.user?.role === 'admin') {
-          navigate("/adminReservationEdit");
-        } else if(auth.user?.role === 'user') {
-          navigate("/userReservation");
-        } else {
-          throw new Error("Invalid role");
+        const user = await auth.loginUser(username, password); // receive the user info
+        if(user) { // check if user is not null
+          console.log('foundUser', user);
+          if(user.role === 'admin') {
+            navigate("/lock");
+          } else if(user.role === 'user') {
+            navigate("/userReservation");
+          } else {
+            alert("Invalid role"); 
+            throw new Error("Invalid role");
+          }
         }
-        
       } catch (error: any) {
         setError(error.message);
         console.log(error);
@@ -63,6 +63,8 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
       alert("IDとパスワードを入力してください。");
     }
   };
+  
+  
   
   
   return (

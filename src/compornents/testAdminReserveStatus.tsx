@@ -76,17 +76,30 @@ export default function TestAdminOrderSummaryPage() {
     const columns = [
         { field: 'id', headerName: '社員ID', width: 70 },
         { field: 'name', headerName: '社員名', width: 130 },
-        ...Array(12).fill(null).map((_, month) => ({
-            field: `${month + 1}月`,
-            headerName: `${month + 1}月`,
-            width: 200,
-            valueGetter: (params: GridValueGetterParams) => {
-                const summary: EmployeeSummary = params.row;
-                const monthlySummary = summary.monthlySummary[month];
-                return monthlySummary ? `${monthlySummary.orderCount} 注文, 合計金額${monthlySummary.totalAmount} ` : 'データなし';
+        ...Array.from({ length: 12 }, (_, month) => [
+            {
+                field: `${month + 1}月注文数`,
+                headerName: `${month + 1}月注文数`,
+                width: 200,
+                valueGetter: (params: GridValueGetterParams) => {
+                    const summary: EmployeeSummary = params.row;
+                    const monthlySummary = summary.monthlySummary[month];
+                    return monthlySummary ? `${monthlySummary.orderCount} ` : 'データなし';
+                }
+            },
+            {
+                field: `${month + 1}月合計金額`,
+                headerName: `${month + 1}月合計金額`,
+                width: 200,
+                valueGetter: (params: GridValueGetterParams) => {
+                    const summary: EmployeeSummary = params.row;
+                    const monthlySummary = summary.monthlySummary[month];
+                    return monthlySummary ? `${monthlySummary.totalAmount}` : 'データなし';
+                }
             }
-        }))
+        ]).flat()
     ];
+
 
     return (
         <div>

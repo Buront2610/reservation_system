@@ -14,17 +14,27 @@ const API_BASE_URL = 'http://192.168.20.10:5000/api';
 
 export async function login(id: string, password: string): Promise<Login | null> {
     try {
-        const response = await axios.post(`${API_BASE_URL}/login`, { id, password });
+      console.log('Sending login request', id, password);
+      const response = await axios.post(`${API_BASE_URL}/login`, { id, password });
+  
+      console.log('Received response', response);
+  
+      if (response.data && response.data.id && response.data.token && response.data.role) {
         return {
-            id: response.data.id,
-            token: response.data.token,
-            role: response.data.role,
+          id: response.data.id,
+          token: response.data.token,
+          role: response.data.role,
         };
-    } catch (error) {
-        console.error(error);
+      } else {
+        console.error('Invalid response data', response.data);
         return null;
+      }
+    } catch (error) {
+      console.error('Login request failed', error);
+      return null;
     }
-}
+  }
+  
 
 export async function getWorkplaces(): Promise<Workplace[]> {
     

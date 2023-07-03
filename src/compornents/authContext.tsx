@@ -2,12 +2,14 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { login } from "./API";
 import { Login } from "./types";
 import { useNavigate } from "react-router-dom";
+import { set } from "date-fns";
 
 interface AuthContextProps {
   user: Login | null; 
-  loginUser: (id: string, password: string) => Promise<void>;
+  loginUser: (id: string, password: string) => Promise<Login | null>; // Changed from Promise<void> to Promise<Login | null>
   logout: () => void;
 }
+
 
 export const AuthContext = createContext<AuthContextProps | null>(null);
 
@@ -24,6 +26,7 @@ interface AuthProviderProps {
 }
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<Login | null>(() => {
     const userFromLocalStorage = localStorage.getItem('user');
     const loginTimeStamp = localStorage.getItem('loginTimeStamp');
@@ -46,17 +49,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   });
 
-  const loginUser = async (id: string, password: string): Promise<void> => {
+  const loginUser = async (id: string, password: string): Promise<Login | null> => {
+  if(id !== "" || password !== "") {
     const foundUser = await login(id, password);
 
     if (foundUser) {
       setUser(foundUser);
       localStorage.setItem('user', JSON.stringify(foundUser));
       localStorage.setItem('loginTimeStamp', JSON.stringify(new Date().getTime()));
+      return foundUser; // return the foundUser
     } else {
+      alert("IDまたはパスワードが違います。");
       throw new Error('IDまたはパスワードが違います。');
     }
-  };
+  }
+
+  return null; // return null if id or password is empty
+};
 
   const logout = () => {
     setUser(null);

@@ -9,6 +9,7 @@ from flask import Flask, current_app, request, jsonify,Blueprint,Response
 from typing import Union, Tuple
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, extract
+from sqlalchemy.exc import NoResultFound
 from app import db
 from app.models import Workplace, Bento, Reservation, User, Exclude,TimeFlag
 from app.functions import check_password, hash_password,generate_token
@@ -344,13 +345,22 @@ class ReservationService:
         quantity = data.get('quantity')
         remarks = data.get('remarks')
 
+        # Get the current price of the bento
+        try:
+            bento = db.session.query(Bento).filter_by(id=bento_id).one()
+            price_at_order = bento.price
+        except NoResultFound:
+            current_app.logger.error(f'Bento with id {bento_id} not found.')
+            return None
+
         try:
             reservation = Reservation(
                 user_id=user_id,
                 bento_id=bento_id,
                 reservation_date=reservation_date,
                 quantity=quantity,
-                remarks=remarks
+                remarks=remarks,
+                price_at_order=price_at_order
             )
             db.session.add(reservation)
             db.session.commit()
@@ -359,8 +369,6 @@ class ReservationService:
             current_app.logger.error(f'Error while creating reservation: {e}\n{traceback.format_exc()}')
             return None
 
-
-    
     @classmethod
     def update_reservation(cls, reservation_id, data):
         reservation = db.session.get(Reservation, reservation_id)
@@ -376,11 +384,20 @@ class ReservationService:
         quantity = data.get('quantity')
         remarks = data.get('remarks')
 
+        # Get the current price of the bento
+        try:
+            bento = db.session.query(Bento).filter_by(id=bento_id).one()
+            price_at_order = bento.price
+        except NoResultFound:
+            current_app.logger.error(f'Bento with id {bento_id} not found.')
+            return None
+
         if user_id is not None:
             reservation.user_id = user_id
         
         if bento_id is not None:
             reservation.bento_id = bento_id
+            reservation.price_at_order = price_at_order
         
         if reservation_date is not None:
             reservation.reservation_date = reservation_date
@@ -681,10 +698,9 @@ def get_statistics(year: int, month: int) -> Tuple[Response, int]:
         group_by(Workplace.name).all()
 
     # 各勤務場所の注文金額
-    location_order_amounts = db.session.query(Workplace.name, func.sum(Bento.price * Reservation.quantity)).\
+    location_order_amounts = db.session.query(Workplace.name, func.sum(Reservation.price_at_order * Reservation.quantity)).\
         join(User, Workplace.id == User.workplace_id).\
-        join(Reservation, User.employee_number == Reservation.user_id).\
-        join(Bento, Reservation.bento_id == Bento.id)
+        join(Reservation, User.employee_number == Reservation.user_id)
     location_order_amounts = filter_by_month_and_year(location_order_amounts, month, year).\
         group_by(Workplace.name).all()
 
@@ -695,9 +711,8 @@ def get_statistics(year: int, month: int) -> Tuple[Response, int]:
         group_by(User.employee_number).all()
 
     # 社員ごとの月次注文金額
-    employee_monthly_order_amounts = db.session.query(User.employee_number, User.name, func.sum(Bento.price * Reservation.quantity)).\
-        join(Reservation, User.employee_number == Reservation.user_id).\
-        join(Bento, Reservation.bento_id == Bento.id)
+    employee_monthly_order_amounts = db.session.query(User.employee_number, User.name, func.sum(Reservation.price_at_order * Reservation.quantity)).\
+        join(Reservation, User.employee_number == Reservation.user_id)
     employee_monthly_order_amounts = filter_by_month_and_year(employee_monthly_order_amounts, month, year).\
         group_by(User.employee_number).all()
 
@@ -719,6 +734,7 @@ def get_statistics(year: int, month: int) -> Tuple[Response, int]:
     current_app.logger.info(result)
 
     return jsonify(result), 200
+
 
 
 
