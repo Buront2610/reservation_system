@@ -30,6 +30,7 @@ export interface Reservation {
     id: number;
     user_id: string;
     bento_id: number;
+    price_at_order: number;
     reservation_date: string;
     quantity: number;
     remarks: string;

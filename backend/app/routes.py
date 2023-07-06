@@ -658,8 +658,10 @@ def add_reservation()-> Tuple[Response, int]:
 
     reservation = ReservationService.create_reservation(data)
 
+    if reservation is None:
+        return jsonify({'error': 'Reservation could not be created'}), 400
+
     return jsonify(reservation.to_dict()), 201
-    
 
 # 既存の予約情報を更新
 @bp.route('/reservations/<int:id>', methods=['PUT'])

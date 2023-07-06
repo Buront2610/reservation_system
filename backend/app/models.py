@@ -60,7 +60,7 @@ class Reservation(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.String(10), db.ForeignKey('user.employee_number'), nullable=False)
     bento_id = db.Column(db.Integer, db.ForeignKey('bento.id'), nullable=False)
-    price_at_order = db.Column(db.Integer, nullable=False)  # 追加: 注文時の価格
+    price_at_order = db.Column(db.Integer, nullable=True)  # 追加: 注文時の価格
     reservation_date = db.Column(db.Date, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     remarks = db.Column(db.String(100), nullable=True)

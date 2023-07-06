@@ -50,7 +50,7 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
           } else if(user.role === 'user') {
             navigate("/userReservation");
           } else {
-            alert("Invalid role"); 
+            alert("ログインに失敗しました"); 
             throw new Error("Invalid role");
           }
         }
