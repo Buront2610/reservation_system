@@ -8,7 +8,7 @@ Expand-Archive -Path C:\release.zip -DestinationPath C:\release
 $env:RESERVATION_SYSTEM_PATH="C:\release\build"
 
 # Generate the nginx configuration
-$template = Get-Content -Path C:\nginx.conf.template -Raw
+$template = Get-Content -Path C:\release\nginx.conf.template -Raw
 $expanded = $ExecutionContext.InvokeCommand.ExpandString($template)
 $expanded | Set-Content -Path C:\nginx\conf\nginx.conf
 
