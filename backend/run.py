@@ -18,7 +18,8 @@ if __name__ == "__main__":
           app.secret_key = os.environ.get('SECRET_KEY')
 
      # シークレットキーの定期再生成をスケジューリング
-     # schedule_secret_key_regeneration()
-     # serve(app, host="0.0.0.0", port=5000)
-     app.run(host="192.168.20.10", debug=False, port=5000)
+     schedule_secret_key_regeneration()
+     serve(app, host="0.0.0.0", port=5000)
+     #テスト用サーバ設定
+     # app.run(host="192.168.20.10", debug=False, port=5000)
 

@@ -90,18 +90,17 @@ class UserService:
 
         return True
 
-    
     @staticmethod
     def _validate_user_data_for_creation(data):
         # Check if the required fields are present
-        required_fields = ['employee_number','password', 'role', 'name', 'email_address',]
+        required_fields = ['employee_number','password', 'role', 'name']
         for field in required_fields:
             if field not in data:
                 raise ValueError(f"Missing required field: {field}")
 
-        # Check if the email address is in the correct format
+        # Check if the email address is in the correct format, if it is present
         email_address = data.get('email_address')
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", email_address):
+        if email_address and not re.match(r"[^@]+@[^@]+\.[^@]+", email_address):
             raise ValueError("Invalid email address format")
 
         # Check if the password meets minimum security requirements
@@ -120,7 +119,7 @@ class UserService:
     @staticmethod
     def _validate_user_data_for_update(data):
         # Check if the fields that are present are valid
-        if 'email_address' in data and not re.match(r"[^@]+@[^@]+\.[^@]+", data['email_address']):
+        if 'email_address' in data and data['email_address'] and not re.match(r"[^@]+@[^@]+\.[^@]+", data['email_address']):
             raise ValueError("Invalid email address format")
             
         if 'password' in data and len(data['password']) < 4:
