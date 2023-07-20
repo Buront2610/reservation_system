@@ -16,7 +16,7 @@ if errorlevel 1 (
     echo Pip not found, please install Pip first.
     exit /b 1
 )
-pip freeze | findstr /i /c:"flask" >nul 2>nul || pip install -r C:\release\backend\requirement.txt
+pip freeze | findstr /i /c:"flask" >nul 2>nul || pip install -r C:\release\backend\requirements.txt
 
 :: Start Flask application with Waitress
 :: This assumes that you have a Python script to start your Flask application with Waitress
