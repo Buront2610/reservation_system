@@ -1,18 +1,33 @@
-server {
-    listen       5555;
-    server_name  reservation-bento-system.com;
+worker_processes  1;
 
-    location / {
-        root   ${RESERVATION_SYSTEM_PATH};
-        index  index.html index.htm;
-        try_files $uri /index.html;
-    }
+events {
+    worker_connections  1024;
+}
 
-    location /api {
-        proxy_pass http://localhost:5000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+
+    keepalive_timeout  65;
+
+    server {
+        listen       5555;
+        server_name  reservation-bento-system.com;
+
+        location / {
+            root   ${RESERVATION_SYSTEM_PATH}\\build;
+            index  index.html index.htm;
+            try_files $uri /index.html;
+        }
+
+        location /api {
+            proxy_pass http://localhost:5000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
     }
 }
