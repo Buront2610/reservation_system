@@ -2,7 +2,7 @@
 setlocal
 
 :: Download the latest release file from GitHub
-powershell -Command "Invoke-WebRequest -Uri (Invoke-RestMethod -Uri 'https://api.github.com/repos/Buront2610/reservation_system/releases/tag/pre').assets[0].browser_download_url -OutFile C:\release.zip"
+powershell -Command "Invoke-WebRequest -Uri (Invoke-RestMethod -Uri 'https://api.github.com/repos/Buront2610/reservation_system/releases/latest').assets[0].browser_download_url -OutFile C:\release.zip"
 
 :: Unzip the release file
 powershell -Command "Expand-Archive -Path C:\release.zip -DestinationPath C:\release"
