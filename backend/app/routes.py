@@ -508,6 +508,12 @@ def login() -> Tuple[Response, int]:
     
 #以下にAPIの実装を行う
 
+#初回起動時管理者登録用メソッド
+@bp.route('/setup', methods=['POST'])
+def admin_setup() -> Tuple[Response, int]:
+
+    return jsonify({'message': '管理者登録が完了しました'}), 200
+
 ##ユーザに対するCRUD操作
 @bp.route("/users", methods=["GET"])
 def get_users() -> Tuple[Response, int]:
