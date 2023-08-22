@@ -16,12 +16,12 @@ if errorlevel 1 (
     echo Pip not found, please install Pip first.
     exit /b 1
 )
-pip freeze | findstr /i /c:"flask" >nul 2>nul || pip install -r C:\release\backend\requirements.txt
+pip freeze | findstr /i /c:"flask" >nul 2>nul || pip install -r C:\\release\\backend\\requirements.txt
 
 :: Start Flask application with Waitress
 :: This assumes that you have a Python script to start your Flask application with Waitress
-:: Replace 'C:\release\backend\start_script.py' with the actual path to your script
-start python C:\release\backend\start_script.py
+:: Replace 'C:\\release\\backend\\start_script.py' with the actual path to your script
+start python C:\\release\\backend\\start_script.py
 
 :: Start Flask application with Waitress
 :: This assumes that 'run:app' points to your Flask application
@@ -29,3 +29,15 @@ start python C:\release\backend\start_script.py
 start /b waitress-serve --listen=127.0.0.1:5000 run:app
 
 exit /b 0
+
+:: Set Flask environment variables
+set FLASK_APP=run.py
+set FLASK_ENV=production
+
+:: Initialize and migrate database
+flask db init
+flask db migrate
+flask db upgrade
+
+:: Setup the admin account
+python ./backend/create_admin.py
