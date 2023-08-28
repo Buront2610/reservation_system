@@ -510,9 +510,25 @@ def login() -> Tuple[Response, int]:
 
 #初回起動時管理者登録用メソッド
 @bp.route('/setup', methods=['POST'])
-def admin_setup() -> Tuple[Response, int]:
+def setup_admin():
+    data = request.get_json()
+    current_app.logger.info(f"Received data: {data}")
+    username = data.get('username')
+    password = data.get('password')
 
-    return jsonify({'message': '管理者登録が完了しました'}), 200
+    # Check if an admin already exists
+    admin_count = User.query.filter_by(role='admin').count()
+    if admin_count > 0:
+        return jsonify({'success': False, 'message': 'Admin account already exists.'}), 400
+
+    # Create the new admin user
+    hashed_password = hash_password(password)
+    new_admin = User(username=username, password=hashed_password, role='admin')
+    db.session.add(new_admin)
+    db.session.commit()
+    
+    current_app.logger.info(f"Admin account created successfully.")
+    return jsonify({'success': True, 'message': 'Admin account created successfully.'}), 200
 
 ##ユーザに対するCRUD操作
 @bp.route("/users", methods=["GET"])

@@ -35,8 +35,20 @@ export async function login(id: string, password: string): Promise<Login | null>
       console.error('Login request failed', error);
       return null;
     }
-  }
+}
   
+
+export async function administratorSetup(id: string, password: string): Promise<Login | null> {
+    try {
+        console.log('Sending adminstratorSetup request', id, password);
+        const response = await axios.post(`${API_BASE_URL}/adminsetup`, { id, password });
+    }
+    catch (error) {
+        console.error('adminstratorSetup request failed', error);
+        return null;
+    }
+    return await login(id, password);
+}
 
 export async function getWorkplaces(): Promise<Workplace[]> {
     
