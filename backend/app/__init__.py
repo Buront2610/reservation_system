@@ -56,18 +56,18 @@ def create_app(config_class=Config):
 
     return app
 
-def setup_admin_account():
-    from .models import User
-    existing_users = User.query.all()
-    if len(existing_users) == 0:
-        #ユーザがいない場合、管理者アカウントを作成
-        admin = User(username='admin', email='admin@example.com', role='admin')
-        admin.set_password('password')
-        db.session.add(admin)
-        db.session.commit()
-        print('Admin account created')
-        logging.info('Admin account created')
+# def setup_admin_account():
+#     from .models import User
+#     existing_users = User.query.all()
+#     if len(existing_users) == 0:
+#         #ユーザがいない場合、管理者アカウントを作成
+#         admin = User(username='admin', email='admin@example.com', role='admin')
+#         admin.set_password('password')
+#         db.session.add(admin)
+#         db.session.commit()
+#         print('Admin account created')
+#         logging.info('Admin account created')
 
-@app.before_first_request
-def before_first_request():
-    setup_admin_account()
+# @app.before_first_request
+# def before_first_request():
+#     setup_admin_account()

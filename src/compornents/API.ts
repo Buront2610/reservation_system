@@ -16,39 +16,39 @@ const API_BASE_URL = 'http://localhost:5555/api';
 
 export async function login(id: string, password: string): Promise<Login | null> {
     try {
-      console.log('Sending login request', id, password);
-      const response = await axios.post(`${API_BASE_URL}/login`, { id, password });
+        console.log('Sending login request', id, password);
+        const response = await axios.post(`${API_BASE_URL}/login`, { id, password });
   
-      console.log('Received response', response);
+        console.log('Received response', response);
   
-      if (response.data && response.data.id && response.data.token && response.data.role) {
-        return {
-          id: response.data.id,
-          token: response.data.token,
-          role: response.data.role,
-        };
-      } else {
-        console.error('Invalid response data', response.data);
-        return null;
-      }
+        if (response.data && response.data.id && response.data.token && response.data.role) {
+            return {
+                id: response.data.id,
+                token: response.data.token,
+            role: response.data.role,
+            };
+        } else {
+            console.error('Invalid response data', response.data);
+            return null;
+        }
     } catch (error) {
-      console.error('Login request failed', error);
-      return null;
+        console.error('Login request failed', error);
+        return null;
     }
 }
   
 
 export async function administratorSetup(id: string, password: string): Promise<Login | null> {
     try {
-      console.log('Sending administratorSetup request', id, password);
-      const response = await axios.post(`${API_BASE_URL}/adminsetup`, { id, password });
-      
-      // Assuming that the API returns the Login object in response.data
-      return response.data;
+        console.log('Sending administratorSetup request', id, password);
+        const response = await axios.post(`${API_BASE_URL}/adminsetup`, { id, password });
+        
+        // Assuming that the API returns the Login object in response.data
+        return response.data;
     }
     catch (error) {
-      console.error('administratorSetup request failed', error);
-      return null;
+        console.error('administratorSetup request failed', error);
+        return null;
     }
   }
 export async function getWorkplaces(): Promise<Workplace[]> {
