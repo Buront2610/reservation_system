@@ -22,8 +22,10 @@ export default function AdminSetup() {
                 const user = await administratorSetup(username, password); // receive the user info
                 if(user) { // check if user is not null
                     console.log('SetupFirstAdminstrator We welcome your return', user);
-                    await auth.loginUser(username, password);
-                    navigate("/lock");
+                    const set = await auth.loginUser(username, password);
+                    if(set) {
+                        navigate("/lock");
+                    }
                 }
             } catch (error: any) {
                 setError(error.message);
