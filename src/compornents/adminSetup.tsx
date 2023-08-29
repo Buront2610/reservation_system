@@ -16,20 +16,14 @@ export default function AdminSetup() {
     const navigate = useNavigate();
     const auth  = UseAuth();
 
-    const onClickLogin = async () => {
+    const onClickSetupAdmin = async () => {
         if(username !== null && username !== "" && auth !== null && password !== "") {
             try {
-                const user = await auth.loginUser(username, password); // receive the user info
+                const user = await administratorSetup(username, password); // receive the user info
                 if(user) { // check if user is not null
-                    console.log('foundUser', user);
-                    if(user.role === 'admin') {
-                        navigate("/lock");
-                    } else if(user.role === 'user') {
-                        navigate("/userReservation");
-                    } else {
-                        alert("ログインに失敗しました");
-                        throw new Error("Invalid role");
-                    }
+                    console.log('SetupFirstAdminstrator We welcome your return', user);
+                    await auth.loginUser(username, password);
+                    navigate("/lock");
                 }
             } catch (error: any) {
                 setError(error.message);
@@ -63,8 +57,8 @@ export default function AdminSetup() {
                     placeholder="社員番号"
                     margin="normal"
                     onChange={(e) => {
-                      const newVal = e.target.value;
-                      setUsername(newVal);
+                        const newVal = e.target.value;
+                        setUsername(newVal);
                     }} 
                 />
                 <TextField
@@ -75,8 +69,8 @@ export default function AdminSetup() {
                     placeholder="Password"
                     margin="normal"
                     onChange={(e) => {
-                      const newVal = e.target.value;
-                      setPassword(newVal);
+                        const newVal = e.target.value;
+                        setPassword(newVal);
                     }}                />
                 </div>
             </CardContent>
@@ -85,9 +79,9 @@ export default function AdminSetup() {
                     variant="contained"
                     size="large"
                     color="secondary"
-                    onClick={onClickLogin}
+                    onClick={onClickSetupAdmin}
                 >
-                ログイン
+                管理者登録
                 </Button>
             </CardActions>
         </Card>
