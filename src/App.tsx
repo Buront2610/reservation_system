@@ -3,13 +3,16 @@ import { AuthProvider, UseAuth } from './compornents/authContext'; // Fixed typo
 import RouterComponent from './compornents/router'; // Fixed typo in folder name
 import axios from 'axios';
 
+const API_BASE_URL = 'http://localhost:5555/api';
+
+
 const App: React.FC = () => {
   const { updateInitialSetupState } = UseAuth(); // Get the updateInitialSetupState function from the AuthContext
 
   useEffect(() => {
     const checkInitialSetup = async () => {
       try {
-        const response = await axios.get('/api/check_initial_setup');
+        const response = await axios.get(`${API_BASE_URL}/api/check_initial_setup`);
         
         // Update the initial setup state based on API response
         if (response.data.initialSetupRequired) {

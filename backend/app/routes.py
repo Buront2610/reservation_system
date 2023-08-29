@@ -23,6 +23,14 @@ bp = Blueprint('api', __name__)
 
 
 
+# API endpoint to check if initial setup is required
+@bp.route('/api/check_initial_setup', methods=['GET'])
+def check_initial_setup():
+    if User.query.count() == 0:
+        return jsonify({'initialSetupRequired': True}), 200
+    else:
+        return jsonify({'initialSetupRequired': False}), 200
+
 
 # ユーザー操作用のエンドポイント
 class UserService:
