@@ -40,16 +40,17 @@ export async function login(id: string, password: string): Promise<Login | null>
 
 export async function administratorSetup(id: string, password: string): Promise<Login | null> {
     try {
-        console.log('Sending adminstratorSetup request', id, password);
-        const response = await axios.post(`${API_BASE_URL}/adminsetup`, { id, password });
+      console.log('Sending administratorSetup request', id, password);
+      const response = await axios.post(`${API_BASE_URL}/adminsetup`, { id, password });
+      
+      // Assuming that the API returns the Login object in response.data
+      return response.data;
     }
     catch (error) {
-        console.error('adminstratorSetup request failed', error);
-        return null;
+      console.error('administratorSetup request failed', error);
+      return null;
     }
-    return await login(id, password);
-}
-
+  }
 export async function getWorkplaces(): Promise<Workplace[]> {
     
     const response = await axios.get<Workplace[]>(`${API_BASE_URL}/workplaces`);
