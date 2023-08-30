@@ -5,7 +5,7 @@ types.tsに定義されている型を使用すること
 */
 import axios from 'axios';
 import { Workplace, Bento, Reservation, User, Login, TimeFlag,Statistics, Exclude } from './types';
-import { UseAuth } from './authContext';
+import { useAuth } from './authContext';
 import { th } from 'date-fns/locale';
 
 // const API_BASE_URL = 'http://192.168.20.10:5000/api';

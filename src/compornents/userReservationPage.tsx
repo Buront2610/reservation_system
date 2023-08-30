@@ -5,7 +5,7 @@ import  CalenderHeader  from './calendarHeader';
 import CalendarBody from './calendarBody';
 import { getReservationByID, getUserById, getAllUsers ,addReservation, deleteReservation, getStatistics , getTimeFlagByID} from './API';
 import { hi } from 'date-fns/locale';
-import { UseAuth } from './authContext';
+import { useAuth } from './authContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUserAuthenticationLogoutNavigate } from './useUserAuthLogoutNavigate';
 
@@ -288,7 +288,7 @@ export default function ReservationPage() {
     const [userReservation, setUserReservation] = useState<Reservation[] | null>(null);
     const [Employees, setEmployees] = useState<User[]>([]);
  
-    const { user } = UseAuth();
+    const { user } = useAuth();
 
     useUserAuthenticationLogoutNavigate();
 
@@ -315,7 +315,7 @@ export default function ReservationPage() {
     useEffect(() => {
         reloadReservations();
     }, []);
-    console.log(UseAuth())
+    console.log(useAuth())
 
     const PageHeader: FC<{username: string}> = ({username}) => (
       <Box marginBottom={2}>

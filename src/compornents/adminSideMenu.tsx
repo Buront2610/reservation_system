@@ -31,7 +31,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import { Link as RouterLink, useLocation, Outlet  } from 'react-router-dom';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { UseAuth } from './authContext';
+import { useAuth } from './authContext';
 
 import Login from './login';
 import { textAlign } from '@mui/system';
@@ -128,7 +128,7 @@ import { useUserAuthenticationLogoutNavigate } from './useUserAuthLogoutNavigate
       const Path = location.pathname;
       const theme = useTheme();
       const [open, setOpen] = React.useState(false);
-      const { logout } = UseAuth();
+      const { logout } = useAuth();
       useUserAuthenticationLogoutNavigate();
 
       const handleDrawerOpen = () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate} from 'react-router-dom';
-import { UseAuth } from './authContext';
+import { useAuth } from './authContext';
 import TestReservationPage from './testUserReserve';
 import TestReservationHistoryPage from './testUserReserveInfo';
 import TestAdminReservationPage from './testAdminReserveList';
@@ -20,7 +20,7 @@ import { AuthProvider } from './authContext';
 import AdminReservationManage from './adminReserveEdit';
 
 function RouterComponent() {
-  const { user, isInitialSetup } = UseAuth(); // Added isInitialSetup, assuming it is provided by UseAuth
+  const { user, isInitialSetup } = useAuth(); // Added isInitialSetup, assuming it is provided by UseAuth
 
   // Redirect to admin setup page if initial setup is required
   if (isInitialSetup) {

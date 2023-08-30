@@ -519,24 +519,48 @@ def login() -> Tuple[Response, int]:
 #初回起動時管理者登録用メソッド
 @bp.route('/setup', methods=['POST'])
 def setup_admin():
-    data = request.get_json()
-    current_app.logger.info(f"Received data: {data}")
-    username = data.get('username')
-    password = data.get('password')
-
-    # Check if an admin already exists
-    admin_count = User.query.filter_by(role='admin').count()
-    if admin_count > 0:
-        return jsonify({'success': False, 'message': 'Admin account already exists.'}), 400
-
-    # Create the new admin user
-    hashed_password = hash_password(password)
-    new_admin = User(username=username, password=hashed_password, role='admin')
-    db.session.add(new_admin)
-    db.session.commit()
+    """
+    Endpoint to set up an admin account.
+    """
+    try:
+        data = request.get_json()
+        
+        # Validate incoming data
+        if not data or 'username' not in data or 'password' not in data:
+            return jsonify({'success': False, 'message': 'Invalid data.'}), 400
+        
+        username = data['username']
+        password = data['password']
+        
+        # Check if an admin already exists
+        admin_count = User.query.filter_by(role='admin').count()
+        
+        if admin_count > 0:
+            return jsonify({'success': False, 'message': 'Admin account already exists.'}), 400
+        
+        # Hash the password
+        hashed_password = hash_password(password)
+        
+        # Create the new admin user
+        # Here, I'm hard-coding the values for non-nullable fields like employee_number, name, and workplace_id
+        new_admin = User(
+            username=username, 
+            password=hashed_password, 
+            role='admin',
+            employee_number="ADM0001",  # Hard-coded value
+            name="Administrator",       # Hard-coded value
+            workplace_id=1              # Hard-coded value, assuming a workplace with id=1 exists
+        )
+        
+        db.session.add(new_admin)
+        db.session.commit()
+        
+        current_app.logger.info(f"Admin account created successfully.")
+        return jsonify({'success': True, 'message': 'Admin account created successfully.'}), 200
     
-    current_app.logger.info(f"Admin account created successfully.")
-    return jsonify({'success': True, 'message': 'Admin account created successfully.'}), 200
+    except Exception as e:
+        current_app.logger.error(f"Error while creating admin account: {e}")
+        return jsonify({'success': False, 'message': 'An error occurred while creating the admin account.'}), 500
 
 ##ユーザに対するCRUD操作
 @bp.route("/users", methods=["GET"])

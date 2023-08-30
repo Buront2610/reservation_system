@@ -20,7 +20,7 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import LoginIcon from '@mui/icons-material/Login';
-import { UseAuth } from './authContext';
+import { useAuth } from './authContext';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HomeIcon from '@mui/icons-material/Home';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
@@ -127,7 +127,7 @@ import LockIcon from '@mui/icons-material/Lock';
       const Path = location.pathname;
       const theme = useTheme();
       const [open, setOpen] = React.useState(false);
-      const { logout } = UseAuth();
+      const { logout } = useAuth();
 
 
       const handleDrawerOpen = () => {
