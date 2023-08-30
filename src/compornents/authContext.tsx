@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return null;
     }
   });
-
+  
   const loginUser = async (id: string, password: string): Promise<Login | null> => {
     if (id !== "" && password !== "") {
       const foundUser = await login(id, password);
