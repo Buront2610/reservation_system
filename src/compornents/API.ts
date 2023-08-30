@@ -14,6 +14,22 @@ const API_BASE_URL = 'http://localhost:5555/api';
 
 
 
+export async function checkInitialSetup(){
+    const {updateInitialSetupState} = useAuth(); // Get the function from the AuthContext
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/check_initial_setup`);
+      
+      // Update the initial setup state based on API response
+      if (response.data.initialSetupRequired) {
+        updateInitialSetupState(true); // Use the function from the AuthContext
+        // Optionally, you can redirect to the admin setup page here.
+      } else {
+        updateInitialSetupState(false); // Use the function from the AuthContext
+      }
+    } catch (error) {
+      console.error('Failed to check initial setup:', error);
+    }
+}
 export async function login(id: string, password: string): Promise<Login | null> {
     try {
         console.log('Sending login request', id, password);

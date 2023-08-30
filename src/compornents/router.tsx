@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{ReactElement} from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate} from 'react-router-dom';
 import { useAuth } from './authContext';
 import TestReservationPage from './testUserReserve';
@@ -18,14 +18,32 @@ import AdminSideMenu from './adminSideMenu';
 import Login from './login';
 import { AuthProvider } from './authContext';
 import AdminReservationManage from './adminReserveEdit';
+import { checkInitialSetup } from './API';
+import AdminSetup from './adminSetup';
+
+
+interface PrivateRouteProps {
+  element: ReactElement;
+  path: string;
+}
+
+function PrivateRoute({ element, ...rest }: PrivateRouteProps) {
+  const { isInitialSetup } = useAuth();
+  return (
+    <Route
+      {...rest}
+      element={isInitialSetup ? element : <Navigate to="/setup_admin" />}
+    />
+  );
+}
+
 
 function RouterComponent() {
+  checkInitialSetup()
+
   const { user, isInitialSetup } = useAuth(); // Added isInitialSetup, assuming it is provided by UseAuth
 
-  // Redirect to admin setup page if initial setup is required
-  if (isInitialSetup) {
-    return <Navigate to="/setup_admin" />;
-  }
+  console.log("isInitialSetup: " + isInitialSetup);
 
 
   return (
@@ -33,6 +51,7 @@ function RouterComponent() {
         <AuthProvider>
             <Routes>
                 <Route path="/login" element={<Login />} />
+                <PrivateRoute path="/setup_admin" element={<AdminSetup />} />
                 {user ? (
                 user.role === 'admin' ? (
                     <Route path="/" element={<AdminSideMenu />}>

@@ -4,7 +4,7 @@ import {
     getWorkplaces, getBento, getUserById, getAllUsers, addReservation, 
     updateReservation, deleteReservation, createUser,getReservations, deleteUser,
 } from './API';
-import { UseAuth } from './authContext';
+import { useAuth } from './authContext';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { Box } from '@mui/system';

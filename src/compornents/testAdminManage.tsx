@@ -22,7 +22,7 @@ import {
 } from 'react-papaparse';
 
 import { useNavigate, useLocation } from 'react-router-dom';
-import { UseAuth } from './authContext';
+import { useAuth } from './authContext';
 import { useUserAuthenticationLogoutNavigate } from './useUserAuthLogoutNavigate';
 // CSVReaderをインポート
 

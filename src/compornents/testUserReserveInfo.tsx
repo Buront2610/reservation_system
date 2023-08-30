@@ -5,7 +5,7 @@ import  CalenderHeader  from './calendarHeader';
 import CalendarBody from './calendarBody';
 import { getReservationByID, getUserById, getAllUsers ,addReservation, deleteReservation, getStatistics , getTimeFlagByID} from './API';
 import { hi } from 'date-fns/locale';
-import { UseAuth } from './authContext';
+import { useAuth } from './authContext';
 // Define dummy data
 
 
@@ -300,6 +300,6 @@ export default function TestReservationHistoryPage() {
   useEffect(() => {
     reloadReservations();
   }, []);
-  console.log(UseAuth())
+  console.log(useAuth())
   return userReservation ? <Calendar userReservations={userReservation} reloadReservations={reloadReservations} /> : <div>Loading...</div>;
 }
