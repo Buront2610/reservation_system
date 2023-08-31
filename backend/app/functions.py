@@ -1,4 +1,5 @@
 import os
+import sys
 from typing import List
 from datetime import date, datetime, timedelta
 import secrets
@@ -41,6 +42,8 @@ def hash_password(password: str) -> bytes:
 
 # パスワードがハッシュ化されたパスワードと一致するか確認する関数
 def check_password(password: str, hashed_password: bytes) -> bool:
+    sys.stdout.write(f'password: {password}\n')
+    sys.stdout.write(f'hashed_password: {hashed_password}\n')
     return bcrypt.checkpw(password.encode(), hashed_password)
 
 

@@ -4,6 +4,7 @@
 各種CRUD操作を行うエンドポイントと、統計情報を取得するエンドポイントを用意 更新があれば随時追加
 """
 from importlib.abc import ResourceReader
+import time
 from venv import logger
 from flask import Flask, current_app, request, jsonify,Blueprint,Response
 from typing import Union, Tuple
@@ -16,6 +17,7 @@ from app.functions import check_password, hash_password,generate_token
 import traceback
 import re
 import datetime
+import sys
     
 from datetime import date
 
@@ -496,8 +498,11 @@ def login() -> Tuple[Response, int]:
     data = request.get_json()
     id = data.get('id')
     password = data.get('password')
+    logger.info(f"id: {id}, password: {password}")
+    sys.stdout.flush()
 
     if not password or not id:
+        logger.info(f"password: {password}, id: {id}")
         return jsonify({'error': 'IDとパスワードが必要です'}), 400
 
     user = User.query.filter_by(employee_number=id).first()
@@ -510,8 +515,11 @@ def login() -> Tuple[Response, int]:
     if check_password(password, user.password):
         # 認証に成功した場合、トークンを生成して返す
         token = generate_token(user)
+        logger.info(f"token: {token}")
         return jsonify({'id': user.id, 'token': token, 'role': user.role}), 200
     else:
+        logger.info(f"error: パスワードが間違っています")
+        sys.stdout.write("error: パスワードが間違っています")
         return jsonify({'error': 'パスワードが間違っています'}), 401
     
 #以下にAPIの実装を行う
@@ -524,12 +532,13 @@ def setup_admin():
     """
     try:
         data = request.get_json()
+        create_timeflag()
         
         # Validate incoming data
-        if not data or 'username' not in data or 'password' not in data:
+        if not data or 'id' not in data or 'password' not in data:
             return jsonify({'success': False, 'message': 'Invalid data.'}), 400
         
-        username = data['username']
+        employee_number = data['id']
         password = data['password']
         
         # Check if an admin already exists
@@ -541,26 +550,30 @@ def setup_admin():
         # Hash the password
         hashed_password = hash_password(password)
         
+        
         # Create the new admin user
         # Here, I'm hard-coding the values for non-nullable fields like employee_number, name, and workplace_id
         new_admin = User(
-            username=username, 
             password=hashed_password, 
             role='admin',
-            employee_number="ADM0001",  # Hard-coded value
+            employee_number= employee_number,  # Hard-coded value
             name="Administrator",       # Hard-coded value
             workplace_id=1              # Hard-coded value, assuming a workplace with id=1 exists
         )
-        
+        sys.stdout.write(f"new_admin: {new_admin}")
+        # timeflag = TimeFlag(False)
+        # db.session.add(timeflag)
+
         db.session.add(new_admin)
         db.session.commit()
         
         current_app.logger.info(f"Admin account created successfully.")
+
         return jsonify({'success': True, 'message': 'Admin account created successfully.'}), 200
     
     except Exception as e:
         current_app.logger.error(f"Error while creating admin account: {e}")
-        return jsonify({'success': False, 'message': 'An error occurred while creating the admin account.'}), 500
+        return jsonify({'Error': False, 'message': 'An error occurred while creating the admin account.'}), 500
 
 ##ユーザに対するCRUD操作
 @bp.route("/users", methods=["GET"])
@@ -846,7 +859,7 @@ def create_timeflag() -> Tuple[Response, int]:
     timeflag = data.get('timeflag')
     if not timeflag:
         return jsonify({'error': '未入力の必須情報があります。'}), 400
-    timeflag = TimeFlag(timeflag=timeflag)
+    timeflag = TimeFlag(timeflag=False)
     db.session.add(timeflag)
     db.session.commit()
     return jsonify(timeflag.to_dict()), 201

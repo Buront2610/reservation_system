@@ -9,13 +9,12 @@ import { useAuth } from './authContext';
 import { th } from 'date-fns/locale';
 
 // const API_BASE_URL = 'http://192.168.20.10:5000/api';
-const API_BASE_URL = 'http://localhost:5555/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 
 
 
-export async function checkInitialSetup(){
-    const {updateInitialSetupState} = useAuth(); // Get the function from the AuthContext
+export async function checkInitialSetup(updateInitialSetupState: Function){
     try {
       const response = await axios.get(`${API_BASE_URL}/api/check_initial_setup`);
       
@@ -41,7 +40,7 @@ export async function login(id: string, password: string): Promise<Login | null>
             return {
                 id: response.data.id,
                 token: response.data.token,
-            role: response.data.role,
+                role: response.data.role,
             };
         } else {
             console.error('Invalid response data', response.data);
@@ -57,7 +56,7 @@ export async function login(id: string, password: string): Promise<Login | null>
 export async function administratorSetup(id: string, password: string): Promise<Login | null> {
     try {
         console.log('Sending administratorSetup request', id, password);
-        const response = await axios.post(`${API_BASE_URL}/adminsetup`, { id, password });
+        const response = await axios.post(`${API_BASE_URL}/setup`, { id, password });
         
         // Assuming that the API returns the Login object in response.data
         return response.data;
@@ -66,7 +65,8 @@ export async function administratorSetup(id: string, password: string): Promise<
         console.error('administratorSetup request failed', error);
         return null;
     }
-  }
+}
+
 export async function getWorkplaces(): Promise<Workplace[]> {
     
     const response = await axios.get<Workplace[]>(`${API_BASE_URL}/workplaces`);
