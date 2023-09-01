@@ -99,18 +99,30 @@ export async function getBentoByID(id: number): Promise<Bento> {
 }
 
 export async function getBento(): Promise<Bento[]> {
-    const response = await axios.get<Bento[]>(`${API_BASE_URL}/bento`);
-    return response.data;
+    try{
+        const response = await axios.get<Bento[]>(`${API_BASE_URL}/bento`);
+        return response.data;
+    }catch(error){
+        console.error("Error in getBento:", error);
+        return [];
+    }
 }
 
-export async function getBentoByChooseFlag(): Promise<Bento> {
-    const response = await axios.get<Bento>(`${API_BASE_URL}/bento/choose`);
-    return response.data;
+export async function getBentoByChooseFlag(): Promise<Bento|null> {
+    try{
+        const response = await axios.get<Bento>(`${API_BASE_URL}/bento/choose`);
+        return response.data;
+    }catch(error){
+        console.error("Error in getBento:", error);
+        return null ;
+    }
 }
 
 export async function addBento(newBento: Partial<Bento>): Promise<Bento> {
-    const response = await axios.post<Bento>(`${API_BASE_URL}/bento`, newBento);
-    return response.data;
+    
+        const response = await axios.post<Bento>(`${API_BASE_URL}/bento`, newBento);
+        return response.data;
+
 }
 
 export async function updateBento(id: number, updatedBento: Partial<Bento>): Promise<Bento> {

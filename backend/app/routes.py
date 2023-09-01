@@ -28,7 +28,8 @@ bp = Blueprint('api', __name__)
 # API endpoint to check if initial setup is required
 @bp.route('/api/check_initial_setup', methods=['GET'])
 def check_initial_setup():
-    if User.query.count() == 0:
+    if User.query.filter_by(role='admin').count() == 0:
+        current_app.logger.info('Initial setup required')
         return jsonify({'initialSetupRequired': True}), 200
     else:
         return jsonify({'initialSetupRequired': False}), 200
@@ -543,8 +544,11 @@ def setup_admin():
         
         # Check if an admin already exists
         admin_count = User.query.filter_by(role='admin').count()
+        sys.stdout.write("count:{admin_count}")
+
         
         if admin_count > 0:
+            sys.stdout.write("count:{admin_count}")
             return jsonify({'success': False, 'message': 'Admin account already exists.'}), 400
         
         # Hash the password
@@ -658,16 +662,22 @@ def delete_workplace(workplace_id:int) -> Tuple[Response, int]:
 @bp.route("/bento", methods=["GET"])
 def get_bento() -> Tuple[Response, int]:
     bento = BentoService.get_all_bentos()
+    if bento is None:
+        return jsonify({"error": "データ未入力です"}), 404
     return jsonify([b.to_dict() for b in bento]),200
 
 @bp.route("/bento/<int:bento_id>", methods=["GET"])
 def get_bento_by_id(bento_id:int) -> Tuple[Response, int]:
     bento = BentoService.get_bento_by_id(bento_id)
+    if bento is None:
+        return jsonify({"error": "弁当が見つかりません"}), 404
     return jsonify(bento.to_dict()), 200
 
 @bp.route("/bento/choose", methods=["GET"])
 def get_bento_by_choose_flag() -> Tuple[Response, int]:
     bento = BentoService.get_bento_by_choose()
+    if bento is None:
+        return jsonify({"error": "弁当が見つかりません"}), 404
     return jsonify(bento.to_dict()), 200
 
 @bp.route("/bento", methods=["POST"])
@@ -756,34 +766,40 @@ def filter_by_month_and_year(query, month, year):
     return query.filter(extract("month", Reservation.reservation_date) == month,
                         extract("year", Reservation.reservation_date) == year)
 
+
 @bp.route("/statistics/<int:year>/<int:month>", methods=["GET"])
 def get_statistics(year: int, month: int) -> Tuple[Response, int]:
     # 各勤務場所の予約数
     location_order_counts = db.session.query(Workplace.name, func.count(Reservation.id)).\
         join(User, Workplace.id == User.workplace_id).\
-        join(Reservation, User.employee_number == Reservation.user_id)
+        join(Reservation, User.employee_number == Reservation.user_id).\
+        filter(User.role != 'admin')
     location_order_counts = filter_by_month_and_year(location_order_counts, month, year).\
         group_by(Workplace.name).all()
 
     # 各勤務場所の注文金額
     location_order_amounts = db.session.query(Workplace.name, func.sum(Reservation.price_at_order * Reservation.quantity)).\
         join(User, Workplace.id == User.workplace_id).\
-        join(Reservation, User.employee_number == Reservation.user_id)
+        join(Reservation, User.employee_number == Reservation.user_id).\
+        filter(User.role != 'admin')
     location_order_amounts = filter_by_month_and_year(location_order_amounts, month, year).\
         group_by(Workplace.name).all()
 
     # 社員ごとの月次予約数
     employee_monthly_order_counts = db.session.query(User.employee_number, User.name, func.count(Reservation.id)).\
-        join(Reservation, User.employee_number == Reservation.user_id)
+        join(Reservation, User.employee_number == Reservation.user_id).\
+        filter(User.role != 'admin')
     employee_monthly_order_counts = filter_by_month_and_year(employee_monthly_order_counts, month, year).\
         group_by(User.employee_number).all()
 
     # 社員ごとの月次注文金額
     employee_monthly_order_amounts = db.session.query(User.employee_number, User.name, func.sum(Reservation.price_at_order * Reservation.quantity)).\
-        join(Reservation, User.employee_number == Reservation.user_id)
+        join(Reservation, User.employee_number == Reservation.user_id).\
+        filter(User.role != 'admin')
     employee_monthly_order_amounts = filter_by_month_and_year(employee_monthly_order_amounts, month, year).\
         group_by(User.employee_number).all()
 
+    # Pagination
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
     reservations = Reservation.query.paginate(page=page, per_page=per_page, error_out=False)
@@ -855,14 +871,17 @@ def get_timeflag():
 
 @bp.route("/timeflag", methods=["POST"])
 def create_timeflag() -> Tuple[Response, int]:
-    data = request.get_json()
-    timeflag = data.get('timeflag')
-    if not timeflag:
-        return jsonify({'error': '未入力の必須情報があります。'}), 400
-    timeflag = TimeFlag(timeflag=False)
-    db.session.add(timeflag)
+    # data = request.get_json()
+    # timeflag = data.get('timeflag')
+    # if not timeflag:
+    #     return jsonify({'error': '未入力の必須情報があります。'}), 400
+    if TimeFlag.query.first() is not None:
+        return jsonify({'error': 'すでに時間フラグが存在します。'}), 400
+    time_flag = TimeFlag(time_flag=False)
+    db.session.add(time_flag)
     db.session.commit()
-    return jsonify(timeflag.to_dict()), 201
+    return jsonify(time_flag.to_dict()), 201
+
 
 @bp.route("/timeflag/<int:id>", methods=["GET"])
 def get_timeflag_by_id(id:int) -> Tuple[Response, int]:

@@ -35,8 +35,8 @@ export default function TestAdminOrderSummaryPage() {
         return(
         <GridToolbarExport
             csvOptions={{
-              fileName: 'customerDataBase',
-              utf8WithBom: true,
+                fileName: 'customerDataBase',
+                utf8WithBom: true,
             }}
           />
         )
