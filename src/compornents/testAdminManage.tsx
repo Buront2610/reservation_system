@@ -301,7 +301,7 @@ export default function TestAdminManage() {
                             </FormControl>
                         </Box>
                         <Box mb={2}>
-                            <Button type="submit" variant="contained" onclick ={downloadTemplate} color="primary">登録</Button>
+                            <Button type="submit" variant="contained" onClick ={downloadTemplate} color="primary">登録</Button>
                         </Box>
                     </form>
                     
@@ -321,8 +321,8 @@ export default function TestAdminManage() {
                         <li>7. 役割</li>
                     </ul>
                     <p>この順序に従ったCSVファイルをアップロードしてください。</p>
-                <Button variant="contained" color="secondary">CSVテンプレートをダウンロード</Button>   
-                            <CSVReader
+                    <Button variant="contained" color="secondary" onClick={downloadTemplate}>CSVテンプレートをダウンロード</Button>                            
+                    <CSVReader
                         onUploadAccepted={(results: any) => {
                             console.log('---------------------------');
                             console.log(results);
