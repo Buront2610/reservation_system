@@ -9,12 +9,8 @@ import { Theme, useTheme } from '@mui/material/styles';
 import InputLabel from '@mui/material/InputLabel';
 import Select ,{SelectChangeEvent} from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { styled } from '@mui/material/styles';
-import { type } from 'os';
 import { FormControl, OutlinedInput } from '@mui/material';
-import { get } from 'http';
-import { set } from 'date-fns';
-import { ParseResult } from 'papaparse'; // 追加
+
 import {
     useCSVReader,
     lightenDarkenColor,
@@ -208,6 +204,30 @@ export default function TestAdminManage() {
         setSelectedTab(newValue);
     };
 
+    const downloadTemplate = () => {
+        const header = '社員番号,パスワード,名前,メールアドレス,電話番号,勤務場所ID,Role\n'; // CSVヘッダー
+        const exampleRow = '123456,pass123,John Doe,johndoe@example.com,123-456-7890,1,user\n'; // 例となるデータ行
+    
+        // Blobを用いてテンプレートCSVを生成
+        const blob = new Blob([header, exampleRow], { type: 'text/csv' });
+
+        // ダウンロードのためのリンクを生成
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'user_template.csv';
+
+        // リンクをDOMに追加し、プログラム的にクリック
+        document.body.appendChild(a);
+        a.click();
+
+        // リソースのクリーンアップ
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    };
+
+
     return (
         <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -281,7 +301,7 @@ export default function TestAdminManage() {
                             </FormControl>
                         </Box>
                         <Box mb={2}>
-                            <Button type="submit" variant="contained" color="primary">登録</Button>
+                            <Button type="submit" variant="contained" onclick ={downloadTemplate} color="primary">登録</Button>
                         </Box>
                     </form>
                     
@@ -289,8 +309,20 @@ export default function TestAdminManage() {
             )}
             {selectedTab === 1 && (
                 <Grid item xs={12}>
-                    <h1>CSVユーザ登録</h1>   
-                    <CSVReader
+                    <h1>CSVユーザ登録</h1>
+                    <p>CSVファイルは以下のデータ順序である必要があります：</p>
+                    <ul>
+                        <li>1. 社員番号</li>
+                        <li>2. パスワード</li>
+                        <li>3. 名前</li>
+                        <li>4. メールアドレス</li>
+                        <li>5. 電話番号</li>
+                        <li>6. 職場ID（数値）</li>
+                        <li>7. 役割</li>
+                    </ul>
+                    <p>この順序に従ったCSVファイルをアップロードしてください。</p>
+                <Button variant="contained" color="secondary">CSVテンプレートをダウンロード</Button>   
+                            <CSVReader
                         onUploadAccepted={(results: any) => {
                             console.log('---------------------------');
                             console.log(results);

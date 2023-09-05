@@ -62,7 +62,7 @@ powershell -Command "Set-Content -Path 'current_policy.txt' -Value (Get-Executio
 powershell -Command "Set-ExecutionPolicy RemoteSigned -Force"
 
 :: Run your script
-powershell -File "C:\releases\set_config.ps1" >> "%logFile%" 2>&1
+::powershell -File "C:\releases\set_config.ps1" >> "%logFile%" 2>&1
 
 :: Restore the original execution policy
 powershell -Command "Set-ExecutionPolicy (Get-Content -Path 'current_policy.txt') -Force"
@@ -70,7 +70,8 @@ powershell -Command "Set-ExecutionPolicy (Get-Content -Path 'current_policy.txt'
 :: Delete the temporary file
 del /F /Q current_policy.txt
 
-
+:: Copy nginx.conf.template to nginx.conf
+copy "C:\releases\nginx.conf.template" "C:\nginx\conf\nginx.conf"
 if errorlevel 1 goto :error
 set message=Nginx configuration generated.
 echo %message%
