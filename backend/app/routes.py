@@ -6,7 +6,7 @@
 
 from importlib.abc import ResourceReader
 import time
-from venv import logger
+from venv import create, logger
 from flask import Flask, current_app, request, jsonify,Blueprint,Response
 from typing import Union, Tuple
 from flask_sqlalchemy import SQLAlchemy
@@ -27,7 +27,7 @@ bp = Blueprint('api', __name__)
 
 
 # API endpoint to check if initial setup is required
-@bp.route('/api/check_initial_setup', methods=['GET'])
+@bp.route('/check_initial_setup', methods=['GET'])
 def check_initial_setup():
     if User.query.filter_by(role='admin').count() == 0:
         current_app.logger.info('Initial setup required')
@@ -537,6 +537,7 @@ def setup_admin():
     try:
         data = request.get_json()
         create_timeflag()
+        create_guest()
         
         # Validate incoming data
         if not data or 'id' not in data or 'password' not in data:
@@ -581,6 +582,27 @@ def setup_admin():
     except Exception as e:
         current_app.logger.error(f"Error while creating admin account: {e}")
         return jsonify({'Error': False, 'message': 'An error occurred while creating the admin account.'}), 500
+    
+def create_guest():
+    try:
+        count = User.query.filter_by(role='guest').count()
+        if count > 0:
+            return jsonify({'success': False, 'message': 'Guest account already exists.'}), 400
+        
+        new_guest = User(
+            password=hash_password('guest'),
+            role='guest',
+            employee_number= 99999,  # Hard-coded value
+            name="Guest",       # Hard-coded value
+            workplace_id=1              # Hard-coded value, assuming a workplace with id=1 exists
+        )
+
+        db.session.add(new_guest)
+        db.session.commit()
+        current_app.logger.info(f"Guest account created successfully.")
+    except Exception as e:
+        current_app.logger.error(f"Error while creating guest account: {e}")
+        return jsonify({'Error': False, 'message': 'An error occurred while creating the guest account.'}), 500
 
 ##ユーザに対するCRUD操作
 @bp.route("/users", methods=["GET"])

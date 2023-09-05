@@ -16,7 +16,7 @@ const API_BASE_URL = 'http://localhost:5000/api';
 
 export async function checkInitialSetup(updateInitialSetupState: Function){
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/check_initial_setup`);
+      const response = await axios.get(`${API_BASE_URL}/check_initial_setup`);
       
       // Update the initial setup state based on API response
       if (response.data.initialSetupRequired) {

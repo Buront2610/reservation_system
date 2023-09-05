@@ -141,11 +141,6 @@ import { useUserAuthenticationLogoutNavigate } from './useUserAuthLogoutNavigate
 
       const itemsList = [
         {
-            text:"ログイン",
-            icon:<LoginIcon/>,
-            path:"/login"
-        },
-        {
           text: "予約登録",
           icon: <AddShoppingCartIcon/>,
           path: "/adminReservationEdit"

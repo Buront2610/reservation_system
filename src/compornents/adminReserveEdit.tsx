@@ -34,6 +34,9 @@ export default function AdminReservationManage() {
 
     useEffect(() => {
         loadInitialData();
+        const today = new Date().toISOString().split('T')[0];
+        setNewEntry({ ...newEntry, reservation_date: today });
+        console.log('newEntry:',newEntry);
     }, []);
 
     async function loadInitialData() {
@@ -54,6 +57,8 @@ export default function AdminReservationManage() {
             const createdReservation = await addReservation(newEntry);
             setReservations([...reservations, createdReservation]);
             setNewEntry({});
+        }else{
+            console.log('erroe')
         }
         
     }
@@ -107,7 +112,7 @@ const handleAutoFillReservation = () => {
                     
                     <form onSubmit={handleAddReservation}>
                         <Box mb={2}>
-                            <TextField fullWidth label="ユーザーID" value={newEntry.user_id || ''} onChange={e => setNewEntry({ ...newEntry, user_id: e.target.value })} />
+                            <TextField fullWidth label="社員番号" value={newEntry.user_id || ''} onChange={e => setNewEntry({ ...newEntry, user_id: e.target.value })} />
                         </Box>
                         
                             
@@ -115,19 +120,15 @@ const handleAutoFillReservation = () => {
                             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'ja'}>
                             <DatePicker
                                 label="予約日"
-                                value={dayjs(newEntry.reservation_date)}
+                                // 初期値がundefinedでないことを確認する
+                                value={dayjs(newEntry.reservation_date || '')} 
                                 onChange={(newValue) => {
-                                    // newValueがundefinedまたはnullでないことを確認します
                                     if (newValue) {
-                                        const year = newValue.year();
-                                        const month = (newValue.month() + 1).toString().padStart(2, '0'); // Months are 0-indexed in dayjs
-                                        const day = newValue.date().toString().padStart(2, '0');
-                                        const formattedDate = `${year}-${month}-${day}`;
+                                        const formattedDate = newValue.format('YYYY-MM-DD');
                                         console.log(formattedDate);
                                         setNewEntry({ ...newEntry, reservation_date: formattedDate });
                                     }
                                 }}
-                                
                                 slotProps={{
                                     textField: {
                                         helperText: '日付を選択してください',

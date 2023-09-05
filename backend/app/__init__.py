@@ -41,7 +41,7 @@ def create_app(config_class=Config):
 
 
 
-    CORS(app, origins=['http://localhost:9999', 'http://192.168.20.10:9999'])  #      
+    CORS(app, origins=['http://localhost:5555', 'http://192.168.20.10:5555'])  #      
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)  # Add this line
