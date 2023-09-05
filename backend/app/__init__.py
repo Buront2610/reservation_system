@@ -1,4 +1,6 @@
 import email
+import socket
+from threading import local
 from flask import Flask, app
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -15,6 +17,11 @@ from flask_jwt_extended import JWTManager
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()  # Add this line
+
+def get_local_ip_address():
+    hostname = socket.gethostname()
+    local_ip = socket.gethostbyname(hostname)
+    return local_ip
 
 def setup_logger(app: Flask):
     # Loggerの設定
@@ -40,8 +47,8 @@ def create_app(config_class=Config):
     app.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY')  # Add this line
 
 
-
-    CORS(app, origins=['http://localhost:5555', 'http://192.168.20.10:5555'])  #      
+    local_ip = get_local_ip_address()
+    CORS(app, origins=['http://localhost:5555',f'http://{local_ip}:5555'])  #      
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)  # Add this line
