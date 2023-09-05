@@ -28,7 +28,7 @@ export default function AdminReservationManage() {
     const [newEntry, setNewEntry] = useState<Partial<Reservation>>({});
     const [selectedTab, setSelectedTab] = React.useState(0);
     const [users, setUsers] = useState<User[]>([]);
-    const [bento, setBento] = useState<Partial<Bento>>({});
+    const [bento, setBento] = useState<Partial<Bento|null>>({});
     const [newReservation, setNewReservation] = useState<Partial<Reservation>>({});
 
 
@@ -46,13 +46,15 @@ export default function AdminReservationManage() {
     }
 
     const handleAddReservation = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        newEntry.bento_id = bento.id;
-        console.log('newEntry:',newEntry);
-        console.log('bento:',bento);
-        const createdReservation = await addReservation(newEntry);
-        setReservations([...reservations, createdReservation]);
-        setNewEntry({});
+        if(bento != null){
+            event.preventDefault();
+            newEntry.bento_id = bento.id;
+            console.log('newEntry:',newEntry);
+            console.log('bento:',bento);
+            const createdReservation = await addReservation(newEntry);
+            setReservations([...reservations, createdReservation]);
+            setNewEntry({});
+        }
         
     }
 

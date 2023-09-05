@@ -122,7 +122,6 @@ export async function addBento(newBento: Partial<Bento>): Promise<Bento> {
     
         const response = await axios.post<Bento>(`${API_BASE_URL}/bento`, newBento);
         return response.data;
-
 }
 
 export async function updateBento(id: number, updatedBento: Partial<Bento>): Promise<Bento> {

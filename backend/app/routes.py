@@ -3,6 +3,7 @@
 トークン認証などによりセキュリティ対策を行っている
 各種CRUD操作を行うエンドポイントと、統計情報を取得するエンドポイントを用意 更新があれば随時追加
 """
+
 from importlib.abc import ResourceReader
 import time
 from venv import logger
@@ -250,6 +251,8 @@ class BentoService:
         name = data.get('name')
         price = data.get('price')
         choose_flag = data.get('choose_flag')
+        if choose_flag is None:
+            choose_flag = False
         try:
             bento = Bento(name=name, price=price, choose_flag=choose_flag)
             db.session.add(bento)
@@ -341,7 +344,7 @@ class ReservationService:
     @classmethod
     def get_reservations_by_user_id(cls, user_id):
         reservations = Reservation.query.filter_by(user_id=user_id).all()
-        logger.info(f"reservations: {reservations}")
+        current_app.logger.info(f"reservations: {reservations}")
         return [Reservation.to_dict() for Reservation in reservations]
 
 
@@ -499,15 +502,15 @@ def login() -> Tuple[Response, int]:
     data = request.get_json()
     id = data.get('id')
     password = data.get('password')
-    logger.info(f"id: {id}, password: {password}")
+    current_app.logger.info(f"id: {id}, password: {password}")
     sys.stdout.flush()
 
     if not password or not id:
-        logger.info(f"password: {password}, id: {id}")
+        current_app.logger.info(f"password: {password}, id: {id}")
         return jsonify({'error': 'IDとパスワードが必要です'}), 400
 
     user = User.query.filter_by(employee_number=id).first()
-    logger.info(f"user: {user}")
+    current_app.logger.info(f"user: {user}")
 
     if not user:
         return jsonify({'error': 'ユーザーが見つかりません'}), 404
@@ -516,10 +519,10 @@ def login() -> Tuple[Response, int]:
     if check_password(password, user.password):
         # 認証に成功した場合、トークンを生成して返す
         token = generate_token(user)
-        logger.info(f"token: {token}")
+        current_app.logger.info(f"token: {token}")
         return jsonify({'id': user.id, 'token': token, 'role': user.role}), 200
     else:
-        logger.info(f"error: パスワードが間違っています")
+        current_app.logger.info(f"error: パスワードが間違っています")
         sys.stdout.write("error: パスワードが間違っています")
         return jsonify({'error': 'パスワードが間違っています'}), 401
     
@@ -722,7 +725,7 @@ def get_reservation_by_id(id:int)-> Tuple[Response, int]:
 # IDで指定した予約情報を取得
 @bp.route('/reservations/user/<string:user_id>', methods=['GET'])
 def get_reservation_user_id(user_id:str)-> Tuple[Response, int]:
-    logger.info(f"Received user_id: {user_id}")
+    current_app.logger.info(f"Received user_id: {user_id}")
     reservations = ReservationService.get_reservations_by_user_id(user_id)
   
     return jsonify(reservations),200
@@ -767,43 +770,40 @@ def filter_by_month_and_year(query, month, year):
                         extract("year", Reservation.reservation_date) == year)
 
 
-@bp.route("/statistics/<int:year>/<int:month>", methods=["GET"])
-def get_statistics(year: int, month: int) -> Tuple[Response, int]:
-    # 各勤務場所の予約数
-    location_order_counts = db.session.query(Workplace.name, func.count(Reservation.id)).\
-        join(User, Workplace.id == User.workplace_id).\
-        join(Reservation, User.employee_number == Reservation.user_id).\
-        filter(User.role != 'admin')
-    location_order_counts = filter_by_month_and_year(location_order_counts, month, year).\
-        group_by(Workplace.name).all()
+def query_location_statistics(base_query, month, year):
+    return filter_by_month_and_year(base_query, month, year).group_by(Workplace.name).all()
 
-    # 各勤務場所の注文金額
-    location_order_amounts = db.session.query(Workplace.name, func.sum(Reservation.price_at_order * Reservation.quantity)).\
-        join(User, Workplace.id == User.workplace_id).\
-        join(Reservation, User.employee_number == Reservation.user_id).\
-        filter(User.role != 'admin')
-    location_order_amounts = filter_by_month_and_year(location_order_amounts, month, year).\
-        group_by(Workplace.name).all()
+def query_employee_statistics(base_query, month, year):
+    return filter_by_month_and_year(base_query, month, year).group_by(User.employee_number).all()
 
-    # 社員ごとの月次予約数
-    employee_monthly_order_counts = db.session.query(User.employee_number, User.name, func.count(Reservation.id)).\
-        join(Reservation, User.employee_number == Reservation.user_id).\
-        filter(User.role != 'admin')
-    employee_monthly_order_counts = filter_by_month_and_year(employee_monthly_order_counts, month, year).\
-        group_by(User.employee_number).all()
-
-    # 社員ごとの月次注文金額
-    employee_monthly_order_amounts = db.session.query(User.employee_number, User.name, func.sum(Reservation.price_at_order * Reservation.quantity)).\
-        join(Reservation, User.employee_number == Reservation.user_id).\
-        filter(User.role != 'admin')
-    employee_monthly_order_amounts = filter_by_month_and_year(employee_monthly_order_amounts, month, year).\
-        group_by(User.employee_number).all()
-
-    # Pagination
+def get_pagination_parameters():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
+    return page, per_page
+
+@bp.route("/statistics/<int:year>/<int:month>", methods=["GET"])
+def get_statistics(year: int, month: int) -> Tuple[Response, int]:
+    # Base queries
+    base_location_query = db.session.query(Workplace.name, func.count(Reservation.id))\
+        .join(User, Workplace.id == User.workplace_id)\
+        .join(Reservation, User.employee_number == Reservation.user_id)\
+        .filter(User.role != 'admin')
+
+    base_employee_query = db.session.query(User.employee_number, User.name, func.count(Reservation.id))\
+        .join(Reservation, User.employee_number == Reservation.user_id)\
+        .filter(User.role != 'admin')
+
+    # Query statistics
+    location_order_counts = query_location_statistics(base_location_query, month, year)
+    location_order_amounts = query_location_statistics(base_location_query.with_entities(Workplace.name, func.sum(Reservation.price_at_order * Reservation.quantity)), month, year)
+    employee_monthly_order_counts = query_employee_statistics(base_employee_query, month, year)
+    employee_monthly_order_amounts = query_employee_statistics(base_employee_query.with_entities(User.employee_number, User.name, func.sum(Reservation.price_at_order * Reservation.quantity)), month, year)
+
+    # Pagination
+    page, per_page = get_pagination_parameters()
     reservations = Reservation.query.paginate(page=page, per_page=per_page, error_out=False)
 
+    # Prepare result
     result = {
         "reservations": [reservation.to_dict() for reservation in reservations.items],
         "total": reservations.total,

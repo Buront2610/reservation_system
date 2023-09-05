@@ -39,9 +39,14 @@ export default function AdminBentoAndWorkplaceManagePage() {
 
     const handleAddBento = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const createdBento = await addBento(newBento);
-        setBento([...bento, createdBento]);
-        setNewBento({});
+        if(newBento.name != null && newBento.price != null ){
+            const createdBento = await addBento(newBento);
+            setBento([...bento, createdBento]);
+            setNewBento({});
+        }
+        else{
+            alert('弁当名と価格を入力してください')
+        }
     }
 
     const handleUpdateBento = async (id: number, updatedData: Partial<Bento>) => {
