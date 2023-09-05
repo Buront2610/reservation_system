@@ -42,12 +42,20 @@ if errorlevel 1 (
 
 :: Install Python libraries if not already installed:: Move to the Flask application directory
 cd C:\\releases\\backend
+:: Move to the Flask application directory
+cd C:\\releases\\backend
 
-:: Create and activate virtual environment
-if not exist "myenv" (
-    echo [%date% %time%] Creating virtual environment... >> %LOGFILE%
-    python -m venv myenv
+:: Delete existing virtual environment if it exists
+if exist "myenv" (
+    echo [%date% %time%] Deleting existing virtual environment... >> %LOGFILE%
+    rmdir /s /q myenv
 )
+
+:: Create and activate new virtual environment
+echo [%date% %time%] Creating virtual environment... >> %LOGFILE%
+python -m venv myenv
+
+:: Activate virtual environment
 echo [%date% %time%] Activating virtual environment... >> %LOGFILE%
 call myenv\Scripts\activate
 
