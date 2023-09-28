@@ -9,19 +9,28 @@ from flask_mail import Mail
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+import psutil
 from flask_cors import CORS
 # Import flask_jwt_extended library
 from flask_jwt_extended import JWTManager
-
 
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()  # Add this line
 
 def get_local_ip_address():
-    hostname = socket.gethostname()
-    local_ip = socket.gethostbyname(hostname)
-    return local_ip
+    # Get all network interfaces and addresses
+    addrs = psutil.net_if_addrs()
+    
+    # Loop through all interfaces and their associated addresses
+    for interface, addrs_list in addrs.items():
+        for addr in addrs_list:
+            if addr.family == socket.AF_INET:
+                ip = addr.address
+                if ip.startswith("192.168"):
+                    return ip
+    return None
+
 
 def setup_logger(app: Flask):
     # Loggerの設定
@@ -48,7 +57,7 @@ def create_app(config_class=Config):
 
 
     local_ip = get_local_ip_address()
-    CORS(app, origins=['http://localhost:5555',f'http://{local_ip}:5555'])  #      
+    CORS(app, origins=['http://localhost:5555','http://127.0.0.1:5555',f'http://{local_ip}:5555'])  #      
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)  # Add this line
