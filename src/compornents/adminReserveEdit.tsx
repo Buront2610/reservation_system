@@ -49,6 +49,17 @@ export default function AdminReservationManage() {
     }
 
     const handleAddReservation = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+    
+        // ユーザIDが存在するかチェック
+        const userId = newEntry.user_id;
+        const userExists = users.some(user => user.employee_number.toString() === userId);
+        
+        if (!userExists) {
+            // ユーザが存在しない場合、エラーアラートを表示
+            alert("入力された社員番号のユーザは存在しません。");
+            return;
+        }
         if(bento != null){
             event.preventDefault();
             newEntry.bento_id = bento.id;

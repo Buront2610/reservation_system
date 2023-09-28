@@ -51,7 +51,8 @@ export async function login(id: string, password: string): Promise<Login | null>
         return null;
     }
 }
-  
+
+
 
 export async function administratorSetup(id: string, password: string): Promise<Login | null> {
     try {
@@ -165,6 +166,25 @@ export const createUser = async (userData: Partial<User>): Promise<User> => {
 export const updateUser = async (userId: number, userData: Partial<User>): Promise<User> => {
     const response = await axios.put(`${API_BASE_URL}/users/${userId}`, userData);
     return response.data;
+}
+
+export async function changeUserPassword(userId: number, newPassword: string): Promise<User | null> {
+    try {
+        console.log('Sending change password request', userId, newPassword);
+        const response = await axios.put(`${API_BASE_URL}/users/${userId}`, { password: newPassword });
+  
+        console.log('Received response', response);
+  
+        if (response.data) {
+            return response.data;
+        } else {
+            console.error('Invalid response data', response.data);
+            return null;
+        }
+    } catch (error) {
+        console.error('Change password request failed', error);
+        return null;
+    }
 }
 
 export const deleteUser = async (userId: number): Promise<void> => {

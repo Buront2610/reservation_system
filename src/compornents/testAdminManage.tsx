@@ -113,6 +113,8 @@ export default function TestAdminManage() {
     const [users, setUsers] = useState<User[]>([]);
     const [newEntry, setNewEntry] = useState<Partial<User>>({});
     const [selectedTab, setSelectedTab] = React.useState(0);
+    const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+    const [newPassword, setNewPassword] = useState("");
     const [roles, setRoles] = React.useState('');
     const [workplaces, setWorkplaces] = useState<Workplace[]>([]);
     const [workplace, setWorkplace] = useState(0);
@@ -202,6 +204,13 @@ export default function TestAdminManage() {
 
     const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setSelectedTab(newValue);
+    };
+
+    const handleChangePassword = async () => {
+        if (selectedUserId !== null && newPassword !== "") {
+            await updateUser(selectedUserId, {password: newPassword});
+            setNewPassword("");
+        }
     };
 
     const downloadTemplate = () => {
@@ -304,6 +313,36 @@ export default function TestAdminManage() {
                             <Button type="submit" variant="contained" onClick ={downloadTemplate} color="primary">登録</Button>
                         </Box>
                     </form>
+                    
+                    <Box mb={3}>
+                        <h2>Change User Password</h2>
+                        <FormControl fullWidth>
+                            <InputLabel id="select-user-label">Select User</InputLabel>
+                            <Select
+                                labelId="select-user-label"
+                                value={selectedUserId || ""}
+                                onChange={(event) => setSelectedUserId(Number(event.target.value))}
+                            >
+                                {users.map(user => (
+                                    <MenuItem key={user.id} value={user.id}>
+                                        {user.name || user.id}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <TextField
+                            fullWidth
+                            label="New Password"
+                            type="password"
+                            value={newPassword}
+                            onChange={(event) => setNewPassword(event.target.value)}
+                            margin="normal"
+                        />
+                        <Button variant="contained" color="primary" onClick={handleChangePassword}>
+                            Change Password
+                        </Button>
+                    </Box>
+
                     
                 </Grid>
             )}
