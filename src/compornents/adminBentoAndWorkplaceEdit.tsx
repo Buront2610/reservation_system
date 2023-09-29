@@ -22,9 +22,6 @@ export default function AdminBentoAndWorkplaceManagePage() {
 
     useUserAuthenticationLogoutNavigate();
 
-
-
-
     useEffect(() => {
         loadInitialData();
     }, []);

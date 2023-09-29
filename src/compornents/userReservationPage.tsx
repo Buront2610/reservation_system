@@ -133,6 +133,12 @@ const Calendar: FC<{ userReservations: Reservation[]; Employees:User[]; reloadRe
           alert('過去の日付に予約を追加することはできません');
           return;
         }
+        // 月をまたいでの予約を制限
+        if (selectedDate.getMonth() !== now.getMonth()) {
+          alert('月をまたいでの予約はできません');
+          setIsProcessing(false);
+          return;
+        }
   
         // Check if TimeFlag is true, then abort the process
         const timeFlag: TimeFlag = await getTimeFlagByID(1);

@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { Box, Grid, Tab, Tabs } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
-import { getAllUsers, createUser, updateUser, deleteUser, getWorkplaces } from './API';
+import { getAllUsers, createUser, updateUser, deleteUser, getWorkplaces, changeUserPassword } from './API';
 import { Theme, useTheme } from '@mui/material/styles';
 import InputLabel from '@mui/material/InputLabel';
 import Select ,{SelectChangeEvent} from '@mui/material/Select';
@@ -113,6 +113,8 @@ export default function TestAdminManage() {
     const [users, setUsers] = useState<User[]>([]);
     const [newEntry, setNewEntry] = useState<Partial<User>>({});
     const [selectedTab, setSelectedTab] = React.useState(0);
+    const [selectedUserId, setSelectedUserId] = React.useState("");
+    const [newPassword, setNewPassword] = useState('');
     const [roles, setRoles] = React.useState('');
     const [workplaces, setWorkplaces] = useState<Workplace[]>([]);
     const [workplace, setWorkplace] = useState(0);
@@ -202,6 +204,13 @@ export default function TestAdminManage() {
 
     const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setSelectedTab(newValue);
+    };
+
+    const handleChangePassword = async () => {
+        if(selectedUserId !== null && newPassword !== ''){
+            await changeUserPassword(selectedUserId, newPassword);
+            setNewPassword('');
+        }
     };
 
     const downloadTemplate = () => {
@@ -301,7 +310,7 @@ export default function TestAdminManage() {
                             </FormControl>
                         </Box>
                         <Box mb={2}>
-                            <Button type="submit" variant="contained" onClick ={downloadTemplate} color="primary">登録</Button>
+                            <Button type="submit" variant="contained" color="primary">登録</Button>
                         </Box>
                     </form>
                     
@@ -428,6 +437,52 @@ export default function TestAdminManage() {
                         ]}
 
                     />
+                {/* パスワード変更セクション */}
+                <Box mb={3}>
+                    <h2>パスワード変更</h2>
+                    <FormControl fullWidth>
+                        <InputLabel id="select-user-label">ユーザーを選択</InputLabel>
+                        <Select
+                            labelId="select-user-label"
+                            value={selectedUserId || ""}
+                            onChange={(event) => setSelectedUserId(String(event.target.value))}
+                        >
+                            {users.map(user => (
+                                <MenuItem key={user.id} value={user.id}>
+                                    {user.name || user.id}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        onClick={async () => {
+                            if (!selectedUserId) {
+                                alert('ユーザが選択されていません。');
+                                return;
+                            }
+
+                            const selectedUser = users.find(user => String(user.id) === selectedUserId);
+                            if (selectedUser) {
+                                try {
+                                    await changeUserPassword(selectedUserId, selectedUser.employee_number);
+                                    alert('パスワードが正常に変更されました。');
+                                } catch (error) {
+                                    console.error('パスワードの変更に失敗しました。', error);
+                                    alert('パスワードの変更に失敗しました。');
+                                }
+                            } else {
+                                alert('選択されたユーザが存在しません。');
+                            }
+                        }}
+                    >
+                        パスワード変更
+                    </Button>
+                </Box>
+
+
+
                 </Grid>
                 
             )}

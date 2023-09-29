@@ -8,8 +8,8 @@ import { Workplace, Bento, Reservation, User, Login, TimeFlag,Statistics, Exclud
 import { useAuth } from './authContext';
 import { th } from 'date-fns/locale';
 
-// const API_BASE_URL = 'http://192.168.20.10:5000/api';
-const API_BASE_URL = 'http://localhost:5000/api';
+//const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://192.168.0.63:5000/api';
 
 
 
@@ -165,6 +165,25 @@ export const createUser = async (userData: Partial<User>): Promise<User> => {
 export const updateUser = async (userId: number, userData: Partial<User>): Promise<User> => {
     const response = await axios.put(`${API_BASE_URL}/users/${userId}`, userData);
     return response.data;
+}
+
+export async function changeUserPassword(userId: string, newPassword: string): Promise<User | null> {
+    try {
+        console.log('Sending change password request', userId, newPassword);
+        const response = await axios.put(`${API_BASE_URL}/users/${userId}`, { password: newPassword });
+  
+        console.log('Received response', response);
+  
+        if (response.data) {
+            return response.data;
+        } else {
+            console.error('Invalid response data', response.data);
+            return null;
+        }
+    } catch (error) {
+        console.error('Change password request failed', error);
+        return null;
+    }
 }
 
 export const deleteUser = async (userId: number): Promise<void> => {

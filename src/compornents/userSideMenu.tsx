@@ -32,7 +32,7 @@ import CalculateIcon from '@mui/icons-material/Calculate';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import { Link as RouterLink, useLocation, Outlet  } from 'react-router-dom';
-
+import ChangePassword from './userPasswordEdit';
 import Login from './login';
 import { textAlign } from '@mui/system';
 import { ManageAccounts } from '@mui/icons-material';
@@ -144,6 +144,11 @@ import LockIcon from '@mui/icons-material/Lock';
           text: "予約ページ",
           icon: <AddBusinessIcon />,
           path: "/userReservation"
+        },
+        {
+          text: "パスワード変更",
+          icon: <LockIcon />,
+          path: "/userChangePass"
         },
         {
           text:"ログアウト",

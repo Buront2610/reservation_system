@@ -18,6 +18,7 @@ import AdminSideMenu from './adminSideMenu';
 import Login from './login';
 import AdminSetup from './adminSetup';
 import AdminReservationManage from './adminReserveEdit';
+import ChangePassword from './userPasswordEdit';
 // Export all the imported components
 export {
   TestReservationPage,
@@ -36,5 +37,6 @@ export {
   UserSideMenu,
   AdminSideMenu,
   Login,
-  AdminSetup
+  AdminSetup,
+  ChangePassword
 };

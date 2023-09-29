@@ -65,6 +65,7 @@ function RouterComponent() {
                   <Route path="/" element={<Pages.UserSideMenu />}>
                     <Route path="/userReservation" element={<Pages.ReservationPage />} />
                     <Route path="/userReserveHistory" element={<Pages.TestReservationHistoryPage />} />
+                    <Route path='/userChangePass' element={<Pages.ChangePassword />} />
                 </Route>
             ))}
             <Route path="/*" element={<Pages.Login />} />
