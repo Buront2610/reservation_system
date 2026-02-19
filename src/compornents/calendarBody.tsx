@@ -35,4 +35,4 @@ const CalendarBody: FC<CalendarBodyProps> = ({ currentDate, employeeList, getRes
   )
 }
 
-export default CalendarBody;
+export default React.memo(CalendarBody);

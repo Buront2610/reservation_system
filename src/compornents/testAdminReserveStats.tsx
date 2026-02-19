@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { User, Workplace, Statistics, Reservation, Bento } from './types';
 import { getWorkplaces, getReservations, getAllUsers, getBento } from './API'; // Add API import here
@@ -42,53 +42,63 @@ export default function AdminReserveWorkplacePage() {
         setCurrentMonth(newMonth);
     };
 
-    const rows: WorkplaceSummary[] = workplaces.map((workplace) => {
+    // Optimize with useMemo and Map indexing to avoid O(n²) complexity
+    const rows: WorkplaceSummary[] = useMemo(() => {
         const today = new Date();
-        const workplaceUsers = users.filter(
-            (user) => user.workplace_id === workplace.id
-        );
-        const workplaceReservations = reservations.filter((reservation) =>
-            workplaceUsers.some((user) => user.employee_number === reservation.user_id)
-        );
-
-        const todayReservations = workplaceReservations.filter(
-            (reservation) =>
-                new Date(reservation.reservation_date).toDateString() === today.toDateString()
-        );
-        const monthReservations = workplaceReservations.filter((reservation) => {
-            const reservationDate = new Date(reservation.reservation_date);
-            return (
-                reservationDate.getFullYear() === currentMonth.getFullYear() &&
-                reservationDate.getMonth() === currentMonth.getMonth()
-            );
-        });
+        const todayStr = today.toDateString();
         
+        // Create indexed maps for O(1) lookups instead of O(n) searches
+        const bentoMap = new Map(bento.map(b => [b.id, b.price]));
+        const usersByWorkplace = new Map<number, Set<string>>();
+        
+        // Group users by workplace
+        users.forEach(user => {
+            if (!usersByWorkplace.has(user.workplace_id)) {
+                usersByWorkplace.set(user.workplace_id, new Set());
+            }
+            usersByWorkplace.get(user.workplace_id)!.add(user.employee_number);
+        });
 
-        const todayTotalOrder = todayReservations.reduce((prev, curr) => prev + curr.quantity, 0);
-        const monthTotalOrder = monthReservations.reduce((prev, curr) => prev + curr.quantity, 0);
-        const todayTotalAmount = todayReservations.reduce(
-            (prev, curr) =>
-                prev +
-                curr.quantity * (bento.find((b) => b.id === curr.bento_id)?.price || 0),
-            0
-        );
+        return workplaces.map((workplace) => {
+            const workplaceUserIds = usersByWorkplace.get(workplace.id) || new Set();
+            
+            // Filter reservations once and categorize
+            let todayTotalOrder = 0;
+            let monthTotalOrder = 0;
+            let todayTotalAmount = 0;
+            let monthTotalAmount = 0;
 
-        const monthTotalAmount = monthReservations.reduce(
-            (prev, curr) =>
-                prev +
-                curr.quantity * (bento.find((b) => b.id === curr.bento_id)?.price || 0),
-            0
-        );
+            reservations.forEach(reservation => {
+                if (!workplaceUserIds.has(reservation.user_id)) return;
+                
+                const reservationDate = new Date(reservation.reservation_date);
+                const bentoPrice = bentoMap.get(reservation.bento_id) || 0;
+                const orderAmount = reservation.quantity * bentoPrice;
+                
+                // Check if today
+                if (reservationDate.toDateString() === todayStr) {
+                    todayTotalOrder += reservation.quantity;
+                    todayTotalAmount += orderAmount;
+                }
+                
+                // Check if current month
+                if (reservationDate.getFullYear() === currentMonth.getFullYear() &&
+                    reservationDate.getMonth() === currentMonth.getMonth()) {
+                    monthTotalOrder += reservation.quantity;
+                    monthTotalAmount += orderAmount;
+                }
+            });
 
-        return {
-            id: workplace.id,
-            workplace: workplace.name,
-            todayTotalOrder,
-            monthTotalOrder,
-            todayTotalAmount,
-            monthTotalAmount,
-        };
-    });
+            return {
+                id: workplace.id,
+                workplace: workplace.name,
+                todayTotalOrder,
+                monthTotalOrder,
+                todayTotalAmount,
+                monthTotalAmount,
+            };
+        });
+    }, [workplaces, users, reservations, bento, currentMonth]);
 
     const columns = [
         { field: 'workplace', headerName: '勤務場所', width: 200 },
@@ -109,7 +119,16 @@ export default function AdminReserveWorkplacePage() {
                 <button onClick={() => selectMonth(1)}>&gt;</button>
             </Box>
             <div style={{ height: 400 }} >
-                <DataGrid rows={rows} columns={columns}  />
+                <DataGrid 
+                    rows={rows} 
+                    columns={columns}
+                    initialState={{
+                        pagination: {
+                            paginationModel: { pageSize: 10, page: 0 },
+                        },
+                    }}
+                    pageSizeOptions={[5, 10, 25]}
+                />
             </div>
         </Box>
     );

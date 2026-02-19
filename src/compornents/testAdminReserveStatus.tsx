@@ -50,18 +50,23 @@ export default function TestAdminOrderSummaryPage() {
             try {
                 const users = await getAllUsers();
                 setUsers(users);
-                const summaries = await Promise.all(users.map(async user => {
-                    const monthlySummary: MonthlySummary[] = [];
-                    for (let month = 0; month < 12; month++) {
-                        const stats = await getStatistics(selectedYear, month + 1);
+                
+                // Fetch statistics for all 12 months in parallel instead of sequentially per user
+                const monthlyStatsPromises = Array.from({ length: 12 }, (_, month) => 
+                    getStatistics(selectedYear, month + 1)
+                );
+                const monthlyStats = await Promise.all(monthlyStatsPromises);
+                
+                // Build summaries for all users from the cached monthly stats
+                const summaries = users.map(user => {
+                    const monthlySummary: MonthlySummary[] = monthlyStats.map((stats, index) => {
                         const userStats = stats.employee_monthly_order_counts[user.employee_number];
                         const orderCount = userStats ? userStats.count : 0;
                         const totalAmount = userStats ? stats.employee_monthly_order_amounts[user.employee_number].amount : 0;
-                        monthlySummary.push({ month: month + 1, orderCount, totalAmount });
-                        console.log(stats)
-                    }
+                        return { month: index + 1, orderCount, totalAmount };
+                    });
                     return { id: user.id, name: user.name, monthlySummary };
-                }));
+                });
                 setEmployeeSummaries(summaries);
             } catch (error) {
                 console.error("Error loading data:", error);
@@ -119,11 +124,20 @@ export default function TestAdminOrderSummaryPage() {
           <div style={{ height: 400, width: '100%' }}>
             {isLoading
               ? <div>Loading...</div>
-              : <DataGrid rows={employeeSummaries} columns={columns}
-                          slots={{
-                            toolbar: gridToolbarExport,
-                          }}
-                          localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}  />}
+              : <DataGrid 
+                  rows={employeeSummaries} 
+                  columns={columns}
+                  slots={{
+                    toolbar: gridToolbarExport,
+                  }}
+                  localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { pageSize: 25, page: 0 },
+                    },
+                  }}
+                  pageSizeOptions={[10, 25, 50]}
+                />}
           </div>
         </div>
     );

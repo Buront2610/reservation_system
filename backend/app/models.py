@@ -16,13 +16,13 @@ from app import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    employee_number = db.Column(db.String(10), unique=True, nullable=False)
+    employee_number = db.Column(db.String(10), unique=True, nullable=False, index=True)
     password = db.Column(db.String(100), nullable=False)
-    role = db.Column(db.String(100), nullable=False)
+    role = db.Column(db.String(100), nullable=False, index=True)
     name = db.Column(db.String(100), nullable=False)
     email_address = db.Column(db.String(100), nullable=True)
     telephone = db.Column(db.String(100), nullable=True)
-    workplace_id = db.Column(db.Integer, db.ForeignKey('workplace.id'), nullable=False)
+    workplace_id = db.Column(db.Integer, db.ForeignKey('workplace.id'), nullable=False, index=True)
     reservations = db.relationship('Reservation', backref='user')  # これを追加
 
     def to_dict(self):
@@ -58,12 +58,17 @@ class Bento(db.Model):
 
 class Reservation(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.String(10), db.ForeignKey('user.employee_number'), nullable=False)
-    bento_id = db.Column(db.Integer, db.ForeignKey('bento.id'), nullable=False)
+    user_id = db.Column(db.String(10), db.ForeignKey('user.employee_number'), nullable=False, index=True)
+    bento_id = db.Column(db.Integer, db.ForeignKey('bento.id'), nullable=False, index=True)
     price_at_order = db.Column(db.Integer, nullable=True)  # 追加: 注文時の価格
-    reservation_date = db.Column(db.Date, nullable=False)
+    reservation_date = db.Column(db.Date, nullable=False, index=True)
     quantity = db.Column(db.Integer, nullable=False)
     remarks = db.Column(db.String(100), nullable=True)
+    
+    # Add compound index for common query patterns (user_id + reservation_date)
+    __table_args__ = (
+        db.Index('idx_user_date', 'user_id', 'reservation_date'),
+    )
 
     def to_dict(self):
         dict_repr = {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -72,7 +77,7 @@ class Reservation(db.Model):
 
 class Exclude(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    exclude_date = db.Column(db.Date, nullable=True)
+    exclude_date = db.Column(db.Date, nullable=True, index=True)
 
     def to_dict(self):
         dict_repr = {c.name: getattr(self, c.name) for c in self.__table__.columns}
