@@ -360,7 +360,7 @@ class ReservationService:
     def get_reservations_by_user_id(cls, user_id):
         reservations = Reservation.query.filter_by(user_id=user_id).all()
         current_app.logger.info(f"reservations: {reservations}")
-        return [Reservation.to_dict() for Reservation in reservations]
+        return [reservation.to_dict() for reservation in reservations]
 
 
     @classmethod
@@ -563,11 +563,11 @@ def setup_admin():
         
         # Check if an admin already exists
         admin_exists = User.query.filter_by(role='admin').first() is not None
-        sys.stdout.write(f"admin exists: {admin_exists}")
+        current_app.logger.info(f"admin exists: {admin_exists}")
 
         
         if admin_exists:
-            sys.stdout.write(f"admin already exists")
+            current_app.logger.info("admin already exists")
             return jsonify({'success': False, 'message': 'Admin account already exists.'}), 400
         
         # Hash the password
