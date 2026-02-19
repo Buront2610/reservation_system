@@ -124,11 +124,20 @@ export default function TestAdminOrderSummaryPage() {
           <div style={{ height: 400, width: '100%' }}>
             {isLoading
               ? <div>Loading...</div>
-              : <DataGrid rows={employeeSummaries} columns={columns}
-                          slots={{
-                            toolbar: gridToolbarExport,
-                          }}
-                          localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}  />}
+              : <DataGrid 
+                  rows={employeeSummaries} 
+                  columns={columns}
+                  slots={{
+                    toolbar: gridToolbarExport,
+                  }}
+                  localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { pageSize: 25, page: 0 },
+                    },
+                  }}
+                  pageSizeOptions={[10, 25, 50]}
+                />}
           </div>
         </div>
     );

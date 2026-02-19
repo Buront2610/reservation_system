@@ -119,7 +119,16 @@ export default function AdminReserveWorkplacePage() {
                 <button onClick={() => selectMonth(1)}>&gt;</button>
             </Box>
             <div style={{ height: 400 }} >
-                <DataGrid rows={rows} columns={columns}  />
+                <DataGrid 
+                    rows={rows} 
+                    columns={columns}
+                    initialState={{
+                        pagination: {
+                            paginationModel: { pageSize: 10, page: 0 },
+                        },
+                    }}
+                    pageSizeOptions={[5, 10, 25]}
+                />
             </div>
         </Box>
     );
