@@ -94,4 +94,4 @@ const CalendarCell: FC<CalendarCellProps> = ({ day, reservationStatus, date, onS
   );
 };
 
-export default CalendarCell;
+export default React.memo(CalendarCell);

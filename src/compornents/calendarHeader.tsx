@@ -18,8 +18,8 @@ const CalenderHeader: FC<CalendarHeaderProps> = ({ changeMonth, currentDate }) =
       <IconButton onClick={() => changeMonth(1)}>
         <ChevronRight />
       </IconButton>
-    </Box>
+      </Box>
   );
 }
 
-export default CalenderHeader;
+export default React.memo(CalenderHeader);

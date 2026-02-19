@@ -47,4 +47,4 @@ const CalendarRow: FC<CalendarRowProps> = ({ employee, currentDate, getReservati
   return <>{rows}</>;
 }
 
-export default CalendarRow;
+export default React.memo(CalendarRow);

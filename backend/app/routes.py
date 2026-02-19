@@ -29,7 +29,8 @@ bp = Blueprint('api', __name__)
 # API endpoint to check if initial setup is required
 @bp.route('/check_initial_setup', methods=['GET'])
 def check_initial_setup():
-    if User.query.filter_by(role='admin').count() == 0:
+    # Use .first() instead of .count() for existence check - more efficient
+    if User.query.filter_by(role='admin').first() is None:
         current_app.logger.info('Initial setup required')
         return jsonify({'initialSetupRequired': True}), 200
     else:
@@ -47,8 +48,12 @@ class UserService:
             raise
 
     @classmethod
-    def get_all_users(cls):
-        return User.query.all()
+    def get_all_users(cls, page=None, per_page=None):
+        query = User.query
+        if page and per_page:
+            paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+            return paginated.items, paginated.total, paginated.page, paginated.per_page
+        return User.query.all(), None, None, None
 
     @classmethod
     def create_user(cls, data):
@@ -145,9 +150,13 @@ class UserService:
 
 class WorkplaceService:
     @classmethod
-    def get_all_workplaces(cls):
+    def get_all_workplaces(cls, page=None, per_page=None):
         try:
-            return Workplace.query.all()
+            query = Workplace.query
+            if page and per_page:
+                paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+                return paginated.items, paginated.total, paginated.page, paginated.per_page
+            return Workplace.query.all(), None, None, None
         except Exception as e:
             current_app.logger.error(f'Error while retrieving workplaces: {e}\n{traceback.format_exc()}')
             raise
@@ -232,9 +241,12 @@ class WorkplaceService:
 
 class BentoService:
     @classmethod
-    def get_all_bentos(cls):
-        bentos = Bento.query.all()
-        return bentos
+    def get_all_bentos(cls, page=None, per_page=None):
+        query = Bento.query
+        if page and per_page:
+            paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+            return paginated.items, paginated.total, paginated.page, paginated.per_page
+        return Bento.query.all(), None, None, None
     
     @classmethod
     def get_bento_by_id(cls,bento_id):
@@ -332,9 +344,12 @@ class BentoService:
 class ReservationService:
 
     @classmethod
-    def get_all_reservations(cls):
-        reservations = Reservation.query.all()
-        return reservations
+    def get_all_reservations(cls, page=None, per_page=None):
+        query = Reservation.query
+        if page and per_page:
+            paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+            return paginated.items, paginated.total, paginated.page, paginated.per_page
+        return Reservation.query.all(), None, None, None
     
     @classmethod
     def get_reservation_by_id(cls,user_id):
@@ -547,12 +562,12 @@ def setup_admin():
         password = data['password']
         
         # Check if an admin already exists
-        admin_count = User.query.filter_by(role='admin').count()
-        sys.stdout.write("count:{admin_count}")
+        admin_exists = User.query.filter_by(role='admin').first() is not None
+        sys.stdout.write(f"admin exists: {admin_exists}")
 
         
-        if admin_count > 0:
-            sys.stdout.write("count:{admin_count}")
+        if admin_exists:
+            sys.stdout.write(f"admin already exists")
             return jsonify({'success': False, 'message': 'Admin account already exists.'}), 400
         
         # Hash the password
@@ -607,8 +622,19 @@ def create_guest():
 ##ユーザに対するCRUD操作
 @bp.route("/users", methods=["GET"])
 def get_users() -> Tuple[Response, int]:
-    users = UserService.get_all_users()
-    return jsonify([users.to_dict() for users in users]) , 200
+    page = request.args.get("page", type=int)
+    per_page = request.args.get("per_page", type=int)
+    
+    users, total, page_num, per_page_num = UserService.get_all_users(page, per_page)
+    
+    if page and per_page:
+        return jsonify({
+            "users": [user.to_dict() for user in users],
+            "total": total,
+            "page": page_num,
+            "per_page": per_page_num
+        }), 200
+    return jsonify([user.to_dict() for user in users]), 200
 
 @bp.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id: int) -> Tuple[Response, int]:
@@ -647,7 +673,18 @@ def delete_user(user_id) -> Tuple[Response, int]:
 # 勤務場所情報取得
 @bp.route("/workplaces", methods=["GET"])
 def get_workplaces() -> Tuple[Response, int]:
-    workplaces = WorkplaceService.get_all_workplaces()
+    page = request.args.get("page", type=int)
+    per_page = request.args.get("per_page", type=int)
+    
+    workplaces, total, page_num, per_page_num = WorkplaceService.get_all_workplaces(page, per_page)
+    
+    if page and per_page:
+        return jsonify({
+            "workplaces": [w.to_dict() for w in workplaces],
+            "total": total,
+            "page": page_num,
+            "per_page": per_page_num
+        }), 200
     return jsonify([w.to_dict() for w in workplaces]), 200
 
 @bp.route("/workplaces/<int:workplace_id>", methods=["GET"])
@@ -686,10 +723,22 @@ def delete_workplace(workplace_id:int) -> Tuple[Response, int]:
 # 弁当情報取得
 @bp.route("/bento", methods=["GET"])
 def get_bento() -> Tuple[Response, int]:
-    bento = BentoService.get_all_bentos()
-    if bento is None:
+    page = request.args.get("page", type=int)
+    per_page = request.args.get("per_page", type=int)
+    
+    bento, total, page_num, per_page_num = BentoService.get_all_bentos(page, per_page)
+    
+    if not bento:
         return jsonify({"error": "データ未入力です"}), 404
-    return jsonify([b.to_dict() for b in bento]),200
+    
+    if page and per_page:
+        return jsonify({
+            "bento": [b.to_dict() for b in bento],
+            "total": total,
+            "page": page_num,
+            "per_page": per_page_num
+        }), 200
+    return jsonify([b.to_dict() for b in bento]), 200
 
 @bp.route("/bento/<int:bento_id>", methods=["GET"])
 def get_bento_by_id(bento_id:int) -> Tuple[Response, int]:
@@ -735,7 +784,18 @@ def delete_bento(bento_id:int) -> Tuple[Response, int]:
 # 全ての予約情報を取得
 @bp.route('/reservations', methods=['GET'])
 def get_reservations()-> Tuple[Response, int]:
-    reservations = ReservationService.get_all_reservations()
+    page = request.args.get("page", type=int)
+    per_page = request.args.get("per_page", type=int)
+    
+    reservations, total, page_num, per_page_num = ReservationService.get_all_reservations(page, per_page)
+    
+    if page and per_page:
+        return jsonify({
+            "reservations": [r.to_dict() for r in reservations],
+            "total": total,
+            "page": page_num,
+            "per_page": per_page_num
+        }), 200
     return jsonify([r.to_dict() for r in reservations]), 200
 
 
