@@ -1,4 +1,4 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosHeaders, InternalAxiosRequestConfig } from 'axios';
 import { resolveApiBaseUrl } from './apiConfig';
 
 type AuthStorage = Pick<Storage, 'getItem' | 'removeItem'>;
@@ -34,11 +34,9 @@ export function applyAuthorizationHeader(
   const token = getStoredAuthToken(storage);
 
   if (token) {
-    if (!config.headers) {
-      config.headers = {} as InternalAxiosRequestConfig['headers'];
-    }
-
-    (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
+    const headers = new AxiosHeaders(config.headers);
+    headers.set('Authorization', `Bearer ${token}`);
+    config.headers = headers;
   }
 
   return config;

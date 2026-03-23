@@ -17,7 +17,7 @@ export async function checkInitialSetup(updateInitialSetupState: (value: boolean
       const response = await axiosInstance.get<InitialSetupResponse>('/check_initial_setup');
       
       // Update the initial setup state based on API response
-      updateInitialSetupState(Boolean(response.data.initialSetupRequired));
+      updateInitialSetupState(response.data.initialSetupRequired);
     } catch (error) {
       console.error('Failed to check initial setup:', error);
     }

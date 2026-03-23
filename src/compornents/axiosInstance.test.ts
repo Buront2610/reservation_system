@@ -4,6 +4,15 @@ jest.mock('axios', () => {
 
   return {
     __esModule: true,
+    AxiosHeaders: class MockAxiosHeaders {
+      constructor(headers = {}) {
+        Object.assign(this, headers);
+      }
+
+      set(name, value) {
+        Object.assign(this, { [name]: value });
+      }
+    },
     default: {
       create: jest.fn(() => ({
         interceptors: {
