@@ -1,46 +1,71 @@
-# Getting Started with Create React App
+# reservation_system
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 現状分析
 
-## Available Scripts
+このリポジトリは、弁当予約システムの React フロントエンドと Flask バックエンドをまとめた構成です。
 
-In the project directory, you can run:
+- フロントエンド: `src/`
+- バックエンド: `backend/app/`
+- 認証/初期設定/予約/集計の責務が画面・API に分散
+- README は Create React App 初期状態のままで、実態と乖離
 
-### `npm start`
+## 丁寧に確認した問題点
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### 1. 構成と責務の問題
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- フロントエンド側の API 接続先が固定文字列で、環境切り替えが難しい
+- 型定義、API 呼び出し、画面遷移の責務が密結合
+- `src/compornents` の綴り誤りなど、保守の入口で混乱しやすい
 
-### `npm test`
+### 2. 品質保証の問題
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- フロントエンドの既存テストは Create React App の初期テストのまま
+- 実行前提の依存関係セットアップが不足しており、即時に回帰確認しづらい
+- バックエンドもローカル環境依存が強く、検証再現性が低い
 
-### `npm run build`
+### 3. 運用とセキュリティの問題
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- 設定値がコードに寄っており、環境差分の安全な管理が難しい
+- 初期設定、認証、予約編集の導線が UI 上で十分に説明されていない
+- 改修優先度の共有資料がなく、全面改修の進め方が見えにくい
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 全面改修の方針
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. **見える化**  
+   まずは現状監査の結果、問題点、優先度、改修フェーズを README と画面に明示する。
+2. **土台の整理**  
+   設定値・API 契約・型定義を整理し、環境差分に耐えられる構成へ寄せる。
+3. **画面/機能の再構成**  
+   管理者画面と利用者画面を責務単位で分割し、予約フローを再設計する。
+4. **テストと運用整備**  
+   改修単位ごとにテストを追加し、README・運用手順・検証方法を実態に合わせて更新する。
 
-### `npm run eject`
+## 今回着手した改修
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- ログイン画面に「現行アプリの監査結果」「全面改修の方針」「今回着手したこと」を表示
+- API 接続先を `REACT_APP_API_BASE_URL` で切り替え可能に変更
+- フロントエンドテストを、実際の画面表示を確認する内容に更新
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 開発コマンド
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### フロントエンド
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```bash
+npm install --package-lock=false
+npm test -- --watchAll=false
+npm run build
+```
 
-## Learn More
+### バックエンド
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+cd backend
+python3 -m pip install -r requirements.txt
+python3 -m pytest
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 次に進めるべき改修
+
+- 認証まわりの設定値を環境変数へ移す
+- 型定義と API レスポンス契約を整理し、画面単位でテストを増やす
+- 共通 API クライアントを土台に、画面ごとのエラーハンドリングを統一する

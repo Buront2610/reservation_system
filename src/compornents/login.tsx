@@ -7,23 +7,13 @@ import {
   CardContent,
   CardHeader,
   TextField,
+  Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from './authContext';
-import CryptoJS from 'crypto-js';
+import RenovationOverview from './renovationOverview';
 
 interface LoginProps {}
-
-const SALT = 'your-unique-salt-here';
-
-const hashPassword = (password: string): string => {
-  const hashedPassword = CryptoJS.PBKDF2(password, SALT, {
-    keySize: 256 / 32,
-    iterations: 1000,
-  }).toString(CryptoJS.enc.Hex);
-
-  return hashedPassword;
-}
 
 const Login: React.FC<LoginProps> = (): ReactElement => {
   const [username, setUsername] = useState<string | null>("");  // Here, initial value changed to empty string
@@ -72,7 +62,10 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
         display="flex"
         alignItems="center"
         justifyContent="center"
-        padding={20}
+        minHeight="100vh"
+        padding={4}
+        gap={4}
+        flexWrap="wrap"
     >
         <Card style={cardStyle}>
             <CardHeader title="お弁当予約システム" />
@@ -101,6 +94,11 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
                       const newVal = e.target.value;
                       setPassword(newVal);
                     }}                />
+                  {error && (
+                    <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                      {error}
+                    </Typography>
+                  )}
                 </div>
             </CardContent>
             <CardActions>
@@ -114,6 +112,7 @@ const Login: React.FC<LoginProps> = (): ReactElement => {
                 </Button>
             </CardActions>
         </Card>
+        <RenovationOverview />
     </Box>
   );
 };
