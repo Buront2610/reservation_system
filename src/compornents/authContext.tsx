@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { login } from "./API";
+import { clearStoredAuth } from "./axiosInstance";
 import { Login } from "./types";
 // import { useNavigate } from "react-router-dom"; // Uncomment this if you need navigation
 
@@ -41,8 +42,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (timeDifference < 24 * 60 * 60 * 1000) {
         return JSON.parse(userFromLocalStorage);
       } else {
-        localStorage.removeItem('user');
-        localStorage.removeItem('loginTimeStamp');
+        clearStoredAuth();
         return null;
       }
     } else {
@@ -68,8 +68,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('loginTimeStamp');
+    clearStoredAuth();
     // navigate("login"); // Uncomment this if you need navigation
   };
 

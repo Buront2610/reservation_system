@@ -3,42 +3,28 @@ API実装ファイル
 APIの定義に関してはbackend/app/routes.pyを参照すること
 types.tsに定義されている型を使用すること
 */
-import axios from 'axios';
 import { Workplace, Bento, Reservation, User, Login, TimeFlag,Statistics, Exclude } from './types';
+import axiosInstance from './axiosInstance';
 
-const DEFAULT_API_BASE_URL = 'http://localhost:5000/api';
-
-export function resolveApiBaseUrl(): string {
-    const configuredBaseUrl = process.env.REACT_APP_API_BASE_URL?.trim();
-    return configuredBaseUrl ? configuredBaseUrl.replace(/\/+$/, '') : DEFAULT_API_BASE_URL;
+interface InitialSetupResponse {
+    initialSetupRequired: boolean;
 }
 
-const API_BASE_URL = resolveApiBaseUrl();
 
 
-
-
-export async function checkInitialSetup(updateInitialSetupState: Function){
+export async function checkInitialSetup(updateInitialSetupState: (value: boolean) => void){
     try {
-      const response = await axios.get(`${API_BASE_URL}/check_initial_setup`);
+      const response = await axiosInstance.get<InitialSetupResponse>('/check_initial_setup');
       
       // Update the initial setup state based on API response
-      if (response.data.initialSetupRequired) {
-        updateInitialSetupState(true); // Use the function from the AuthContext
-        // Optionally, you can redirect to the admin setup page here.
-      } else {
-        updateInitialSetupState(false); // Use the function from the AuthContext
-      }
+      updateInitialSetupState(Boolean(response.data.initialSetupRequired));
     } catch (error) {
       console.error('Failed to check initial setup:', error);
     }
 }
 export async function login(id: string, password: string): Promise<Login | null> {
     try {
-        console.log('Sending login request', id, password);
-        const response = await axios.post(`${API_BASE_URL}/login`, { id, password });
-  
-        console.log('Received response', response);
+        const response = await axiosInstance.post<Login>('/login', { id, password });
   
         if (response.data && response.data.id && response.data.token && response.data.role) {
             return {
@@ -60,8 +46,7 @@ export async function login(id: string, password: string): Promise<Login | null>
 
 export async function administratorSetup(id: string, password: string): Promise<Login | null> {
     try {
-        console.log('Sending administratorSetup request', id, password);
-        const response = await axios.post(`${API_BASE_URL}/setup`, { id, password });
+        const response = await axiosInstance.post<Login>('/setup', { id, password });
         
         // Assuming that the API returns the Login object in response.data
         return response.data;
@@ -74,38 +59,38 @@ export async function administratorSetup(id: string, password: string): Promise<
 
 export async function getWorkplaces(): Promise<Workplace[]> {
     
-    const response = await axios.get<Workplace[]>(`${API_BASE_URL}/workplaces`);
+    const response = await axiosInstance.get<Workplace[]>('/workplaces');
     return response.data;
 }
 
 export async function getWorkplace(id: number): Promise<Workplace> {
-    const response = await axios.get<Workplace>(`${API_BASE_URL}/workplaces/${id}`);
+    const response = await axiosInstance.get<Workplace>(`/workplaces/${id}`);
     return response.data;
 }
 
 export async function addWorkplace(newWorkplace: Partial<Workplace>): Promise<Workplace> {
-    const response = await axios.post<Workplace>(`${API_BASE_URL}/workplaces`, newWorkplace);
+    const response = await axiosInstance.post<Workplace>('/workplaces', newWorkplace);
     return response.data;
 }
 
 export async function updateWorkplace(id: number, updatedWorkplace: Partial<Workplace>): Promise<Workplace> {
-    const response = await axios.put<Workplace>(`${API_BASE_URL}/workplaces/${id}`, updatedWorkplace);
+    const response = await axiosInstance.put<Workplace>(`/workplaces/${id}`, updatedWorkplace);
     return response.data;
 }
 
 export async function deleteWorkplace(id: number): Promise<void> {
-    await axios.delete(`${API_BASE_URL}/workplaces/${id}`);
+    await axiosInstance.delete(`/workplaces/${id}`);
 }
 
 
 export async function getBentoByID(id: number): Promise<Bento> {
-    const response = await axios.get<Bento>(`${API_BASE_URL}/bento/${id}`);
+    const response = await axiosInstance.get<Bento>(`/bento/${id}`);
     return response.data;
 }
 
 export async function getBento(): Promise<Bento[]> {
     try{
-        const response = await axios.get<Bento[]>(`${API_BASE_URL}/bento`);
+        const response = await axiosInstance.get<Bento[]>('/bento');
         return response.data;
     }catch(error){
         console.error("Error in getBento:", error);
@@ -115,7 +100,7 @@ export async function getBento(): Promise<Bento[]> {
 
 export async function getBentoByChooseFlag(): Promise<Bento|null> {
     try{
-        const response = await axios.get<Bento>(`${API_BASE_URL}/bento/choose`);
+        const response = await axiosInstance.get<Bento>('/bento/choose');
         return response.data;
     }catch(error){
         console.error("Error in getBento:", error);
@@ -125,23 +110,23 @@ export async function getBentoByChooseFlag(): Promise<Bento|null> {
 
 export async function addBento(newBento: Partial<Bento>): Promise<Bento> {
     
-        const response = await axios.post<Bento>(`${API_BASE_URL}/bento`, newBento);
+        const response = await axiosInstance.post<Bento>('/bento', newBento);
         return response.data;
 }
 
 export async function updateBento(id: number, updatedBento: Partial<Bento>): Promise<Bento> {
-    const response = await axios.put<Bento>(`${API_BASE_URL}/bento/${id}`, updatedBento);
+    const response = await axiosInstance.put<Bento>(`/bento/${id}`, updatedBento);
     return response.data;
 }
 
 export async function deleteBento(id: number): Promise<void> {
-    await axios.delete(`${API_BASE_URL}/bento/${id}`);
+    await axiosInstance.delete(`/bento/${id}`);
 }
 
 
 export const getAllUsers = async (): Promise<User[]> => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/users`);
+        const response = await axiosInstance.get('/users');
         console.log(response);
         return response.data;
     } catch (error) {
@@ -152,7 +137,7 @@ export const getAllUsers = async (): Promise<User[]> => {
 
 export const getUserById = async (userId: number): Promise<User> => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/users/${userId}`);
+        const response = await axiosInstance.get(`/users/${userId}`);
         console.log(response);
         return response.data;
     } catch (error) {
@@ -163,21 +148,18 @@ export const getUserById = async (userId: number): Promise<User> => {
 }
 
 export const createUser = async (userData: Partial<User>): Promise<User> => {
-    const response = await axios.post(`${API_BASE_URL}/users`, userData);
+    const response = await axiosInstance.post('/users', userData);
     return response.data;
 }
 
 export const updateUser = async (userId: number, userData: Partial<User>): Promise<User> => {
-    const response = await axios.put(`${API_BASE_URL}/users/${userId}`, userData);
+    const response = await axiosInstance.put(`/users/${userId}`, userData);
     return response.data;
 }
 
 export async function changeUserPassword(userId: number, newPassword: string): Promise<User | null> {
     try {
-        console.log('Sending change password request', userId, newPassword);
-        const response = await axios.put(`${API_BASE_URL}/users/${userId}`, { password: newPassword });
-  
-        console.log('Received response', response);
+        const response = await axiosInstance.put(`/users/${userId}`, { password: newPassword });
   
         if (response.data) {
             return response.data;
@@ -192,67 +174,67 @@ export async function changeUserPassword(userId: number, newPassword: string): P
 }
 
 export const deleteUser = async (userId: number): Promise<void> => {
-    await axios.delete(`${API_BASE_URL}/users/${userId}`);
+    await axiosInstance.delete(`/users/${userId}`);
 }
 
 export async function getReservationByID(user_id: string): Promise<Reservation[]> {
-    const response = await axios.get<Reservation[]>(`${API_BASE_URL}/reservations/user/${user_id}`);
+    const response = await axiosInstance.get<Reservation[]>(`/reservations/user/${user_id}`);
     return response.data;
 }
 
 export async function getReservations(): Promise<Reservation[]> {
-    const response = await axios.get<Reservation[]>(`${API_BASE_URL}/reservations`);
+    const response = await axiosInstance.get<Reservation[]>('/reservations');
     return response.data;
 }
 
 
 export async function addReservation(newReservation: Partial<Reservation>): Promise<Reservation> {
-    const response = await axios.post<Reservation>(`${API_BASE_URL}/reservations`, newReservation);
+    const response = await axiosInstance.post<Reservation>('/reservations', newReservation);
     return response.data;
 }
 
 export async function updateReservation(id: number, updatedReservation: Partial<Reservation>): Promise<Reservation> {
-    const response = await axios.put<Reservation>(`${API_BASE_URL}/reservations/${id}`, updatedReservation);
+    const response = await axiosInstance.put<Reservation>(`/reservations/${id}`, updatedReservation);
     return response.data;
 }
 
 export async function deleteReservation(id: number): Promise<void> {
-    await axios.delete(`${API_BASE_URL}/reservations/${id}`);
+    await axiosInstance.delete(`/reservations/${id}`);
 }
 
 export async function getExcludes(): Promise<Exclude[]> {
-    const response = await axios.get<Exclude[]>(`${API_BASE_URL}/exclude`);
+    const response = await axiosInstance.get<Exclude[]>('/exclude');
     return response.data;
 }
 
 export async function addExclude(newExclude: Partial<Exclude>): Promise<Exclude> {
-    const response = await axios.post<Exclude>(`${API_BASE_URL}/exclude`, newExclude);
+    const response = await axiosInstance.post<Exclude>('/exclude', newExclude);
     return response.data;
 }
 
 export async function deleteExclude(id: number): Promise<void> {
-    await axios.delete(`${API_BASE_URL}/exclude/${id}`);
+    await axiosInstance.delete(`/exclude/${id}`);
 }
 
 export async function getTimeFlag(): Promise<TimeFlag> {
-    const response = await axios.get<TimeFlag>(`${API_BASE_URL}/timeflag`);
+    const response = await axiosInstance.get<TimeFlag>('/timeflag');
     return response.data;
 }
 
 export async function getTimeFlagByID(id: number): Promise<TimeFlag> {
-    const response = await axios.get<TimeFlag>(`${API_BASE_URL}/timeflag/${id}`);
+    const response = await axiosInstance.get<TimeFlag>(`/timeflag/${id}`);
     console.log(response.data);
     return response.data;
 }
 export async function updateTimeFlag(timeFlag: TimeFlag): Promise<TimeFlag> {
     console.log(timeFlag);
-    const response = await axios.put<TimeFlag>(`${API_BASE_URL}/timeflag/${timeFlag.id}`, {
+    const response = await axiosInstance.put<TimeFlag>(`/timeflag/${timeFlag.id}`, {
         time_flag: timeFlag.time_flag // ensure the data is sent as JSON
     });
     return response.data;
 }
 
 export async function getStatistics(year: number, month: number, page: number = 1, perPage: number = 10): Promise<Statistics> {
-    const response = await axios.get<Statistics>(`${API_BASE_URL}/statistics/${year}/${month}?page=${page}&per_page=${perPage}`);
+    const response = await axiosInstance.get<Statistics>(`/statistics/${year}/${month}?page=${page}&per_page=${perPage}`);
     return response.data;
 }
