@@ -5,11 +5,15 @@ types.tsに定義されている型を使用すること
 */
 import axios from 'axios';
 import { Workplace, Bento, Reservation, User, Login, TimeFlag,Statistics, Exclude } from './types';
-import { useAuth } from './authContext';
-import { th } from 'date-fns/locale';
 
-// const API_BASE_URL = 'http://192.168.20.10:5000/api';
-const API_BASE_URL = 'http://localhost:5000/api';
+const DEFAULT_API_BASE_URL = 'http://localhost:5000/api';
+
+export function resolveApiBaseUrl(): string {
+    const configuredBaseUrl = process.env.REACT_APP_API_BASE_URL?.trim();
+    return configuredBaseUrl ? configuredBaseUrl.replace(/\/+$/, '') : DEFAULT_API_BASE_URL;
+}
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 
 
